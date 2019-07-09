@@ -31,18 +31,20 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'smart_selects',
     'Fahrerteam.apps.FahrerteamConfig',
     'Bus.apps.BusConfig',
     'Einsatztage.apps.EinsatztageConfig',
     'Klienten.apps.KlientenConfig',
     'Tour.apps.TourConfig',
+    'jet.dashboard',
+    'jet',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'smart_selects',
 ]
 
 MIDDLEWARE = [
@@ -132,3 +134,6 @@ STATIC_URL = '/static/'
 
 USE_DJANGO_JQUERY = True
 
+# JET_DEFAULT_THEME = 'light-gray'
+JET_SIDE_MENU_COMPACT = True
+JET_CHANGE_FORM_SIBLING_LINKS = True

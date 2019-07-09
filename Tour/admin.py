@@ -1,15 +1,70 @@
 from django.contrib import admin
 
-from Klienten.models import Klienten
+from Klienten.models import Klienten, Orte, Strassen
+from Einsatztage.models import Einsatztag
 from .models import Tour
+from datetime import datetime, timedelta
+import time
+import googlemaps
 
-class KlientenInline(admin.TabularInline):
-	model = Klienten
-	fk_name = "klient"
+class DistanceMatrix():
 
+	def setUp(self):
+		self.key = 'AIzaSyAFnpYcStEl-LIKHKH1_5OIK0ghQKkECrw '
+		self.client = googlemaps.Client(self.key)
+
+	def getMatrix(self, o, d, startdatum, startzeit):
+
+		origins      = [o.strasse.strasse+" "+o.hausnr+", "+o.ort.ort]
+		destinations = [d.strasse.strasse+" "+d.hausnr+", "+d.ort.ort]
+		startuhrzeit = datetime.combine(startdatum, startzeit)
+
+		matrix = self.client.distance_matrix(origins, destinations, departure_time=startuhrzeit)
+
+		dist  = matrix['rows'][0]['elements'][0]['distance']['text']
+		dura  = matrix['rows'][0]['elements'][0]['duration']['text']
+		arrivaltime = (startuhrzeit + timedelta(seconds=matrix['rows'][0]['elements'][0]['duration']['value'])).time()
+
+		return [dist,dura, arrivaltime]
+
+#class KlientenInline(admin.TabularInline):
+#	model = Klienten
+#	fk_name = "klient"
 
 class TourAdmin(admin.ModelAdmin):
-	list_display = ('bus', 'klient', 'uhrzeit')
-	autocomplete_fields = ('klient',)
+	def abholort(self, obj):
+		if (obj.klient == obj.abholklient):
+			return ', '.join([obj.abholklient.ort.ort, obj.abholklient.strasse.strasse +" "+obj.abholklient.hausnr])
+		else:
+			return ', '.join([obj.abholklient.name, obj.abholklient.ort.ort, obj.abholklient.strasse.strasse +" "+obj.abholklient.hausnr])
+
+	def zielort(self, obj):
+		if (obj.klient == obj.zielklient):
+			return ', '.join([obj.zielklient.ort.ort, obj.zielklient.strasse.strasse +" "+obj.zielklient.hausnr])
+		else:
+			return ', '.join([obj.zielklient.name, obj.zielklient.ort.ort, obj.zielklient.strasse.strasse +" "+obj.zielklient.hausnr])
+	
+	list_display = ('klient', 'bus', 'datum', 'uhrzeit', 'abholort', 'zielort', 'entfernung', 'ankunft')
+	readonly_fields = ('entfernung','ankunft','bus')
+	list_filter = ('datum','bus')
+	list_editable = ('uhrzeit',)
+	ordering = ('uhrzeit',)
+
+	def formfield_for_foreignkey(self, db_field, request, **kwargs):
+		if db_field.name == "datum":
+			kwargs["queryset"] = Einsatztag.objects.filter(archiv=False)
+		return super().formfield_for_foreignkey(db_field, request, **kwargs)
+	
+	def save_model(self, request, obj, form, change):
+		# Entfernung und Fahrzeit aus GoogleMaps holen
+		DM = DistanceMatrix()
+		DM.setUp()
+		googleList = DM.getMatrix(obj.abholklient, obj.zielklient, obj.datum.datum, obj.uhrzeit)
+		obj.entfernung = googleList[0]
+		obj.ankunft = googleList[2]
+		# Bus nach Klientenort setzen
+		obj.bus = obj.klient.ort.bus
+		obj.user = request.user
+		super().save_model(request, obj, form, change)
 
 admin.site.register(Tour, TourAdmin)

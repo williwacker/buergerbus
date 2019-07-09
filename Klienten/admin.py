@@ -1,20 +1,23 @@
 from django.contrib import admin
+from jet.filters import RelatedFieldAjaxListFilter
 
 from .models import Klienten, Orte, Strassen
 
 class KlientenAdmin(admin.ModelAdmin):
 	search_fields = ('name',)
-	autocomplete_fields = ('strasse',)
 	ordering = ('name',)
-	list_filter = ('ort',)
 	list_display = ('name', 'telefon', 'ort', 'strasse', 'hausnr' )
+	list_editable = ('telefon','ort','strasse','hausnr')
+	list_display_links = ('name',)
 	fieldsets = (
 		('Stammdaten', { 'fields': ('name', 'telefon', 'mobil')}),
-		('Adresse', {'fields': ('ort', 'strasse', 'hausnr')})
+		('Adresse', {'fields': ('ort', 'strasse', 'hausnr')}),
+		('Weitere Info', {'fields': ('dsgvo', 'bemerkung')})
 )
 class OrteAdmin(admin.ModelAdmin):
 	list_display = ('ort','bus')
 	ordering = ('ort',)
+	readonly_fields = ('bus',)
 
 class StrassenAdmin(admin.ModelAdmin):
 	list_display = ('ort', 'strasse')

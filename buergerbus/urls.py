@@ -14,7 +14,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path, include, reverse
+from django.urls import path, include, reverse_lazy
 from django.conf.urls import url
 from smart_selects import urls as smart_selects_urls
 
@@ -26,5 +26,12 @@ urlpatterns = [
     path('Klienten/', include('Klienten.urls')),
     path('admin/', admin.site.urls),
     url(r'^chaining/', include('smart_selects.urls')),
+    url(r'^jet/', include('jet.urls', 'jet')),
+    url(r'^jet/dashboard/', include('jet.dashboard.urls', 'jet-dashboard')), #˓→Django JET dashboard URLS
+#    url(r'^admin/', include('admin.site.urls')),
 ]
+
+admin.site.site_header = "Bürgerbus Admin"
+admin.site.site_title = "Alzey-Land Bürgerbus Portal"
+admin.site.index_title = "Willkommen zum Bürgerbus Portal der VG Alzey-Land"
 
