@@ -20,8 +20,8 @@ from smart_selects import urls as smart_selects_urls
 
 
 urlpatterns = [
-    path('Bus/', include('Bus.urls')),
-    path('Fahrerteam/', include('Fahrerteam.urls')),
+    path('Einsatzmittel/', include('Einsatzmittel.urls')),
+    path('Team/', include('Team.urls')),
     path('Einsatztage/', include('Einsatztage.urls')),
     path('Klienten/', include('Klienten.urls')),
     path('admin/', admin.site.urls),

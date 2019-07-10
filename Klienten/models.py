@@ -14,7 +14,7 @@ DSGVO_AUSWAHL = [
 
 class Orte(models.Model):
 	ort    = models.CharField(max_length=50)
-	bus    = models.ForeignKey('Bus.Bus', null=True, blank=True, on_delete=models.CASCADE)
+	bus    = models.ForeignKey('Einsatzmittel.Bus', null=True, blank=True, on_delete=models.CASCADE)
 	def __str__(self):
 		return self.ort
 	

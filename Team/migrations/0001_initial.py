@@ -10,39 +10,39 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('Einsatzmittel', '0001_initial'),
-        ('Team', '0001_initial'),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Fahrtag',
+            name='Fahrer',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('datum', models.DateField(blank=True)),
-                ('archiv', models.BooleanField(default=False)),
+                ('name', models.CharField(max_length=200)),
+                ('email', models.EmailField(max_length=254)),
+                ('mobil', models.CharField(max_length=30)),
+                ('aktiv', models.BooleanField(default=True, max_length=1)),
                 ('updated_on', models.DateTimeField(auto_now=True, null=True)),
-                ('fahrer_nachmittag', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='nachmittag', to='Team.Fahrer')),
-                ('fahrer_vormittag', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='vormittag', to='Team.Fahrer')),
                 ('team', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, to='Einsatzmittel.Bus')),
             ],
             options={
-                'verbose_name': 'Fahrtag',
-                'verbose_name_plural': 'Fahrtage',
+                'verbose_name': 'Fahrer',
+                'verbose_name_plural': 'Fahrer',
             },
         ),
         migrations.CreateModel(
-            name='Buerotag',
+            name='Buerokraft',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('datum', models.DateField(blank=True)),
-                ('archiv', models.BooleanField(default=False)),
+                ('name', models.CharField(max_length=200)),
+                ('email', models.EmailField(max_length=254)),
+                ('mobil', models.CharField(max_length=30)),
+                ('aktiv', models.BooleanField(default=True, max_length=1)),
                 ('updated_on', models.DateTimeField(auto_now=True, null=True)),
-                ('mitarbeiter', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='Team.Buerokraft')),
                 ('team', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, to='Einsatzmittel.Buero')),
             ],
             options={
-                'verbose_name': 'Fahrtag',
-                'verbose_name_plural': 'Fahrtage',
+                'verbose_name': 'Bürokraft',
+                'verbose_name_plural': 'Bürokräfte',
             },
         ),
     ]

@@ -18,7 +18,7 @@ import django
 django.setup()
 
 from Klienten.models import Orte, Strassen
-from Bus.models import Bus
+from Einsatzmittel.models import Bus
 
 
 def read_names(filename): #read configuration from the configuration file and prepare a preferences dict

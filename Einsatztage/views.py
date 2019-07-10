@@ -2,7 +2,7 @@ from django.http import Http404
 from django.shortcuts import get_object_or_404, render
 from django.http import HttpResponse
 
-from .models import Einsatztag
+from .models import Fahrtag
 
 def index(request):
 	einsatz_liste = Einsatztag.objects.order_by('datum')

@@ -1,10 +1,10 @@
 from django.contrib import admin
+from django import forms
 
 from Klienten.models import Klienten, Orte, Strassen
-from Einsatztage.models import Einsatztag
+from Einsatztage.models import Fahrtag
 from .models import Tour
-from datetime import datetime, timedelta
-import time
+from datetime import datetime, timedelta, time
 import googlemaps
 
 class DistanceMatrix():
@@ -19,11 +19,16 @@ class DistanceMatrix():
 		destinations = [d.strasse.strasse+" "+d.hausnr+", "+d.ort.ort]
 		startuhrzeit = datetime.combine(startdatum, startzeit)
 
-		matrix = self.client.distance_matrix(origins, destinations, departure_time=startuhrzeit)
+		try:
+			matrix = self.client.distance_matrix(origins, destinations, departure_time=startuhrzeit)
 
-		dist  = matrix['rows'][0]['elements'][0]['distance']['text']
-		dura  = matrix['rows'][0]['elements'][0]['duration']['text']
-		arrivaltime = (startuhrzeit + timedelta(seconds=matrix['rows'][0]['elements'][0]['duration']['value'])).time()
+			dist  = matrix['rows'][0]['elements'][0]['distance']['text']
+			dura  = matrix['rows'][0]['elements'][0]['duration']['text']
+			arrivaltime = (startuhrzeit + timedelta(seconds=matrix['rows'][0]['elements'][0]['duration']['value'])).time()
+		except:
+			dist = "unbekannt"
+			dura = "unbekannt"
+			arrivaltime = time(0,0,0)
 
 		return [dist,dura, arrivaltime]
 
@@ -52,7 +57,9 @@ class TourAdmin(admin.ModelAdmin):
 
 	def formfield_for_foreignkey(self, db_field, request, **kwargs):
 		if db_field.name == "datum":
-			kwargs["queryset"] = Einsatztag.objects.filter(archiv=False)
+			kwargs["queryset"] = Fahrtag.objects.filter(archiv=False)
+#		if db_field.name == 'team':
+#			return BusChoiceField(queryset=Bus.objects.all())
 		return super().formfield_for_foreignkey(db_field, request, **kwargs)
 	
 	def save_model(self, request, obj, form, change):

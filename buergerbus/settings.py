@@ -32,10 +32,10 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'smart_selects',
-    'Fahrerteam.apps.FahrerteamConfig',
-    'Bus.apps.BusConfig',
+    'Einsatzmittel.apps.EinsatzmittelConfig',
     'Einsatztage.apps.EinsatztageConfig',
     'Klienten.apps.KlientenConfig',
+    'Team.apps.TeamConfig',    
     'Tour.apps.TourConfig',
     'jet.dashboard',
     'jet',
@@ -84,7 +84,7 @@ WSGI_APPLICATION = 'buergerbus.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'postgresql',
+        'NAME': 'postgres',
         'USER': 'postgres',
         'PASSWORD': 'postgres',
         'HOST': '127.0.0.1',
