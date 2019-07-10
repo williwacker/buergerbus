@@ -123,5 +123,9 @@ dmypy.json
 # Pyre type checker
 .pyre/
 postgresql.bak
-Einsatztage/migrations/__pycache__/0001_initial.cpython-36.pyc
-Einsatztage/migrations/__pycache__/0001_initial.cpython-36.pyc
+Einsatztage/migrations/__pycache__/
+Klienten/__pycache__/
+Klienten/migrations/__pycache__/
+Tour/__pycache__/
+buergerbus/__pycache__/
+
