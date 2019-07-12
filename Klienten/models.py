@@ -53,6 +53,12 @@ class Klienten(models.Model):
 	def __str__(self):
 		return self.name
 
+	def bus(self):
+		name = self.ort
+		rows = Orte.objects.filter(ort=name).values_list('bus',flat=True)
+		bus = [row for row in rows]
+		return bus[0]
+
 	class Meta():
 		verbose_name_plural = "Klienten"
 		verbose_name = "Klient"

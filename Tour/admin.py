@@ -7,6 +7,7 @@ from .models import Tour
 from datetime import datetime, timedelta, time
 import googlemaps
 
+
 class DistanceMatrix():
 
 	def setUp(self):
@@ -74,4 +75,13 @@ class TourAdmin(admin.ModelAdmin):
 		obj.user = request.user
 		super().save_model(request, obj, form, change)
 
+class TourInline(admin.TabularInline):
+    model = Tour
+    inline_actions = []
+
+    def has_add_permission(self):
+        return False
+
+
 admin.site.register(Tour, TourAdmin)
+#admin.site.register(TourInline)

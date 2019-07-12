@@ -1,6 +1,7 @@
 ﻿from django.db import models
 from django.utils import timezone
 from django.contrib.postgres.fields import ArrayField
+from multiselectfield import MultiSelectField
 
 BUS_TAGE_AUSWAHL = [
 	(None, 'Bitte Bus-Fahrtage auswählen'),
@@ -8,14 +9,14 @@ BUS_TAGE_AUSWAHL = [
 	('Mi,Fr', 'Mittwoch und Freitag'),
 ]
 
-BUERO_TAGE_AUSWAHL = [
+BUERO_TAGE_AUSWAHL = (
 	(None, 'Bitte Bürotage auswählen'),
 	('Mo,Di,Mi,Do', 'Montag, Dienstag, Mittwoch und Donnerstag'),
-]
+)
 
 class Buero(models.Model):
 	buero      = models.CharField(max_length=20)
-	buerotage  = models.CharField(choices=BUERO_TAGE_AUSWAHL, max_length=20, default='Mo,Di,Mi,Do')
+	buerotage  = models.CharField(choices=BUERO_TAGE_AUSWAHL, max_length=20, default='')
 	wird_verwaltet = models.BooleanField(max_length=1, default=False)
 	updated_on = models.DateTimeField(auto_now=True, blank=True, null=True)
 	def __str__(self):

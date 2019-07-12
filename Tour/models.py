@@ -9,10 +9,9 @@ from Klienten.models import Klienten, Orte
 class Tour(models.Model):
 	klient  = models.ForeignKey('Klienten.Klienten', related_name='klient', on_delete=models.CASCADE)
 	bus     = models.ForeignKey('Einsatzmittel.Bus', on_delete=models.CASCADE)
-#	datum   = models.ForeignKey('Einsatztage.Einsatztag', on_delete=models.CASCADE)
 	datum   = GroupedForeignKey(Fahrtag, 'team')
 #	datum = ChainedForeignKey(
-#        Einsatztag, # the model where you're populating your streets from
+#        Fahrtag, # the model where you're populating your streets from
 #        chained_field="klienten_bus", # the field on your own model that this field links to 
 #        chained_model_field="team", # the field on Einsatztag that corresponds to bus_id
 #		show_all=False,
