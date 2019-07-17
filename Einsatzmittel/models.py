@@ -33,6 +33,7 @@ class Bus(models.Model):
 	updated_on = models.DateTimeField(auto_now=True, blank=True, null=True)
 	def __str__(self):
 		return "Bus "+str(self.bus)
+#		return str(self.bus)
 
 	class Meta():
 		verbose_name_plural = "Busse"

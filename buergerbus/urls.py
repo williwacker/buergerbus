@@ -24,7 +24,7 @@ urlpatterns = [
     path('Team/', include('Team.urls')),
     path('Einsatztage/', include('Einsatztage.urls')),
     path('Klienten/', include('Klienten.urls')),
-    path('', admin.site.urls),
+#    path('', admin.site.urls),
     path('admin/', admin.site.urls),
     url(r'^chaining/', include('smart_selects.urls')),
     url(r'^jet/', include('jet.urls', 'jet')),
