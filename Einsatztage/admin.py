@@ -121,7 +121,7 @@ class FahrtagAdmin(admin.ModelAdmin):
     ordering = ('team', 'datum',)
     list_display = ('datum', 'team', 'fahrer_vormittag', 'fahrer_nachmittag')
     list_filter = ('team',)
-    list_editable = ('fahrer_vormittag','fahrer_nachmittag')
+#    list_editable = ('fahrer_vormittag','fahrer_nachmittag')
     readonly_fields = ('archiv',)
 
     def get_queryset(self, request):
@@ -154,7 +154,7 @@ class BuerotagAdmin(admin.ModelAdmin):
     ordering = ('team', 'datum',)
     list_display = ('datum', 'team', 'mitarbeiter')
     list_filter = ('team',)
-    list_editable = ('mitarbeiter',)
+#    list_editable = ('mitarbeiter',)
     readonly_fields = ('archiv',)
 
     def get_queryset(self, request):
@@ -164,7 +164,7 @@ class BuerotagAdmin(admin.ModelAdmin):
         return qs.filter(archiv=False)
 
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
-        if db_field.name == "mitarbieter":
+        if db_field.name == "mitarbeiter":
             kwargs["queryset"] = Buerokraft.objects.filter(aktiv=True)
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
 

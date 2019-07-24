@@ -1,8 +1,9 @@
 from django.contrib import admin
 from django import forms
 
-from Klienten.models import Klienten, Orte, Strassen
+from Klienten.models import Klienten, Orte, Strassen, KlientenBus
 from Einsatztage.models import Fahrtag
+from Einsatzmittel.models import Bus
 from .models import Tour
 from datetime import datetime, timedelta, time
 import googlemaps
@@ -50,8 +51,11 @@ class TourAdmin(admin.ModelAdmin):
 		else:
 			return ', '.join([obj.zielklient.name, obj.zielklient.ort.ort, obj.zielklient.strasse.strasse +" "+obj.zielklient.hausnr])
 	
+	def klientenbus(self, obj):
+		return obj.klient.bus
+
 	list_display = ('klient', 'bus', 'datum', 'uhrzeit', 'abholort', 'zielort', 'entfernung', 'ankunft')
-	readonly_fields = ('entfernung','ankunft','bus')
+	readonly_fields = ('entfernung','ankunft')
 	list_filter = ('datum','bus')
 	list_editable = ('uhrzeit',)
 	ordering = ('uhrzeit',)
@@ -59,8 +63,6 @@ class TourAdmin(admin.ModelAdmin):
 	def formfield_for_foreignkey(self, db_field, request, **kwargs):
 		if db_field.name == "datum":
 			kwargs["queryset"] = Fahrtag.objects.filter(archiv=False)
-#		if db_field.name == 'team':
-#			return BusChoiceField(queryset=Bus.objects.all())
 		return super().formfield_for_foreignkey(db_field, request, **kwargs)
 	
 	def save_model(self, request, obj, form, change):
@@ -70,8 +72,6 @@ class TourAdmin(admin.ModelAdmin):
 		googleList = DM.getMatrix(obj.abholklient, obj.zielklient, obj.datum.datum, obj.uhrzeit)
 		obj.entfernung = googleList[0]
 		obj.ankunft = googleList[2]
-		# Bus nach Klientenort setzen
-		obj.bus = obj.klient.ort.bus
 		obj.user = request.user
 		super().save_model(request, obj, form, change)
 

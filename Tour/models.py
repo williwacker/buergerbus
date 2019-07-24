@@ -3,20 +3,27 @@ from django.core.exceptions import ValidationError
 from smart_selects.db_fields import ChainedForeignKey, GroupedForeignKey
 import datetime
 
+from Einsatzmittel.models import Bus
 from Einsatztage.models import Fahrtag
-from Klienten.models import Klienten, Orte
+from Klienten.models import Klienten, Orte, KlientenBus
 
 class Tour(models.Model):
 	klient  = models.ForeignKey('Klienten.Klienten', related_name='klient', on_delete=models.CASCADE)
-	bus     = models.ForeignKey('Einsatzmittel.Bus', on_delete=models.CASCADE)
-	datum   = GroupedForeignKey(Fahrtag, 'team')
-#	datum = ChainedForeignKey(
-#        Fahrtag, # the model where you're populating your streets from
-#        chained_field="klienten_bus", # the field on your own model that this field links to 
-#        chained_model_field="team", # the field on Einsatztag that corresponds to bus_id
-#		show_all=False,
-#        auto_choose=True,
-#        sort=True)
+	bus     = ChainedForeignKey(
+		KlientenBus, # the model where you're populating your instances from
+		chained_field="klient", # the field on your own model that this field links to 
+		chained_model_field="name", # the field on the model above that corresponds to the chained field
+		show_all=False, 
+		null=False,
+        auto_choose=False
+	)
+	datum = ChainedForeignKey(
+        Fahrtag, # the model where you're populating your streets from
+        chained_field="bus", # the field on your own model that this field links to 
+        chained_model_field="team", # the field on Einsatztag that corresponds to bus_id
+		show_all=False,
+        auto_choose=True,
+        sort=True)
 	uhrzeit = models.TimeField()
 	abholklient  = models.ForeignKey('Klienten.Klienten', null=True, related_name='abholort', on_delete=models.CASCADE)
 	zielklient  = models.ForeignKey('Klienten.Klienten', null=True, related_name='zielort', on_delete=models.CASCADE)
@@ -26,7 +33,7 @@ class Tour(models.Model):
 	updated_on = models.DateTimeField(auto_now=True, blank=True, null=True)
 
 	def klienten_bus(self):
-		return self.klient.ort.bus_id
+		return self.klient.bus
 
 	def einsatz_bus(self):
 		rows = Fahrtag.objects.filter(datum=self.datum.datum).values_list('team',flat=True)
