@@ -2,6 +2,7 @@ from django.contrib import admin
 from jet.filters import RelatedFieldAjaxListFilter
 
 from .models import Klienten, Orte, Strassen, KlientenBus
+from Einsatzmittel.models import Bus
 
 class KlientenAdmin(admin.ModelAdmin):
 	search_fields = ('name',)
@@ -15,6 +16,11 @@ class KlientenAdmin(admin.ModelAdmin):
 		('Adresse', {'fields': ('ort', 'strasse', 'hausnr')}),
 		('Weitere Info', {'fields': ('dsgvo', 'bemerkung', 'bus')})
 	)
+
+	def formfield_for_foreignkey(self, db_field, request, **kwargs):
+		if db_field.name == "bus":
+			kwargs["queryset"] = Bus.objects.filter(wird_verwaltet=True)
+		return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
 	def get_readonly_fields(self, request, obj=None):
 		if obj:

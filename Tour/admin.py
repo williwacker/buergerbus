@@ -1,5 +1,5 @@
 from django.contrib import admin
-from django import forms
+#from django import forms
 
 from Klienten.models import Klienten, Orte, Strassen, KlientenBus
 from Einsatztage.models import Fahrtag
@@ -39,6 +39,13 @@ class DistanceMatrix():
 #	fk_name = "klient"
 
 class TourAdmin(admin.ModelAdmin):
+
+	list_display = ('klient', 'datum', 'uhrzeit', 'abholort', 'zielort', 'entfernung', 'ankunft')
+	readonly_fields = ('entfernung','ankunft')
+	list_filter = ('datum',)
+	list_editable = ('uhrzeit',)
+	ordering = ('datum','uhrzeit',)
+
 	def abholort(self, obj):
 		if (obj.klient == obj.abholklient):
 			return ', '.join([obj.abholklient.ort.ort, obj.abholklient.strasse.strasse +" "+obj.abholklient.hausnr])
@@ -51,16 +58,13 @@ class TourAdmin(admin.ModelAdmin):
 		else:
 			return ', '.join([obj.zielklient.name, obj.zielklient.ort.ort, obj.zielklient.strasse.strasse +" "+obj.zielklient.hausnr])
 	
-	def klientenbus(self, obj):
-		return obj.klient.bus
-
-	list_display = ('klient', 'bus', 'datum', 'uhrzeit', 'abholort', 'zielort', 'entfernung', 'ankunft')
-	readonly_fields = ('entfernung','ankunft')
-	list_filter = ('datum','bus')
-	list_editable = ('uhrzeit',)
-	ordering = ('uhrzeit',)
+#	def klientenbus(self, obj):
+#		return obj.klient.bus
 
 	def formfield_for_foreignkey(self, db_field, request, **kwargs):
+		if db_field.name == "bus":
+			kwargs["queryset"] = Bus.objects.filter(wird_verwaltet=True)
+#			kwargs["queryset"] = Bus.objects.filter(bus__in=[3,4])
 		if db_field.name == "datum":
 			kwargs["queryset"] = Fahrtag.objects.filter(archiv=False)
 		return super().formfield_for_foreignkey(db_field, request, **kwargs)
