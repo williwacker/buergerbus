@@ -1,0 +1,44 @@
+{% extends 'Einsatztage/header.html' %}
+{% block title %}<title>Fahrer ändern</title>{% endblock %}
+{% block content %}
+        <h1>Fahrer ändern</h1>
+        <fieldset class="module aligned ">
+                <div class="form-row field-datum">
+                        <div>
+                                <label for="id_datum">Datum:</label>
+                                <p>{{ fahrer.datum }}</p>
+                        </div>
+                </div>
+                <div class="form-row field-team">
+                        <div>
+                                <label for="id_team">Team:</label>
+                                <p>{{ fahrer.team }}</p>    
+                        </div>
+                </div>
+                <div class="form-row field-fahrer_vormittag">
+                        <div>
+                                <label for="id_fahrer_vormittag">Fahrer vormittag:</label>
+                                <div class="related-widget-wrapper">
+                                        <select name="fahrer_vormittag" id="id_fahrer_vormittag" data-chainfield="team" data-url="/chaining/filter/Team/Fahrer/team/Einsatztage/Fahrtag/fahrer_vormittag" data-value="1" data-auto_choose="false" data-empty_label="--------" name="fahrer_vormittag" class="chained-fk">
+                                                <option value="1" selected>{{ fahrer.vormittag }}</option>         
+                                        </select>
+                                </div>
+                        </div>
+                </div>
+                <div class="form-row field-fahrer_nachmittag">
+                        <div>
+                                <label for="id_fahrer_nachmittag">Fahrer nachmittag:</label>
+                                <div class="related-widget-wrapper">
+                                        <select name="fahrer_nachmittag" id="id_fahrer_nachmittag" data-chainfield="team" data-url="/chaining/filter/Team/Fahrer/team/Einsatztage/Fahrtag/fahrer_nachmittag" data-value="null" data-auto_choose="false" data-empty_label="--------" name="fahrer_nachmittag" class="chained-fk">
+                                        </select>
+                                </div>
+                        </div>
+                </div>
+                <div class="form-row field-archiv">
+                        <div>
+                                <label>Archiv:</label>
+                                <p><img src="/static/admin/img/icon-yes.svg" alt="True"></p>
+                        </div>
+                </div>
+        </fieldset>        
+{% endblock %}

@@ -1,0 +1,34 @@
+{% extends 'Einsatztage/header.html' %}
+{% block title %}<title>Fahrer Übersicht</title>{% endblock %}
+{% block content %}
+<h1>Fahrer Übersicht</h1>
+{% if einsatz_liste %}
+<div class="results">
+    <table id="result_list">
+        <thead>
+            <th>Datum</th><th>Team</th><th>Fahrer Vormittag</th><th>Fahrer Nachmittag</th><th>Anzahl Klienten</th><th>Aktionen</th>
+        </thead>    
+    {% for einsatz in einsatz_liste %}
+        <tr><td><a href="/Einsatztage/{{ einsatz.id }}/">{{ einsatz.datum }}</a></td>
+            <td>{{ einsatz.team }}</td>
+            <td>{{ einsatz.fahrer_vormittag }}</td>
+            <td>{{ einsatz.fahrer_nachmittag }}</td>
+            <td>{{ einsatz.klienten_anzahl }}</td>
+            <td>
+            {% if einsatz.klienten_anzahl > 0 %}
+                {% load static %}
+                <a href="/Einsatztage/{{ einsatz.id }}/tour/"><img src="{% static "/project/img/fahrplan.png" %}" alt="Tour anzeigen" title="Tour anzeigen"></a>
+                <a href="/Einsatztage/{{ einsatz.id }}/tourAsPDF/"><img src="{% static "/project/img/icon_pdf.png" %}" alt="PDF erzeugen" title="PDF erzeugen"></a>
+            {% else %}
+                &nbsp;
+            {% endif %}
+            </td>
+        </tr>
+    {% endfor %}
+    </table>
+</div>
+
+{% else %}
+    <p>Keine Fahrtage eingetragen.</p>
+{% endif %}
+{% endblock %}
