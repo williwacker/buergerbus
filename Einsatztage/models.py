@@ -1,6 +1,8 @@
 ﻿import datetime
 
+from django.forms import ModelForm
 from django.db import models
+from django.conf import settings
 from django.utils import timezone
 from Team.models import Fahrer, Buerokraft
 from smart_selects.db_fields import ChainedForeignKey, GroupedForeignKey
@@ -30,17 +32,24 @@ class Fahrtag(models.Model):
         sort=True)		
 	archiv     = models.BooleanField(default=False)
 	updated_on = models.DateTimeField(auto_now=True, blank=True, null=True)
+	updated_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL)
+
 	def __str__(self):
 		return str(self.datum)
-
-#	def KlientenAnzahl(self):
-#		from Tour.models import Tour
-#		print(self.team)
-#		return Tour.objects.filter(bus_id=self.team).count()
+	
+	@property
+	def klienten_anzahl(self):
+		from Tour.models import Tour
+		return Tour.objects.filter(datum_id=self.id).count()
 
 	class Meta():
 		verbose_name_plural = "Fahrtage"
 		verbose_name = "Fahrtag"
+
+class FahrtagForm(ModelForm):
+	class Meta:
+		model = Fahrtag
+		fields = ['datum', 'team', 'fahrer_vormittag', 'fahrer_nachmittag']
 
 class Buerotag(models.Model):
 	datum      = models.DateField(blank=True)
@@ -57,6 +66,8 @@ class Buerotag(models.Model):
         sort=True)	
 	archiv     = models.BooleanField(default=False)
 	updated_on = models.DateTimeField(auto_now=True, blank=True, null=True)
+	updated_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL)
+
 	def __str__(self):
 		return str(self.datum)
 

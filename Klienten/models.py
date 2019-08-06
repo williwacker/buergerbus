@@ -2,6 +2,7 @@ import datetime
 
 from django.db import models
 from django.utils import timezone
+from django.conf import settings
 from smart_selects.db_fields import ChainedForeignKey, GroupedForeignKey
 from Einsatzmittel.models import Bus
 
@@ -61,8 +62,9 @@ class Klienten(models.Model):
 	)
 	hausnr  = models.CharField(max_length=10)
 	dsgvo   = models.CharField(choices=DSGVO_AUSWAHL, max_length=2, blank=True, default='01')
-	bemerkung = models.CharField(max_length=200, blank=True, null=True)
+	bemerkung = models.TextField(max_length=200, blank=True, null=True)
 	updated_on = models.DateTimeField(auto_now=True, blank=True, null=True)
+	updated_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL)
 	
 	def __str__(self):
 		return self.name

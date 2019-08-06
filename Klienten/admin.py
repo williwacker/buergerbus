@@ -33,6 +33,7 @@ class KlientenAdmin(admin.ModelAdmin):
 		if (obj.bus is None):
 			obj.bus = obj.ort.bus
 		obj.user = request.user
+		obj.updated_by = request.user
 		super().save_model(request, obj, form, change)
 
 		if (KlientenBus.objects.filter(name_id=obj.id).count() == 0):

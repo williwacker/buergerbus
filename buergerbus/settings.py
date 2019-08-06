@@ -46,9 +46,11 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'multiselectfield',
+    'debug_toolbar',
 ]
 
 MIDDLEWARE = [
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -63,7 +65,9 @@ ROOT_URLCONF = 'buergerbus.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [
+            os.path.join(BASE_DIR, 'templates'),
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -132,9 +136,29 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, "static"),
+]
+
 
 USE_DJANGO_JQUERY = True
 
 # JET_DEFAULT_THEME = 'light-gray'
 JET_SIDE_MENU_COMPACT = True
 JET_CHANGE_FORM_SIBLING_LINKS = True
+
+INTERNAL_IPS = [
+    # ...
+    '127.0.0.1',
+    # ...
+]
+
+import configparser
+cfg = configparser.ConfigParser()
+cfg.optionxform=str
+cfg.read('secret_googlemaps_key.txt', encoding='utf-8')
+for section in cfg:
+    if (section == 'DEFAULT'):
+        for name, value in cfg.items('DEFAULT'):
+            if (name == 'GOOGLEMAPS_KEY'):
+                GOOGLEMAPS_KEY = value.strip("'")

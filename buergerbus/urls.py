@@ -17,19 +17,22 @@ from django.contrib import admin
 from django.urls import path, include, reverse_lazy
 from django.conf.urls import url
 from smart_selects import urls as smart_selects_urls
+import debug_toolbar
 
 
 urlpatterns = [
+    path('accounts/', include('django.contrib.auth.urls')),
     path('Einsatzmittel/', include('Einsatzmittel.urls')),
-    path('Team/', include('Team.urls')),
+    path('Tour/', include('Tour.urls')),
     path('Einsatztage/', include('Einsatztage.urls')),
     path('Klienten/', include('Klienten.urls')),
-#    path('', admin.site.urls),
+    path('Team/', include('Team.urls')),    
     path('admin/', admin.site.urls),
     url(r'^chaining/', include('smart_selects.urls')),
     url(r'^jet/', include('jet.urls', 'jet')),
     url(r'^jet/dashboard/', include('jet.dashboard.urls', 'jet-dashboard')), #˓→Django JET dashboard URLS
 #    url(r'^admin/', include('admin.site.urls')),
+    path('__debug__/', include(debug_toolbar.urls)),
 ]
 
 admin.site.site_header = "Bürgerbus Admin"

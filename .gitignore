@@ -123,10 +123,6 @@ dmypy.json
 # Pyre type checker
 .pyre/
 postgresql.bak
-Einsatztage/migrations/__pycache__/*
-Klienten/__pycache__/*
-Klienten/migrations/__pycache__/*
-Tour/__pycache__/*
-Tour/migrations/__pycache__/*
-buergerbus/__pycache__/*
 
+
+secret_googlemaps_key.txt

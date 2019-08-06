@@ -1,4 +1,4 @@
-from django.contrib import admin
+﻿from django.contrib import admin
 import datetime, time
 from berechnung_feiertage import Holidays
 from Einsatztage.models import Fahrtag, Buerotag
@@ -11,12 +11,12 @@ class FahrtageSchreiben():
 
     def read_bus_tage(self):
         bus_dict = {}
-        rows = Bus.objects.filter(wird_verwaltet=True).values_list('bus', flat=True)
+        rows = Bus.objects.values_list('bus', flat=True)
         managed_busses = [row for row in rows]
 
         for bus in managed_busses:
             tage_nr = []
-            rows = Bus.objects.filter(bus=bus).values_list('fahrtage', flat=True)
+            rows = Bus.objects.values_list('fahrtage', flat=True)
             fahrtage = [row for row in rows]
             if (fahrtage):
                 for tag in fahrtage[0].split(","):
@@ -24,7 +24,7 @@ class FahrtageSchreiben():
                         if tag in wochentage[i]:
                             tage_nr.append(i)
                 bus_dict[bus] = tage_nr
-        return(bus_dict)    
+        return(bus_dict)
 
     def write_new_fahrtage(self,changedate):
         # die nächsten Feiertage ausrechnen
@@ -78,7 +78,7 @@ class BuerotageSchreiben():
                         if tag in wochentage[i]:
                             tage_nr.append(i)
                 buero_dict[id] = tage_nr
-        return(buero_dict)    
+        return(buero_dict)
 
     def write_new_buerotage(self,changedate):
         # die nächsten Feiertage ausrechnen
@@ -119,7 +119,7 @@ class FahrtagAdmin(admin.ModelAdmin):
     fields = ('datum', 'team', 'fahrer_vormittag', 'fahrer_nachmittag', 'archiv' )
     search_fields = ('datum',)
     ordering = ('team', 'datum',)
-    list_display = ('datum', 'team', 'fahrer_vormittag', 'fahrer_nachmittag')
+    list_display = ('datum', 'team', 'fahrer_vormittag', 'fahrer_nachmittag', 'klienten_anzahl')
     list_filter = ('team',)
 #    list_editable = ('fahrer_vormittag','fahrer_nachmittag')
     readonly_fields = ('archiv',)
@@ -140,6 +140,7 @@ class FahrtagAdmin(admin.ModelAdmin):
         ETS.archive_past_fahrtage()
         ETS.write_new_fahrtage(obj.datum)
         obj.user = request.user
+        obj.updated_by = request.user
         super().save_model(request, obj, form, change)
 
 admin.site.register(Fahrtag, FahrtagAdmin)
@@ -149,13 +150,27 @@ admin.site.register(Fahrtag, FahrtagAdmin)
 ##############################
 
 class BuerotagAdmin(admin.ModelAdmin):
-    fields = ('datum', 'team', 'mitarbeiter', 'archiv' )
+#    fields = ('datum', 'team', 'mitarbeiter', 'archiv' )
     search_fields = ('datum',)
     ordering = ('team', 'datum',)
-    list_display = ('datum', 'team', 'mitarbeiter')
+#    list_display = ('datum', 'team', 'mitarbeiter')
     list_filter = ('team',)
 #    list_editable = ('mitarbeiter',)
     readonly_fields = ('archiv',)
+
+    def get_form(self, request, obj=None, **kwargs):
+        if request.user.is_superuser:
+            self.fields = ['datum', 'team', 'mitarbeiter', 'archiv']
+        else:
+            self.fields = ['datum', 'team', 'mitarbeiter']
+        return super(BuerotagAdmin, self).get_form(request, obj=None, **kwargs)
+
+    def changelist_view(self, request, extra_context=None):
+        if request.user.is_superuser:
+            self.list_display = ['datum', 'team', 'mitarbeiter', 'archiv']
+        else:
+            self.list_display = ['datum', 'team', 'mitarbeiter']
+        return super(BuerotagAdmin, self).changelist_view(request, extra_context)
 
     def get_queryset(self, request):
         qs = super(BuerotagAdmin, self).get_queryset(request)
