@@ -1,20 +1,22 @@
-{% extends 'Einsatztage/header.html' %}
+{% extends 'Basis/header.html' %}
 {% block title %}<title>Tour anzeigen</title>{% endblock %}
 {% block content %}
-        <h1>Fahrplan Bus {{ fahrtag_liste.team.bus }} am {{ fahrtag_liste.datum }}</h1>
+<div class="results">
+    <h1>Fahrplan Bus {{ fahrtag_liste.team.bus }} am {{ fahrtag_liste.datum }}</h1>
 {%if fahrtag_liste %}
-<table class="headline">
-    <tr>
-        <td class="name">Fahrer Vormittag:</td><td class="value">{{ fahrtag_liste.fahrer_vormittag.name }}</td>
-    </tr>
-    <tr>
-        <td class="name">Fahrer Nachmittag:</td><td class="value">{{ fahrtag_liste.fahrer_nachmittag.name }}</td>
-    </tr>
-</table>
+    <table class="result_list">
+        <thead>
+            <th class="name">Fahrer Vormittag:</th>
+            <th class="name">Fahrer Nachmittag:</th>
+        </thead>
+        <tr>
+            <td class="value">{{ fahrtag_liste.fahrer_vormittag.name|default_if_none:"-" }}</td>
+            <td class="value">{{ fahrtag_liste.fahrer_nachmittag.name|default_if_none:"-" }}</td>
+        </tr>
+    </table>
 {% endif %}
 
 {% if tour_liste %}
-<div class="results">
     <table id="result_list">
         <thead>
             <th>Klient</th><th>Telefon</th><th>Uhrzeit</th><th>Abholort</th><th>Zielort</th><th>Entfernung</th><th>Ankunft</th><th>Bemerkungen</th>

@@ -1,4 +1,4 @@
-{% extends 'Einsatztage/header.html' %}
+{% extends 'Basis/header.html' %}
 {% block title %}<title>Fahrer ändern</title>{% endblock %}
 {% block content %}
         <h1>Fahrer ändern</h1>
@@ -20,7 +20,7 @@
                                 <label for="id_fahrer_vormittag">Fahrer vormittag:</label>
                                 <div class="related-widget-wrapper">
                                         <select name="fahrer_vormittag" id="id_fahrer_vormittag" data-chainfield="team" data-url="/chaining/filter/Team/Fahrer/team/Einsatztage/Fahrtag/fahrer_vormittag" data-value="1" data-auto_choose="false" data-empty_label="--------" name="fahrer_vormittag" class="chained-fk">
-                                                <option value="1" selected>{{ fahrer.vormittag }}</option>         
+                                                <option value="1" selected>{{ fahrer.vormittag|default_if_none:"-" }}</option>         
                                         </select>
                                 </div>
                         </div>

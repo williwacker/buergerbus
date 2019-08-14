@@ -1,10 +1,12 @@
 from django.urls import path
-
-from . import views
+from .views import TourenView, TourAddView, TourAddView2, TourChangeView, TourDeleteView
+#from .forms import TourAddForm1, TourAddForm2
 
 app_name = 'Tour'
 urlpatterns = [
-    path('', views.index, name='index'),
-    path('<int:id>/', views.detail, name='detail'),
-    path('<int:id>/results/', views.results, name='results'),
+	path('touren/', TourenView.as_view()),
+	path('tour/add/', TourAddView.as_view()),
+	path('tour/add/<int:pk>/', TourAddView2.as_view()),
+	path('touren/<int:pk>/', TourChangeView.as_view()),
+	path('<int:pk>/delete/', TourDeleteView.as_view()),
 ]

@@ -29,6 +29,21 @@ class Tour(models.Model):
 	updated_on = models.DateTimeField(auto_now=True, blank=True, null=True)
 	updated_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL)
 
+	@property
+	def abholort(self):
+		if (self.klient == self.abholklient):
+			return ', '.join([self.abholklient.ort.ort, self.abholklient.strasse.strasse +" "+self.abholklient.hausnr])
+		else:
+			return ', '.join([self.abholklient.name, self.abholklient.ort.ort, self.abholklient.strasse.strasse +" "+self.abholklient.hausnr])
+
+	@property
+	def zielort(self):
+		if (self.klient == self.zielklient):
+			return ', '.join([self.zielklient.ort.ort, self.zielklient.strasse.strasse +" "+self.zielklient.hausnr])
+		else:
+			return ', '.join([self.zielklient.name, self.zielklient.ort.ort, self.zielklient.strasse.strasse +" "+self.zielklient.hausnr])
+
+	
 	def klienten_bus(self):
 		return str(self.klient.bus)
 
@@ -43,7 +58,6 @@ class Tour(models.Model):
 	def clean(self):
 		if (self.einsatz_bus() != self.klienten_bus()):
 			raise ValidationError(" ".join([str(self.einsatz_bus()), 'ist nicht dem Klienten zugeordnet']))
-#			raise ValidationError(" ".join([str(self.klienten_bus()), 'verkehrt an diesem Tag nicht']))
 
 	class Meta():
 		verbose_name_plural = "Touren"

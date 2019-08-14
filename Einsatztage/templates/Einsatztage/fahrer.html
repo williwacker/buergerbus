@@ -1,18 +1,20 @@
-{% extends 'Einsatztage/header.html' %}
-{% block title %}<title>Fahrer Übersicht</title>{% endblock %}
+{% extends 'Basis/header.html' %}
+{% block title %}<title>Fahrer Einsatztage</title>{% endblock %}
 {% block content %}
-<h1>Fahrer Übersicht</h1>
 {% if einsatz_liste %}
 <div class="results">
+    <h1>Fahrer Einsatztage</h1>
     <table id="result_list">
         <thead>
-            <th>Datum</th><th>Team</th><th>Fahrer Vormittag</th><th>Fahrer Nachmittag</th><th>Anzahl Klienten</th><th>Aktionen</th>
+            <th>Datum</th><th>Wochentag</th><th>Team</th><th>Fahrer Vormittag</th><th>Fahrer Nachmittag</th><th>Anzahl Klienten</th><th>Aktionen</th>
         </thead>    
     {% for einsatz in einsatz_liste %}
-        <tr><td><a href="/Einsatztage/{{ einsatz.id }}/">{{ einsatz.datum }}</a></td>
+        <tr>
+            <td><a href="/Einsatztage/{{ einsatz.id }}/">{{ einsatz.datum }}</a></td>
+            <td>{{ einsatz.wochentag }}</td>
             <td>{{ einsatz.team }}</td>
-            <td>{{ einsatz.fahrer_vormittag }}</td>
-            <td>{{ einsatz.fahrer_nachmittag }}</td>
+            <td>{{ einsatz.fahrer_vormittag|default_if_none:"-" }}</td>
+            <td>{{ einsatz.fahrer_nachmittag|default_if_none:"-" }}</td>
             <td>{{ einsatz.klienten_anzahl }}</td>
             <td>
             {% if einsatz.klienten_anzahl > 0 %}

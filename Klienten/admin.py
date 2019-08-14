@@ -1,8 +1,18 @@
 from django.contrib import admin
+from django.contrib.admin.options import ModelAdmin
 from jet.filters import RelatedFieldAjaxListFilter
 
 from .models import Klienten, Orte, Strassen, KlientenBus
+#from .forms import KlientenForm
+from .sites import my_admin_site
 from Einsatzmittel.models import Bus
+
+#class KlientenModelAdmin(admin.ModelAdmin):
+#	form = KlientenForm()
+
+# Register both models to our custom admin site
+#my_admin_site.register(Orte, ModelAdmin)
+#my_admin_site.register(Klienten, KlientenModelAdmin)
 
 class KlientenAdmin(admin.ModelAdmin):
 	search_fields = ('name',)
@@ -14,12 +24,10 @@ class KlientenAdmin(admin.ModelAdmin):
 	fieldsets = (
 		('Stammdaten', { 'fields': ('name', 'telefon', 'mobil')}),
 		('Adresse', {'fields': ('ort', 'strasse', 'hausnr')}),
-		('Weitere Info', {'fields': ('dsgvo', 'bemerkung', 'bus')})
+		('Weitere Info', {'fields': ('dsgvo', 'typ', 'bemerkung', 'bus')})
 	)
 
 	def formfield_for_foreignkey(self, db_field, request, **kwargs):
-		if db_field.name == "bus":
-			kwargs["queryset"] = Bus.objects.filter(wird_verwaltet=True)
 		return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
 	def get_readonly_fields(self, request, obj=None):

@@ -42,14 +42,14 @@ class Fahrtag(models.Model):
 		from Tour.models import Tour
 		return Tour.objects.filter(datum_id=self.id).count()
 
+	@property
+	def wochentag(self):
+		wochentage = ['Mo','Di','Mi','Do','Fr','Sa','So']
+		return wochentage[self.datum.weekday()]
+
 	class Meta():
 		verbose_name_plural = "Fahrtage"
 		verbose_name = "Fahrtag"
-
-class FahrtagForm(ModelForm):
-	class Meta:
-		model = Fahrtag
-		fields = ['datum', 'team', 'fahrer_vormittag', 'fahrer_nachmittag']
 
 class Buerotag(models.Model):
 	datum      = models.DateField(blank=True)
@@ -71,6 +71,11 @@ class Buerotag(models.Model):
 	def __str__(self):
 		return str(self.datum)
 
+	@property
+	def wochentag(self):
+		wochentage = ['Mo','Di','Mi','Do','Fr','Sa','So']
+		return wochentage[self.datum.weekday()]
+		
 	class Meta():
 		verbose_name_plural = "Bürotage"
 		verbose_name = "Bürotag"		

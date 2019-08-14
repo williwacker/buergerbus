@@ -47,6 +47,7 @@ class TourAdmin(admin.ModelAdmin):
 	list_editable = ('uhrzeit',)
 	ordering = ('datum','uhrzeit',)
 
+	"""
 	def abholort(self, obj):
 		if (obj.klient == obj.abholklient):
 			return ', '.join([obj.abholklient.ort.ort, obj.abholklient.strasse.strasse +" "+obj.abholklient.hausnr])
@@ -58,7 +59,8 @@ class TourAdmin(admin.ModelAdmin):
 			return ', '.join([obj.zielklient.ort.ort, obj.zielklient.strasse.strasse +" "+obj.zielklient.hausnr])
 		else:
 			return ', '.join([obj.zielklient.name, obj.zielklient.ort.ort, obj.zielklient.strasse.strasse +" "+obj.zielklient.hausnr])
-
+	"""
+	
 #	def klientenbus(self, obj):
 #		return obj.klient.bus
 
@@ -71,6 +73,7 @@ class TourAdmin(admin.ModelAdmin):
 		# Entfernung und Fahrzeit aus GoogleMaps holen
 		DM = DistanceMatrix()
 		DM.setUp()
+#		print(obj.datum.datum)
 		googleList = DM.getMatrix(obj.abholklient, obj.zielklient, obj.datum.datum, obj.uhrzeit)
 		obj.entfernung = googleList[0]
 		obj.ankunft = googleList[2]

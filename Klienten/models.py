@@ -3,7 +3,7 @@ import datetime
 from django.db import models
 from django.utils import timezone
 from django.conf import settings
-from smart_selects.db_fields import ChainedForeignKey, GroupedForeignKey
+from smart_selects.db_fields import ChainedForeignKey
 from Einsatzmittel.models import Bus
 
 DSGVO_AUSWAHL = [
@@ -12,6 +12,11 @@ DSGVO_AUSWAHL = [
 	('02', 'Versandt'),
 	('03', 'Unterschrieben'),
 	('99', 'Nicht notwendig'),
+]
+
+TYP_AUSWAHL = [
+	('F', 'Fahrgast'),
+	('D', 'Dienstleister')
 ]
 
 class Orte(models.Model):
@@ -23,6 +28,7 @@ class Orte(models.Model):
 	class Meta():
 		verbose_name_plural = "Orte"
 		verbose_name = "Ort"
+		ordering = ["ort"]
 
 class Strassen(models.Model):
 	ort     = models.ForeignKey(Orte, null=True, on_delete=models.CASCADE)
@@ -46,7 +52,7 @@ class KlientenBus(models.Model):
 		verbose_name = "Bus"		
 
 class Klienten(models.Model):
-	name    = models.CharField(max_length=200)
+	name    = models.CharField(max_length=200, help_text="Name, Vorname")
 	name.short_description = "Name des Klienten"
 	telefon = models.CharField(max_length=30, null=True, blank=True)
 	mobil   = models.CharField(max_length=30, null=True, blank=True)
@@ -61,13 +67,34 @@ class Klienten(models.Model):
         sort=True
 	)
 	hausnr  = models.CharField(max_length=10)
-	dsgvo   = models.CharField(choices=DSGVO_AUSWAHL, max_length=2, blank=True, default='01')
+	dsgvo   = models.CharField(choices=DSGVO_AUSWAHL, max_length=2, blank=True, default='01', verbose_name='DSGVO')
+	typ     = models.CharField(choices=TYP_AUSWAHL, max_length=1, default='F') # F=Fahrgast, D=Dienstleister
 	bemerkung = models.TextField(max_length=200, blank=True, null=True)
 	updated_on = models.DateTimeField(auto_now=True, blank=True, null=True)
 	updated_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL)
 	
 	def __str__(self):
 		return self.name
+
+	@property
+	def vorname(self):
+		try:
+			nachname, vorname = self.name.split(',')
+			return vorname
+		except:
+			return ''
+
+	@property
+	def nachname(self):
+		try:
+			nachname, vorname = self.name.split(',')
+			return nachname
+		except:
+			return self.name		
+	
+	@property
+	def name_ort(self):
+		return "_".join([self.name, self.ort])
 
 	class Meta():
 		verbose_name_plural = "Klienten"

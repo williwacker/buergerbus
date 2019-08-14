@@ -20,28 +20,39 @@ django.setup()
 from Klienten.models import Orte, Strassen
 from Einsatzmittel.models import Bus
 
+class ReadNames():
+	def __init__(self,filename):
+		self.read_names(filename)
 
-def read_names(filename): #read configuration from the configuration file and prepare a preferences dict
-	cfg = configparser.ConfigParser()
-	cfg.optionxform=str
-	cfg.read(filename, encoding='utf-8')
-	Orte.objects.all().delete()
-	for ortsname in cfg:
-		if (ortsname != 'DEFAULT'):
-			strassenname = {}
-			[ort,bus] = ortsname.split("=")
-			print(ort, bus)
-			if (bus == " "):
-				o = Orte(ort=ort.strip())
-			else:
-				b = Bus.objects.get(pk=int(bus))
-				o = Orte(ort=ort.strip(),bus=b)
-			o.save()
-			for name, value in cfg.items(ortsname):
-				strassenname[name] = value
-				print('    ',name)
-				s = Strassen(ort=o, strasse=name.strip())
-				s.save()
-	return
+	def read_names(self,filename): #read configuration from the configuration file and prepare a preferences dict
+		cfg = configparser.ConfigParser()
+		cfg.optionxform=str
+		cfg.read(filename, encoding='utf-8')
+	#	Orte.objects.all().delete()
+		for ortsname in cfg:
+			if (ortsname != 'DEFAULT'):
+				strassenname = {}
+				[ort,bus] = ortsname.split("=")
+				print(ort, bus)
 
-read_names('Strassennamen.txt')
+				# if ort already exists then update, else create
+				try:
+					o = Orte.objects.get(ort=ort.strip())
+				except:
+					o = Orte(ort=ort.strip())
+				if (bus != " "):
+					o.bus = Bus.objects.get(pk=int(bus))
+				else:
+					o.bus = None
+				o.save()
+				for name, value in cfg.items(ortsname):
+					strassenname[name] = value
+					print('    ',name)
+					try:
+						s = Strassen.objects.get(ort=o, strasse=name.strip())
+					except:
+						s = Strassen(ort=o, strasse=name.strip(), )
+					s.save()
+		return
+
+ReadNames('Strassennamen.txt')

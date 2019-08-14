@@ -1,0 +1,37 @@
+{% extends 'Basis/header.html' %}
+{% load static %}
+{% block title %}<title>Touren</title>{% endblock %}
+{% block content %}
+{% if touren_liste %}
+<div class="results">
+    <h1>Touren</h1>
+    <ul class="object-tools">
+        <li>
+            <a href="/Tour/tour/add/" class="addlink">
+                Tour hinzufügen
+            </a>
+        </li>   
+    </ul>    
+    <table id="result_list">
+        <thead>
+            <th>Fahrgast</th><th>Bus</th><th>Datum</th><th>Uhrzeit</th><th>Abholort</th><th>Zielort</th><th>Entfernung</th><th>Ankunft</th>
+        </thead>
+        {% for tour in touren_liste %}
+        <tr>
+            <td><a href="/Tour/touren/{{ tour.id }}/">{{ tour.klient }}</a></td>
+            <td>{{ tour.bus }}</td>
+            <td>{{ tour.datum }}</td>
+            <td>{{ tour.uhrzeit }}</td>
+            <td>{{ tour.abholort }}</td>
+            <td>{{ tour.zielort }}</td>
+            <td>{{ tour.entfernung|default_if_none:"-" }}</td>
+            <td>{{ tour.ankunft|default_if_none:"-" }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+
+{% else %}
+    <p>Keine Touren eingetragen.</p>
+{% endif %}
+{% endblock %}

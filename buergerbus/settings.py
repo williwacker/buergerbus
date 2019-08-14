@@ -32,6 +32,7 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'smart_selects',
+    'Basis.apps.BasisConfig',
     'Einsatzmittel.apps.EinsatzmittelConfig',
     'Einsatztage.apps.EinsatztageConfig',
     'Klienten.apps.KlientenConfig',
@@ -46,6 +47,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'multiselectfield',
+    'formtools',
     'debug_toolbar',
 ]
 
@@ -152,6 +154,9 @@ INTERNAL_IPS = [
     '127.0.0.1',
     # ...
 ]
+
+# Klienten von ausserhalb der VG können hinzugefügt werden
+ALLOW_OUTSIDE_CLIENTS = True
 
 import configparser
 cfg = configparser.ConfigParser()

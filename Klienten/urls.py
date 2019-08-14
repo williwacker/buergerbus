@@ -1,12 +1,14 @@
 from django.urls import path
-
-from . import views
+from Klienten.views import FahrgastView, DienstleisterView, DSGVOView, DSGVOasPDFView, FahrgastAddView, FahrgastChangeView, FahrgastDeleteView, DienstleisterAddView
 
 app_name = 'Klienten'
 urlpatterns = [
-    path('', views.index, name='index'),
-    path('<int:name_id>/', views.detail, name='detail'),
-    path('<int:name_id>/results/', views.results, name='results'),
-    path('<int:name_id>/ort/', views.ort, name='ort'),
-    path('<int:name_id>/strasse/', views.strasse, name='strasse'),
+    path('fahrgaeste/', FahrgastView.as_view()),
+    path('fahrgast/add/', FahrgastAddView.as_view()),
+    path('<int:pk>/', FahrgastChangeView.as_view()),
+    path('<int:pk>/delete/', FahrgastDeleteView.as_view()),
+    path('dienstleister/', DienstleisterView.as_view()),
+    path('dienstleister/add/', DienstleisterAddView.as_view()),
+    path('<int:pk>/dsgvo/', DSGVOView.as_view()),
+    path('<int:id>/dsgvoAsPDF/', DSGVOasPDFView.as_view()),
 ]

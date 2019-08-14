@@ -1,5 +1,4 @@
-from io import BytesIO
-from .utils import render_to_pdf
+from Basis.utils import render_to_pdf
 from django.template.loader import get_template
 from django.http import Http404
 from django.shortcuts import get_object_or_404, render
@@ -11,14 +10,16 @@ from django.conf import settings
 from django import forms
 
 from .models import Fahrtag
+from .utils import FahrtageSchreiben
 from Tour.models import Tour
 from Einsatzmittel.models import Bus
+from Einsatzmittel.utils import get_bus_list, get_buero_list
+from Basis.utils import get_sidebar
 
-def get_sidebar():
-	return [{'name':'Admin','value':'/admin/'},{'name':'Einsatztage','value':'/Einsatztage/'},{'name':'Tour','value':'/Tour/'}]
-
-class TourView(LoginRequiredMixin, ListView):
+class MyListView(LoginRequiredMixin, ListView):
 	login_url = settings.LOGIN_URL
+
+class TourView(MyListView):
 	template_name = 'Einsatztage/tour.html'
 	context_object_name = 'fahrtag_liste'
 	ordering = ['uhrzeit']
@@ -51,11 +52,13 @@ class GeneratePDF(LoginRequiredMixin, View):
 			return response
 		return HttpResponse("Kein Dokument vorhanden")	
 
-class FahrtageView(LoginRequiredMixin, ListView):
-	login_url = settings.LOGIN_URL
-	queryset = Fahrtag.objects.order_by('team','datum').filter(archiv=False)
-	template_name = 'Einsatztage/index.html'
+class FahrtageView(MyListView):
+	template_name = 'Einsatztage/fahrer.html'
 	context_object_name = 'einsatz_liste'
+
+	def get_queryset(self):
+		FahrtageSchreiben()
+		return Fahrtag.objects.order_by('team','datum').filter(archiv=False, team__in=get_bus_list(self.request))
 
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
@@ -64,10 +67,9 @@ class FahrtageView(LoginRequiredMixin, ListView):
 
 class FahrtageDetailView(LoginRequiredMixin, DetailView):
 	login_url = settings.LOGIN_URL
-	template_name = 'Einsatztage/detail.html'
+	template_name = 'Einsatztage/fahrerdetail.html'
 	context_object_name = 'fahrer'
 	
-
 	def get_queryset(self):
 		return Fahrtag.objects.filter(pk=self.kwargs['pk'])
 

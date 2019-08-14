@@ -1,14 +1,14 @@
-{% extends 'Einsatztage/header.html' %}
+{% extends 'Basis/header.html' %}
 {% block title %}<title>Tour anzeigen</title>{% endblock %}
 {% block content %}
         <h1>Fahrplan Bus {{ fahrtag_liste.team.bus }} am {{ fahrtag_liste.datum }}</h1>
 {%if fahrtag_liste %}
 <table class="headline">
     <tr>
-        <td class="name">Fahrer Vormittag:</td><td class="value">{{ fahrtag_liste.fahrer_vormittag.name }}</td>
+        <td class="name">Fahrer Vormittag:</td><td class="value">{{ fahrtag_liste.fahrer_vormittag.name|default_if_none:"-" }}</td>
     </tr>
     <tr>
-        <td class="name">Fahrer Nachmittag:</td><td class="value">{{ fahrtag_liste.fahrer_nachmittag.name }}</td>
+        <td class="name">Fahrer Nachmittag:</td><td class="value">{{ fahrtag_liste.fahrer_nachmittag.name|default_if_none:"-" }}</td>
     </tr>
 </table>
 {% endif %}
