@@ -1,0 +1,38 @@
+{% extends 'Basis/header.html' %}
+{% load static %}
+{% block content %}
+<div id="content-main">
+    <ul class="object-tools">
+    </ul>  
+<form action="" method="post">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+
+    {% for hidden_field in form.hidden_fields %}
+        {{ hidden_field.errors }}
+        {{ hidden_field }}
+    {% endfor %}
+    <div>
+        <fieldset class="module aligned">
+            {% for field in form.visible_fields %}
+            <div class="form-row">
+                <div>
+                    <label {% if field.field.required %}  class=required{% endif %}>{{ field.label }}</label>
+                    {{ field.errors }}
+                    {{ field }}
+                </div>
+            </div>
+            {% endfor %}
+        </fieldset>
+    </div>
+    <div class="submit-row">
+        <input type="submit" value="Sichern" class="default" name="_save">
+        {% if delete_button %}
+        <p class="deletelink-box"><a href="delete/" class="deletelink">Löschen</a></p> 
+        {% endif %}
+    </div>
+     
+</form>
+</div>
+</script>
+{% endblock %}

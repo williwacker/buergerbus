@@ -1,0 +1,54 @@
+{% extends 'Basis/header.html' %}
+{% load static %}
+{% block content %}
+<div id="content-main">
+    {% if klienten_liste %}
+    <ul class="object-tools">
+        <li>
+            <a href="/Klienten/fahrgast/add/" class="addlink">
+                Fahrgast hinzufügen
+            </a>
+        </li>   
+    </ul>   
+    <div id="changelist" class="module filtered">
+        <div id="toolbar"></div>
+        <form id="changelist-form">
+            <div class="results">
+                <table id="result_list">
+                    <thead>
+                        <th>Name</th><th>Telefon</th><th>Adresse</th><th>Bus</th><th>Bemerkung</th><th>DSGVO</th>
+                    </thead>
+                    {% for klient in klienten_liste %}
+                    <tr>
+                        {% if perms.Klienten.change_klienten %}
+                            <td><a href="/Klienten/fahrgast/{{ klient.id }}/">{{ klient.name }}</a></td>
+                        {% else %}
+                            <td>{{ klient.name }}</td>
+                        {% endif %}
+                        <td>{{ klient.telefon|default_if_none:"-" }}<br>{{ klient.mobil|default_if_none:"" }}</td>
+                        <td>{{ klient.ort }}<br>{{ klient.strasse }}&nbsp;{{ klient.hausnr }}</td>
+                        <td>{{ klient.bus|default_if_none:"-" }}</td>
+                        <td>{{ klient.bemerkung|default_if_none:"-" }}</td>
+                        <td>
+                        {% if klient.dsgvo == '01' %}
+                            <a href="/Klienten/fahrgast/{{ klient.id }}/dsgvo/"><img src="{% static "/project/img/dsgvo.png" %}" alt="DSGVO anzeigen" title="DSGVO anzeigen"></a>
+                            <a href="/Klienten/fahrgast/{{ klient.id }}/dsgvoAsPDF/"><img src="{% static "/project/img/icon_pdf.png" %}" alt="PDF erzeugen" title="PDF erzeugen"></a>
+                        {% else %}
+                            {% if klient.dsgvo == '02' %}
+                                <img src="{% static "/project/img/pencil.png" %}" alt="DSGVO zur Unterschrift" title="DSGVO zur Unterschrift">
+                            {% else %}
+                                <img src="{% static "/project/img/checkmark.png" %}" alt="DSGVO liegt vor" title="DSGVO liegt vor">
+                            {% endif %}
+                        {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </div>
+        </form>
+    </div>
+    {% else %}
+        <p>Keine Klienten eingetragen.</p>
+    {% endif %}
+</div>
+{% endblock %}

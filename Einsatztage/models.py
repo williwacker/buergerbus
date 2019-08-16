@@ -11,25 +11,25 @@ class Fahrtag(models.Model):
 	datum      = models.DateField(blank=True)
 	team       = models.ForeignKey('Einsatzmittel.Bus', on_delete=models.CASCADE)
 	fahrer_vormittag     = ChainedForeignKey(
-        Fahrer, # the model where you're populating your fahrer from
-        chained_field="team", # the field on your own model that this field links to 
-        chained_model_field="team", # the field on the foreign model this links to
+		Fahrer, # the model where you're populating your fahrer from
+		chained_field="team", # the field on your own model that this field links to 
+		chained_model_field="team", # the field on the foreign model this links to
 		show_all=False,
-        auto_choose=False,
+		auto_choose=False,
 		null=True,
 		blank=True,
 		related_name='vormittag',
-        sort=True)
+		sort=True)
 	fahrer_nachmittag     = ChainedForeignKey(
-        Fahrer, # the model where you're populating your fahrer from
-        chained_field="team", # the field on your own model that this field links to 
-        chained_model_field="team", # the field on the foreign model this links to
+		Fahrer, # the model where you're populating your fahrer from
+		chained_field="team", # the field on your own model that this field links to 
+		chained_model_field="team", # the field on the foreign model this links to
 		show_all=False,
-        auto_choose=False,
+		auto_choose=False,
 		null=True,
 		blank=True,
 		related_name='nachmittag',
-        sort=True)		
+		sort=True)		
 	archiv     = models.BooleanField(default=False)
 	updated_on = models.DateTimeField(auto_now=True, blank=True, null=True)
 	updated_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL)
@@ -38,9 +38,14 @@ class Fahrtag(models.Model):
 		return str(self.datum)
 	
 	@property
-	def klienten_anzahl(self):
+	def klienten_nachmittag(self):
 		from Tour.models import Tour
-		return Tour.objects.filter(datum_id=self.id).count()
+		return Tour.objects.filter(datum_id=self.id, uhrzeit__gte=datetime.time(12)).count()
+
+	@property
+	def klienten_vormittag(self):
+		from Tour.models import Tour
+		return Tour.objects.filter(datum_id=self.id, uhrzeit__lt=datetime.time(12)).count()
 
 	@property
 	def wochentag(self):
@@ -56,14 +61,14 @@ class Buerotag(models.Model):
 	team       = models.ForeignKey('Einsatzmittel.Buero', on_delete=models.CASCADE)	
 #	mitarbeiter = models.ForeignKey('Team.Buerokraft', blank=True, null=True, on_delete=models.SET_NULL)
 	mitarbeiter     = ChainedForeignKey(
-        Buerokraft, # the model where you're populating your fahrer from
-        chained_field="team", # the field on your own model that this field links to 
-        chained_model_field="team", # the field on the foreign model this links to
+		Buerokraft, # the model where you're populating your fahrer from
+		chained_field="team", # the field on your own model that this field links to 
+		chained_model_field="team", # the field on the foreign model this links to
 		show_all=False,
-        auto_choose=False,
+		auto_choose=False,
 		null=True,
 		blank=True,
-        sort=True)	
+		sort=True)	
 	archiv     = models.BooleanField(default=False)
 	updated_on = models.DateTimeField(auto_now=True, blank=True, null=True)
 	updated_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL)

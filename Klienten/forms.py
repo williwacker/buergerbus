@@ -28,20 +28,24 @@ class KlientenForm(ModelForm):
 		# this method didn't change it.
 		return data
 
-class KlientenAddForm(KlientenForm):
+class FahrgastAddForm(KlientenForm):
 
 	class Meta:
 		model = Klienten
 		fields = ['name','telefon','mobil','ort','strasse','hausnr','bemerkung','dsgvo','bus','typ']
 		widgets = {'dsgvo': forms.HiddenInput(), 'bus': forms.HiddenInput(), 'typ': forms.HiddenInput()}
 
-class KlientenChgForm(KlientenForm):
-#	def __init__(self, *args, **kwargs):
-#		super(KlientenChgForm, self).__init__(*args, **kwargs)
-#		self.fields['dsgvo'] = forms.ChoiceField(choices=DSGVO_AUSWAHL)
+class FahrgastChgForm(KlientenForm):
 		
 	class Meta:
 		model = Klienten
 		fields = ['name','telefon','mobil','ort','strasse','hausnr','bemerkung','dsgvo','bus','typ']
-		widgets = {'dsgvo': forms.TextInput(attrs={'readonly': 'readonly'}), 'typ': forms.HiddenInput()}
+		widgets = {'dsgvo': forms.Select(choices=DSGVO_AUSWAHL), 'typ': forms.HiddenInput()}
+
+class DienstleisterForm(KlientenForm):
+
+	class Meta:
+		model = Klienten
+		fields = ['name','telefon','mobil','ort','strasse','hausnr','bemerkung','dsgvo','bus','typ']
+		widgets = {'dsgvo': forms.HiddenInput(), 'bus': forms.HiddenInput(), 'typ': forms.HiddenInput()}	
 		

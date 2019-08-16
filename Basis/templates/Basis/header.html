@@ -49,7 +49,7 @@
                 <!-- Header -->
                 <div id="header">
                     <div id="title">VG Alzey-Land Bürgerbus Portal</div>
-                    
+
                     <div id="branding">
                         {% block branding %}{% endblock %}
                     </div>
@@ -77,65 +77,78 @@
                 {% if title %} &rsaquo; {{ title }}{% endif %}
                 </div>
                 {% endblock %}
-                {% if messages %}
-                    <ul class="messagelist">
-                        {% for message in messages %}
-                        <li  {% if message.tags %} class=" {{ message.tags }} " {% endif %}> {{ message }} </li>
-                        {% endfor %}
-                    </ul>
-                {% endif %}
+                {% block messages %}
+					{% if messages %}
+						<ul class="messagelist">
+							{% for message in messages %}
+							<li  {% if message.tags %} class=" {{ message.tags }} " {% endif %}> {{ message | safe }} </li>
+							{% endfor %}
+						</ul>
+					{% endif %}
+                {% endblock messages %}
             {% endif %}
             <!-- END Suppress header -->
-            <!-- Sidebar -->
-            {% if sidebar_liste %}
-            <div class="sidebar">
-                <div class="sidebar-section logo">
-                    <img src="{% static "/project/img/buergerbus.jpg" %}">
-                </div>
-                {% if user.is_active and user.is_superuser or has_permission %}
-                <div class="sidebar-section">
-                    <div class="sidebar-title">
-                        <span class="sidebar-title-link">
-                            Autorisierung
-                        </span>
-                    </div>                    
-                    <a class="sidebar-link" href="/admin/auth/user/">
-                        <span class="sidebar-right">
-                            <span class="sidebar-right-arrow icon-arrow-right"></span>
-                        </span>
-                        <span class="sidebar-link-label">Benutzer</span>
-                    </a>
-                    <a class="sidebar-link" href="/admin/auth/group/">
-                        <span class="sidebar-right">
-                            <span class="sidebar-right-arrow icon-arrow-right"></span>
-                        </span>
-                        <span class="sidebar-link-label">Gruppen</span>
-                    </a>
-                </div>                
-                {% endif %}
-                {% for sidebar in sidebar_liste %}
-                <div class="sidebar-section">
-                    <div class="sidebar-title">
-                        <span class="sidebar-title-link">
-                            {{ sidebar.name }}
-                        </span>
-                    </div>
-                    {% for sidebarlink in sidebar.value %}                
-                    <a class="sidebar-link" href="{{ sidebarlink.value }}">
-                        <span class="sidebar-right">
-                                <span class="sidebar-right-arrow icon-arrow-right"></span>
-                        </span>
-                        <span class="sidebar-link-label">{{ sidebarlink.name }}</span>
-                    </a>
-                    {% endfor %}
-                </div>
-                {% endfor %}
-            </div>
-            {% endif %}
-            <!-- END Sidebar -->
-            <div id="content" class="flex">      
-                {% block content %}{% endblock %}
-            </div>
+            <!-- Content -->
+            {% if title %}<title>{{ title }}</title>{% endif %}
+			<div id="content" class="{% block coltype %}colM{% endblock %}">
+				{% block pretitle %}{% endblock %}
+				{% block content_title %}{% if title %}<h1>{{ title }}</h1>{% endif %}{% endblock %}
+				{% block content %}
+				{% block object-tools %}{% endblock %}
+				{{ content }}
+				{% endblock %}
+				<!-- Sidebar -->
+				{% block sidebar %}
+					{% if sidebar_liste %}
+					<div class="sidebar">
+						<div class="sidebar-section logo">
+							<img src="{% static "/project/img/buergerbus.jpg" %}">
+						</div>
+						{% if user.is_active and user.is_superuser or has_permission %}
+						<div class="sidebar-section">
+							<div class="sidebar-title">
+								<span class="sidebar-title-link">
+									Autorisierung
+								</span>
+							</div>
+							<a class="sidebar-link" href="/admin/auth/user/">
+								<span class="sidebar-right">
+									<span class="sidebar-right-arrow icon-arrow-right"></span>
+								</span>
+								<span class="sidebar-link-label">Benutzer</span>
+							</a>
+							<a class="sidebar-link" href="/admin/auth/group/">
+								<span class="sidebar-right">
+									<span class="sidebar-right-arrow icon-arrow-right"></span>
+								</span>
+								<span class="sidebar-link-label">Gruppen</span>
+							</a>
+						</div>
+						{% endif %}
+						{% for sidebar in sidebar_liste %}
+						<div class="sidebar-section">
+							<div class="sidebar-title">
+								<span class="sidebar-title-link">
+									{{ sidebar.name }}
+								</span>
+							</div>
+							{% for sidebarlink in sidebar.value %}
+							<a class="sidebar-link" href="{{ sidebarlink.value }}">
+								<span class="sidebar-right">
+										<span class="sidebar-right-arrow icon-arrow-right"></span>
+								</span>
+								<span class="sidebar-link-label">{{ sidebarlink.name }}</span>
+							</a>
+							{% endfor %}
+						</div>
+						{% endfor %}
+					</div>
+					{% endif %}
+				{% endblock %}
+				<!-- END Sidebar -->
+				<br class="clear" />
+			</div>
+    		<!-- END Content -->
         </body>
         <footer> </footer>
     </div>

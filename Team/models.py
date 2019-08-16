@@ -3,6 +3,7 @@ import datetime
 from django.db import models
 from django.utils import timezone
 from django.conf import settings
+from django.contrib.auth.models import User
 
 class Fahrer(models.Model):
 	name  = models.CharField(max_length=200)
@@ -19,11 +20,13 @@ class Fahrer(models.Model):
 		verbose_name = "Fahrer"
 
 class Buerokraft(models.Model):
-	benutzer = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.CASCADE)
+	benutzer = models.OneToOneField(User, related_name='benutzer', on_delete=models.CASCADE)
 	mobil = models.CharField(max_length=30)
 	team  = models.ForeignKey('Einsatzmittel.Buero', null=True, on_delete=models.SET_NULL)
 	aktiv = models.BooleanField(max_length=1, default=True)
 	updated_on = models.DateTimeField(auto_now=True, blank=True, null=True)
+	updated_by = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='update', null=True, blank=True, on_delete=models.SET_NULL)
+
 	def __str__(self):
 		return ", ".join([str(self.benutzer.last_name),str(self.benutzer.first_name)])
 

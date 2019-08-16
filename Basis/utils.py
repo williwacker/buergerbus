@@ -31,6 +31,7 @@ def has_perm(user, codename):
 def get_sidebar():
 	return [
 		{'name':'Klienten',    'value':({'name':'Fahrgäste','value':'/Klienten/fahrgaeste/'},{'name':'Dienstleister','value':'/Klienten/dienstleister/'})},
-		{'name':'Einsatztage', 'value':({'name':'Fahrer','value':'/Einsatztage/'},{'name':'Büro','value':'/Einsatztage/'})},
-		{'name':'Touren',      'value':({'name':'Touren','value':'/Tour/touren/'},)}
+		{'name':'Einsatztage', 'value':({'name':'Fahrer','value':'/Einsatztage/fahrer/'},{'name':'Büro','value':'/Einsatztage/buero/'})},
+		{'name':'Touren',      'value':({'name':'Touren','value':'/Tour/touren/'},)},
+		{'name':'Team',        'value':({'name':'Fahrer','value':'/Team/fahrer/'},{'name':'Büro','value':'/Team/buero/'})},
 	]
