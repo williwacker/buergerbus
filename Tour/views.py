@@ -4,7 +4,7 @@ from django.views.generic import ListView, DetailView, View
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.conf import settings
 from jet.filters import RelatedFieldAjaxListFilter
-from formtools.wizard.views import SessionWizardView
+#from formtools.wizard.views import SessionWizardView
 
 from .forms import TourAddForm1, TourAddForm2, TourChgForm
 from .utils import DistanceMatrix
@@ -33,7 +33,7 @@ class TourenView(MyListView):
 
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
-		context['sidebar_liste'] = get_sidebar()
+		context['sidebar_liste'] = get_sidebar(self.request.user)
 		return context
 
 class TourSave():
@@ -62,73 +62,99 @@ class TourSave():
 # Dies ist ein zweistufiger Prozess, der zuerst den Klient auswählen lässt, um im zweiten Bildschirm dann mithilfe des dem Klienten zugeordneten Busses
 # die richtigen Fahrtage auszuwählen für das Datumsfeld. An den zweiten Bildschirm wird über die URL die KlientenId übergeben.
 class TourAddView(MyDetailView):
-	login_url = settings.LOGIN_URL
-	template_name = 'Tour/tour_add.html'
+	template_name = 'Basis/detail.html'
 	form_class = TourAddForm1
 
+	def get_context_data(self):
+		context = {}
+		context['sidebar_liste'] = get_sidebar(self.request.user)
+		context['title'] = "Tour hinzufügen"
+		context['submit_button'] = "Weiter"
+		context['back_button'] = "Abbrechen"
+
+		return context
+
 	def get(self, request, *args, **kwargs):
+		context = self.get_context_data()
 		form = self.form_class(initial=self.initial)
 		# nur managed klienten anzeigen
 		form.fields['fahrgast'].queryset = Klienten.objects.order_by('name').filter(typ='F', bus__in=get_bus_list(request))
-		sidebar_liste = get_sidebar()
-		return render(request, self.template_name, {'form': form, 
-													'sidebar_liste': sidebar_liste})
+		context['form'] = form
+		return render(request, self.template_name, context)
 
 	def post(self, request, *args, **kwargs):
+		context = self.get_context_data()
 		form = self.form_class(request.POST)
-		sidebar_liste = get_sidebar()
+		context['form'] = form
 		if form.is_valid():
 			post = request.POST.dict()
 			return HttpResponseRedirect('/Tour/tour/add/'+post['fahrgast'])
 
-		return render(request, self.template_name, {'form': form, 'sidebar_liste': sidebar_liste})
+		return render(request, self.template_name, context)
 
 class TourAddView2(MyDetailView):
+	template_name = 'Basis/detail.html'
 	form_class = TourAddForm2
-	initial = {'key': 'value'}
-	template_name = 'Tour/tour_add.html'
 	
+	def get_context_data(self):
+		context = {}
+		context['sidebar_liste'] = get_sidebar(self.request.user)
+		context['title'] = "Tour hinzufügen"
+		context['submit_button'] = "Sichern"
+		context['back_button'] = "Zurück"		
+		return context
+
 	def get(self, request, *args, **kwargs):
+		context = self.get_context_data()
 		form = self.form_class(initial=self.initial)
-		sidebar_liste = get_sidebar()
 		klient = Klienten.objects.get(pk=kwargs['pk'])
 		self.initial['klient'] = klient.name
 		self.initial['bus'] = klient.bus
 		form.fields['datum'].queryset = Fahrtag.objects.order_by('datum').filter(archiv=False, team_id=klient.bus)
 		form.fields['abholklient'].queryset = Klienten.objects.order_by('name').filter(bus__in=get_bus_list(request))
 		form.fields['zielklient'].queryset = Klienten.objects.order_by('name').filter(bus__in=get_bus_list(request))
-		return render(request, self.template_name, {'form': form, 
-													'sidebar_liste': sidebar_liste})
+		context['form'] = form
+		return render(request, self.template_name, context)
 
 	def post(self, request, *args, **kwargs):
+		context = self.get_context_data()
 		form = self.form_class(request.POST)
-		sidebar_liste = get_sidebar()
+		context['form'] = form
 		if form.is_valid():
 			TourSave(request.POST.dict())			
 			return HttpResponseRedirect('/Tour/touren/')
 
-		return render(request, self.template_name, {'form': form, 'sidebar_liste': sidebar_liste})
+		return render(request, self.template_name, context)
 
 class TourChangeView(MyDetailView):
-	login_url = settings.LOGIN_URL
+	template_name = 'Basis/detail.html'
 	form_class = TourChgForm
-	initial = {'key': 'value'}
-	template_name = 'Tour/tour_add.html'
+	context_object_name = 'tour'
+	
+	def get_context_data(self):
+		context = {}
+		context['sidebar_liste'] = get_sidebar(self.request.user)
+		context['title'] = "Tour ändern"
+		context['delete_button'] = "Löschen"
+		context['submit_button'] = "Weiter"
+		context['back_button'] = "Abbrechen"		
+		return context
 	
 	def get(self, request, *args, **kwargs):
+		context = self.get_context_data()
 		form = self.form_class(instance=Tour.objects.get(pk=kwargs['pk']))
-		sidebar_liste = get_sidebar()
-		return render(request, self.template_name, {'form': form, 
-													'sidebar_liste': sidebar_liste})
+		context['form'] = form
+		return render(request, self.template_name, context)
 
 	def post(self, request, *args, **kwargs):
+		context = self.get_context_data()
 		form = self.form_class(request.POST)
-		sidebar_liste = get_sidebar()
+		context['form'] = form
 		if form.is_valid():
 			TourSave(request.POST.dict())	
 			return HttpResponseRedirect('/Tour/touren/')
 
-		return render(request, self.template_name, {'form': form, 'sidebar_liste': sidebar_liste})		
+		return render(request, self.template_name, context)		
 
 class TourDeleteView(View):
 

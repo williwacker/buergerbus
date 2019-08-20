@@ -39,4 +39,15 @@ class TourChgForm(TourenForm):
 	class Meta:
 		model = Tour
 		fields = ['klient','bus','datum','uhrzeit','abholklient','zielklient','entfernung','ankunft']
-		widgets = {'klient': forms.TextInput(attrs={'readonly': 'readonly'}),'bus': forms.TextInput(attrs={'readonly': 'readonly'}),'entfernung': forms.HiddenInput(), 'ankunft': forms.HiddenInput()}
+		widgets = {'entfernung': forms.HiddenInput(), 'ankunft': forms.HiddenInput()}
+
+	def __init__(self, *args, **kwargs):
+		super(TourChgForm, self).__init__(*args, **kwargs)       
+		instance = getattr(self, 'instance', None)
+
+		# When in EDIT mode.
+		if instance and instance.id:
+			self.fields['klient'].widget.attrs['disabled'] = 'True'
+			self.fields['klient'].required = 'False'
+			self.fields['bus'].widget.attrs['disabled'] = 'True'
+			self.fields['bus'].required = 'False'			

@@ -1,3 +1,4 @@
+from django import template
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.views.generic import ListView, DetailView, View
@@ -5,12 +6,14 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.conf import settings
 from django.contrib import messages
 from jet.filters import RelatedFieldAjaxListFilter
-from .forms import FahrgastAddForm, FahrgastChgForm, DienstleisterForm
+from .forms import FahrgastAddForm, FahrgastChgForm, DienstleisterAddForm, DienstleisterChgForm, OrtAddForm
 
 from .models import Klienten, Orte, Strassen
 from Einsatzmittel.models import Bus
 from Einsatzmittel.utils import get_bus_list
 from Basis.utils import get_sidebar, render_to_pdf
+
+register = template.Library()
 
 class MyListView(LoginRequiredMixin, ListView):
 	login_url = settings.LOGIN_URL
@@ -31,23 +34,25 @@ class FahrgastView(MyListView):
 
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
-		context['sidebar_liste'] = get_sidebar()
+		context['sidebar_liste'] = get_sidebar(self.request.user)
 		context['title'] = "Fahrgäste"
 		return context
 
 class FahrgastAddView(MyDetailView):
 	form_class = FahrgastAddForm
 	initial = {'key': 'value'}
-	template_name = 'Klienten/klient_add.html'
+	template_name = 'Basis/detail.html'
 
-	def get_context_data(self):
+	def get_context_data(self, request):
 		context = {}
-		context['sidebar_liste'] = get_sidebar()
+		context['sidebar_liste'] = get_sidebar(request.user)
 		context['title'] = "Fahrgast hinzufügen"
+		context['submit_button'] = "Sichern"
+		context['back_button'] = "Abbrechen"
 		return context
 	
 	def get(self, request, *args, **kwargs):
-		context = self.get_context_data()
+		context = self.get_context_data(request)
 		form = self.form_class(initial=self.initial)
 		# nur managed orte anzeigen
 		allow = settings.ALLOW_OUTSIDE_CLIENTS
@@ -88,19 +93,22 @@ class FahrgastAddView(MyDetailView):
 class FahrgastChangeView(MyDetailView):
 	form_class = FahrgastChgForm
 	initial = {'key': 'value'}
-	template_name = 'Klienten/klient_add.html'
+	template_name = 'Basis/detail.html'
 
-	def get_context_data(self):
+	def get_context_data(self, request):
 		context = {}
-		context['sidebar_liste'] = get_sidebar()
+		context['sidebar_liste'] = get_sidebar(request.user)
 		context['title'] = "Fahrgast ändern"
+		context['delete_button'] = "Löschen"
+		context['submit_button'] = "Sichern"
+		context['back_button'] = "Abbrechen"
 		return context
 	
 	def get(self, request, *args, **kwargs):
-		context = self.get_context_data()
+		context = self.get_context_data(request)
 		form = self.form_class(instance=Klienten.objects.get(pk=kwargs['pk']))
 		context['form'] = form
-		context['delete_button'] = "Yes"
+
 		# nur managed orte anzeigen
 		allow = settings.ALLOW_OUTSIDE_CLIENTS
 		if allow:
@@ -110,7 +118,7 @@ class FahrgastChangeView(MyDetailView):
 		return render(request, self.template_name, context)
 
 	def post(self, request, *args, **kwargs):
-		context = self.get_context_data()
+		context = self.get_context_data(request)
 		form = self.form_class(request.POST)
 		if form.is_valid():
 			post = request.POST.dict()
@@ -123,9 +131,7 @@ class FahrgastChangeView(MyDetailView):
 			klient.ort=o
 			klient.strasse=s
 			klient.hausnr=post['hausnr']
-#			klient.dsgvo='01'
 			klient.bemerkung=post['bemerkung']
-#			klient.typ='F'
 			if (o.bus == None) & (post['bus'] != ''):
 				klient.bus=Bus.objects.get(pk=int(post['bus']))
 			klient.updated_by = request.user
@@ -154,7 +160,7 @@ class DSGVOView(LoginRequiredMixin, DetailView):
 
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
-		context['sidebar_liste'] = get_sidebar()
+		context['sidebar_liste'] = get_sidebar(self.request.user)
 		context['title'] = "DSGVO anzeigen"
 		return context
 
@@ -184,29 +190,31 @@ class DienstleisterView(MyListView):
 
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
-		context['sidebar_liste'] = get_sidebar()
+		context['sidebar_liste'] = get_sidebar(self.request.user)
 		context['title'] = "Dienstleister"
 		return context		
 
 class DienstleisterAddView(MyDetailView):
-	form_class = DienstleisterForm
+	form_class = DienstleisterAddForm
 	initial = {'key': 'value'}
-	template_name = "Klienten/klient_add.html"
+	template_name = "Basis/detail.html"
 
-	def get_context_data(self):
+	def get_context_data(self, request):
 		context = {}
-		context['sidebar_liste'] = get_sidebar()
+		context['sidebar_liste'] = get_sidebar(request.user)
 		context['title'] = "Dienstleister hinzufügen"
+		context['submit_button'] = "Sichern"
+		context['back_button'] = "Abbrechen"		
 		return context
 	
 	def get(self, request, *args, **kwargs):
-		context = self.get_context_data()
+		context = self.get_context_data(request)
 		form = self.form_class(initial=self.initial)
 		context['form'] = form
 		return render(request, self.template_name, context)
 
 	def post(self, request, *args, **kwargs):
-		context = self.get_context_data()
+		context = self.get_context_data(request)
 		form = self.form_class(request.POST)
 		if form.is_valid():
 			post = request.POST.dict()
@@ -232,25 +240,27 @@ class DienstleisterAddView(MyDetailView):
 		return render(request, self.template_name, context)
 
 class DienstleisterChangeView(MyDetailView):
-	form_class = DienstleisterForm
+	form_class = DienstleisterChgForm
 	initial = {'key': 'value'}
-	template_name = 'Klienten/klient_add.html'
+	template_name = 'Basis/detail.html'
 
-	def get_context_data(self):
+	def get_context_data(self, request):
 		context = {}
-		context['sidebar_liste'] = get_sidebar()
-		context['title'] = "Dienstleister ändern"
+		context['sidebar_liste'] = get_sidebar(request.user)
+		context['title'] = "Fahrgast ändern"
+		context['delete_button'] = "Löschen"
+		context['submit_button'] = "Sichern"
+		context['back_button'] = "Abbrechen"
 		return context
 	
 	def get(self, request, *args, **kwargs):
-		context = self.get_context_data()
+		context = self.get_context_data(request)
 		form = self.form_class(instance=Klienten.objects.get(pk=kwargs['pk']))
 		context['form'] = form
-		context['delete_button'] = "Yes"
 		return render(request, self.template_name, context)
 
 	def post(self, request, *args, **kwargs):
-		context = self.get_context_data()
+		context = self.get_context_data(request)
 		form = self.form_class(request.POST)
 		if form.is_valid():
 			post = request.POST.dict()
@@ -280,3 +290,60 @@ class DienstleisterDeleteView(View):
 
 		return HttpResponseRedirect('/Klienten/dienstleister/')	
 
+class OrtView(MyListView):
+	template_name = 'Klienten/orte.html'
+	context_object_name = 'orte_liste'
+	model = Orte
+	
+	def get_queryset(self):
+		return Orte.objects.order_by('bus','ort')
+
+	def get_context_data(self, **kwargs):
+		context = super().get_context_data(**kwargs)
+		context['sidebar_liste'] = get_sidebar(self.request.user)
+		context['title'] = "Orte"
+		return context		
+
+class OrtAddView(MyDetailView):
+	form_class = OrtAddForm
+	initial = {'key': 'value'}
+	template_name = "Basis/detail.html"
+
+	def get_context_data(self, request):
+		context = {}
+		context['sidebar_liste'] = get_sidebar(request.user)
+		context['title'] = "Ort hinzufügen"
+		context['submit_button'] = "Sichern"
+		context['back_button'] = "Abbrechen"		
+		return context
+	
+	def get(self, request, *args, **kwargs):
+		context = self.get_context_data(request)
+		form = self.form_class(initial=self.initial)
+		context['form'] = form
+		return render(request, self.template_name, context)
+
+	def post(self, request, *args, **kwargs):
+		context = self.get_context_data()
+		form = self.form_class(request.POST)
+		if form.is_valid():
+			post = request.POST.dict()
+			o = Orte.objects.get(pk=int(post['ort']))
+			s = Strassen.objects.get(pk=int(post['strasse']))
+			ort = Orte(	ort=Orte.objects.get(pk=int(post['ort'])),
+						bus=Bus.objects.get(pk=int(post['bus'])),
+						updated_by = request.user
+					)
+			ort.save()
+			context['form'] = form		
+			messages.success(request, 'Ort "<a href="'+request.path+'">'+ort.ort+'</a>" wurde erfolgreich hinzugefügt.')
+			context['messages'] = messages
+			return HttpResponseRedirect('/Klienten/orte/')
+		
+		return render(request, self.template_name, context)
+
+class OrtChangeView(MyDetailView):
+	pass
+
+class OrtDeleteView(View):
+	pass

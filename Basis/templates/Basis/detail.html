@@ -12,7 +12,7 @@
         {{ hidden_field.errors }}
         {{ hidden_field }}
     {% endfor %}
-    <div>
+    <div>  
         <fieldset class="module aligned">
             {% for field in form.visible_fields %}
             <div class="form-row">
@@ -26,10 +26,9 @@
         </fieldset>
     </div>
     <div class="submit-row">
-        <input type="submit" value="Sichern" class="default" name="_save">
-        {% if delete_button %}
-        <p class="deletelink-box"><a href="delete/" class="deletelink">Löschen</a></p> 
-        {% endif %}
+        {% if back_button %}<a href="javascript:history.go(-1)" class="closelink">{{ back_button }}</a>{% endif %}
+        <input type="submit" value="{{ submit_button|default:'Sichern' }}" class="default" name="_save">
+        {% if delete_button %}<p class="deletelink-box"><a href="delete/" class="deletelink">{{ delete_button }}</a></p>{% endif %}
     </div>
      
 </form>

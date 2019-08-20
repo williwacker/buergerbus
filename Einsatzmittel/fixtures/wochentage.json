@@ -1,0 +1,37 @@
+[
+  {
+    "model": "Einsatzmittel.wochentage",
+    "pk": 0,
+    "fields": {
+      "name": "Montag"
+    }
+  },
+  {
+    "model": "Einsatzmittel.wochentage",
+    "pk": 1,
+    "fields": {
+      "name": "Dienstag"
+    }
+  },
+  {
+    "model": "Einsatzmittel.wochentage",
+    "pk": 2,
+    "fields": {
+      "name": "Mittwoch"
+    }
+  },
+  {
+    "model": "Einsatzmittel.wochentage",
+    "pk": 3,
+    "fields": {
+      "name": "Donnerstag"
+    }
+  },
+  {
+    "model": "Einsatzmittel.wochentage",
+    "pk": 4,
+    "fields": {
+      "name": "Freitag"
+    }
+  } 
+]

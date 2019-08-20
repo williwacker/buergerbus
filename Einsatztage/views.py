@@ -67,7 +67,7 @@ class FahrtageView(MyListView):
 
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
-		context['sidebar_liste'] = get_sidebar()
+		context['sidebar_liste'] = get_sidebar(self.request.user)
 		context['title'] = "Fahrtage"
 		return context
 
@@ -79,7 +79,7 @@ class FahrtageDetailView(MyDetailView):
 	
 	def get_context_data(self):
 		context = {}
-		context['sidebar_liste'] = get_sidebar()
+		context['sidebar_liste'] = get_sidebar(self.request.user)
 		context['title'] = "Fahrereinsatz ändern"
 		return context
 	

@@ -47,7 +47,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'multiselectfield',
-    'formtools',
+#    'formtools',
     'debug_toolbar',
 ]
 
@@ -98,6 +98,22 @@ DATABASES = {
         'PORT': '5432',
     }
 }
+
+"""
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql', 
+        'NAME': 'buergerbus',
+        'USER': 'buergerbus',
+        'PASSWORD': 'buergerbus',
+        'HOST': 'localhost',   # Or an IP Address that your DB is hosted on
+        'PORT': '3306',
+        'OPTIONS': {
+            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+        },
+    }
+}
+"""
 
 
 # Password validation

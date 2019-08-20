@@ -26,6 +26,7 @@
             </fieldset>
         </div>
         <div class="submit-row">
+            % if back_button %}<a href="javascript:history.go(-1)" class="closelink">{{ back_button }}</a>{% endif %}
             <input type="submit" value="Sichern" class="default" name="_save">
             <p class="deletelink-box"><a href="delete/" class="deletelink">Löschen</a></p> 
         </div>

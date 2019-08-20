@@ -18,9 +18,11 @@ from django.urls import path, include, reverse_lazy
 from django.conf.urls import url
 from smart_selects import urls as smart_selects_urls
 import debug_toolbar
+from Basis.views import BasisView
 
 
 urlpatterns = [
+    path('', BasisView.as_view()),
     path('accounts/', include('django.contrib.auth.urls')),
     path('Einsatzmittel/', include('Einsatzmittel.urls')),
     path('Tour/', include('Tour.urls')),

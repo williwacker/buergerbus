@@ -22,6 +22,9 @@ TYP_AUSWAHL = [
 class Orte(models.Model):
 	ort    = models.CharField(max_length=50)
 	bus    = models.ForeignKey('Einsatzmittel.Bus', null=True, blank=True, on_delete=models.CASCADE)
+	updated_on = models.DateTimeField(auto_now=True, blank=True, null=True)
+	updated_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL)
+	
 	def __str__(self):
 		return self.ort
 	
@@ -33,6 +36,9 @@ class Orte(models.Model):
 class Strassen(models.Model):
 	ort     = models.ForeignKey(Orte, null=True, on_delete=models.CASCADE)
 	strasse = models.CharField(max_length=50)
+	updated_on = models.DateTimeField(auto_now=True, blank=True, null=True)
+	updated_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL)
+	
 	def __str__(self):
 		return self.strasse
 

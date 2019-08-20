@@ -124,5 +124,11 @@ dmypy.json
 .pyre/
 postgresql.bak
 
+migrations/
+*.bat
+*.bak
+*.txt
+*.csv
 
 secret_googlemaps_key.txt
+Strassennamen.txt
