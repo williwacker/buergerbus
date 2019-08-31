@@ -49,6 +49,7 @@ h1 {
   background: #59677e;
   color: #fff;
   transition: background-color .3s, transform .3s;
+  overflow-y: scroll;
 }
 .sidebar-section {
   padding-bottom: 0;
@@ -115,17 +116,6 @@ h1 {
     margin-left: 12.14286rem;
 
 }
-/*
-.module {
-    padding-left: 20px;
-}
-*/
-/*
-.results {
-    margin-right: 200px;
-    width: auto;
-}
-*/
 .user-tools ul {
     top: 0.78571rem;
 }
@@ -148,9 +138,17 @@ h1 {
 #changelist table thead th {
     padding: 10px 10px;
 }
-/*
-#changelist .results {
-    margin-right: 280px;
-    width: auto;
+.even {
+    background: #ffffff;
 }
-*/
+.odd {
+    background: #f9f9f9;
+}
+ul.pagination li {
+    display: inline-block;
+    margin: -1px;
+    background-color: #dfdddd;
+    padding: 5px;
+    min-width: 20px;
+    text-align: center
+}

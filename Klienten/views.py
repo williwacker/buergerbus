@@ -6,9 +6,13 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.conf import settings
 from django.contrib import messages
 from jet.filters import RelatedFieldAjaxListFilter
-from .forms import FahrgastAddForm, FahrgastChgForm, DienstleisterAddForm, DienstleisterChgForm, OrtAddForm
+from .forms import FahrgastAddForm, FahrgastChgForm, DienstleisterAddForm, DienstleisterChgForm
+from .forms import OrtAddForm, OrtChgForm
+from .forms import StrassenAddForm, StrassenChgForm
 
 from .models import Klienten, Orte, Strassen
+from .tables import OrteTable, StrassenTable, DienstleisterTable, FahrgaesteTable
+from .filter import StrassenFilter, OrteFilter, FahrgaesteFilter, DienstleisterFilter
 from Einsatzmittel.models import Bus
 from Einsatzmittel.utils import get_bus_list
 from Basis.utils import get_sidebar, render_to_pdf
@@ -17,31 +21,44 @@ register = template.Library()
 
 class MyListView(LoginRequiredMixin, ListView):
 	login_url = settings.LOGIN_URL
+	template_name = 'Basis/simple_table.html'
+	context_object_name = 'table'
 
 class MyDetailView(LoginRequiredMixin, DetailView):
 	login_url = settings.LOGIN_URL
+	initial = {'key': 'value'}
+	template_name = 'Basis/detail.html'
 
 class FahrgastView(MyListView):
-	template_name = 'Klienten/fahrgast.html'
-	context_object_name = 'klienten_liste'
 
-	def get_queryset(self):
+	def get_fg_queryset(self):
 		allow = settings.ALLOW_OUTSIDE_CLIENTS
 		if allow:
 			return Klienten.objects.order_by('name','ort').filter(typ='F', bus__in=get_bus_list(self.request)) | Klienten.objects.order_by('name','ort').filter(typ='F', bus__isnull=True)
 		else:
 			return Klienten.objects.order_by('name','ort').filter(typ='F', bus__in=get_bus_list(self.request))
 
+	def get_queryset(self):
+		ort = self.request.GET.get('ort')
+		bus = self.request.GET.get('bus')
+		qs = self.get_fg_queryset()
+		if ort:
+			qs = qs.filter(ort=ort)
+		if bus:
+			qs = qs.filter(bus=bus)
+		return FahrgaesteTable(qs)
+
+
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
 		context['sidebar_liste'] = get_sidebar(self.request.user)
 		context['title'] = "Fahrgäste"
+		context['add'] = "Fahrgast"
+		context['filter'] = FahrgaesteFilter(self.request.GET, queryset=self.get_fg_queryset())
 		return context
 
 class FahrgastAddView(MyDetailView):
 	form_class = FahrgastAddForm
-	initial = {'key': 'value'}
-	template_name = 'Basis/detail.html'
 
 	def get_context_data(self, request):
 		context = {}
@@ -64,7 +81,7 @@ class FahrgastAddView(MyDetailView):
 		return render(request, self.template_name, context)
 
 	def post(self, request, *args, **kwargs):
-		context = self.get_context_data()
+		context = self.get_context_data(request)
 		form = self.form_class(request.POST)
 		if form.is_valid():
 			post = request.POST.dict()
@@ -92,8 +109,6 @@ class FahrgastAddView(MyDetailView):
 
 class FahrgastChangeView(MyDetailView):
 	form_class = FahrgastChgForm
-	initial = {'key': 'value'}
-	template_name = 'Basis/detail.html'
 
 	def get_context_data(self, request):
 		context = {}
@@ -162,6 +177,7 @@ class DSGVOView(LoginRequiredMixin, DetailView):
 		context = super().get_context_data(**kwargs)
 		context['sidebar_liste'] = get_sidebar(self.request.user)
 		context['title'] = "DSGVO anzeigen"
+		context['back_button'] = "Zurück"
 		return context
 
 class DSGVOasPDFView(LoginRequiredMixin, View):
@@ -182,22 +198,27 @@ class DSGVOasPDFView(LoginRequiredMixin, View):
 		return HttpResponse("Kein Dokument vorhanden")
 
 class DienstleisterView(MyListView):
-	template_name = 'Klienten/dienstleister.html'
-	context_object_name = 'klienten_liste'
 
 	def get_queryset(self):
-		return Klienten.objects.order_by('name','ort').filter(typ='D')
+		name = self.request.GET.get('name')
+		ort = self.request.GET.get('ort')
+		qs = Klienten.objects.order_by('name','ort').filter(typ='D')
+		if ort:
+			qs = qs.filter(ort=ort)
+		if name:
+			qs = qs.filter(name=name)
+		return DienstleisterTable(qs)
 
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
 		context['sidebar_liste'] = get_sidebar(self.request.user)
 		context['title'] = "Dienstleister"
+		context['add'] = "Dienstleister"
+		context['filter'] = DienstleisterFilter(self.request.GET, queryset=Klienten.objects.order_by('name','ort').filter(typ='D'))
 		return context		
 
 class DienstleisterAddView(MyDetailView):
 	form_class = DienstleisterAddForm
-	initial = {'key': 'value'}
-	template_name = "Basis/detail.html"
 
 	def get_context_data(self, request):
 		context = {}
@@ -241,8 +262,6 @@ class DienstleisterAddView(MyDetailView):
 
 class DienstleisterChangeView(MyDetailView):
 	form_class = DienstleisterChgForm
-	initial = {'key': 'value'}
-	template_name = 'Basis/detail.html'
 
 	def get_context_data(self, request):
 		context = {}
@@ -291,23 +310,27 @@ class DienstleisterDeleteView(View):
 		return HttpResponseRedirect('/Klienten/dienstleister/')	
 
 class OrtView(MyListView):
-	template_name = 'Klienten/orte.html'
-	context_object_name = 'orte_liste'
-	model = Orte
 	
 	def get_queryset(self):
-		return Orte.objects.order_by('bus','ort')
+		ort = self.request.GET.get('ort')
+		bus = self.request.GET.get('bus')
+		qs = Orte.objects.order_by('bus','ort')
+		if ort:
+			qs = qs.filter(ort=ort)
+		if bus:
+			qs = qs.filter(bus=bus)
+		return OrteTable(qs)
 
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
 		context['sidebar_liste'] = get_sidebar(self.request.user)
 		context['title'] = "Orte"
+		context['add'] = "Ort"
+		context['filter'] = OrteFilter(self.request.GET, queryset=Orte.objects.all())
 		return context		
 
 class OrtAddView(MyDetailView):
 	form_class = OrtAddForm
-	initial = {'key': 'value'}
-	template_name = "Basis/detail.html"
 
 	def get_context_data(self, request):
 		context = {}
@@ -324,16 +347,17 @@ class OrtAddView(MyDetailView):
 		return render(request, self.template_name, context)
 
 	def post(self, request, *args, **kwargs):
-		context = self.get_context_data()
+		context = self.get_context_data(request)
 		form = self.form_class(request.POST)
 		if form.is_valid():
 			post = request.POST.dict()
-			o = Orte.objects.get(pk=int(post['ort']))
-			s = Strassen.objects.get(pk=int(post['strasse']))
-			ort = Orte(	ort=Orte.objects.get(pk=int(post['ort'])),
-						bus=Bus.objects.get(pk=int(post['bus'])),
-						updated_by = request.user
-					)
+			ort = Orte(	
+				ort=post['ort'],
+				updated_by = request.user
+				)
+			if post['bus']:
+				ort.bus=Bus.objects.get(pk=int(post['bus']))
+			
 			ort.save()
 			context['form'] = form		
 			messages.success(request, 'Ort "<a href="'+request.path+'">'+ort.ort+'</a>" wurde erfolgreich hinzugefügt.')
@@ -343,7 +367,144 @@ class OrtAddView(MyDetailView):
 		return render(request, self.template_name, context)
 
 class OrtChangeView(MyDetailView):
-	pass
+	form_class = OrtChgForm
+
+	def get_context_data(self, request):
+		context = {}
+		context['sidebar_liste'] = get_sidebar(request.user)
+		context['title'] = "Ort ändern"
+		context['delete_button'] = "Löschen"
+		context['submit_button'] = "Sichern"
+		context['back_button'] = "Abbrechen"
+		return context
+	
+	def get(self, request, *args, **kwargs):
+		context = self.get_context_data(request)
+		form = self.form_class(instance=Orte.objects.get(pk=kwargs['pk']))
+		context['form'] = form
+		return render(request, self.template_name, context)
+
+	def post(self, request, *args, **kwargs):
+		context = self.get_context_data(request)
+		form = self.form_class(request.POST)
+		if form.is_valid():
+			post = request.POST.dict()
+			ort = Orte.objects.get(pk=kwargs['pk'])
+			ort.ort=post['ort']
+			if post['bus']:
+				ort.bus=Bus.objects.get(pk=int(post['bus']))
+			ort.updated_by = request.user
+			ort.save()
+			context['form'] = form
+			messages.success(request, 'Ort "<a href="'+request.path+'">'+post['ort']+'</a>" wurde erfolgreich geändert.')
+			return HttpResponseRedirect('/Klienten/orte/')
+
+		return render(request, self.template_name, context)		
 
 class OrtDeleteView(View):
-	pass
+
+	def get(self, request, *args, **kwargs):
+		k = Orte.objects.get(pk=kwargs['pk'])
+		k.delete()
+		return HttpResponseRedirect('/Klienten/orte/')	
+
+class StrassenView(MyListView):
+	
+	def get_queryset(self):
+		ort = self.request.GET.get('ort')
+		strasse = self.request.GET.get('strasse')
+		qs = Strassen.objects.order_by('ort','strasse')
+		if ort:
+			qs = qs.filter(ort=ort)
+		if strasse:
+			qs = qs.filter(strasse=strasse)
+		table = StrassenTable(qs)
+		table.paginate(page=self.request.GET.get("page", 1), per_page=20)
+		return table
+
+	def get_context_data(self, **kwargs):
+		context = super().get_context_data(**kwargs)
+		context['sidebar_liste'] = get_sidebar(self.request.user)
+		context['title'] = "Strassen"
+		context['add'] = "Strasse"
+		context['filter'] = StrassenFilter(self.request.GET, queryset=Strassen.objects.all())
+		return context
+
+class StrassenAddView(MyDetailView):
+	form_class = StrassenAddForm
+
+	def get_context_data(self, request):
+		context = {}
+		context['sidebar_liste'] = get_sidebar(request.user)
+		context['title'] = "Strasse hinzufügen"
+		context['submit_button'] = "Sichern"
+		context['back_button'] = "Abbrechen"		
+		return context
+	
+	def get(self, request, *args, **kwargs):
+		context = self.get_context_data(request)
+		form = self.form_class(initial=self.initial)
+		context['form'] = form
+		return render(request, self.template_name, context)
+
+	def post(self, request, *args, **kwargs):
+		context = self.get_context_data(request)
+		form = self.form_class(request.POST)
+		if form.is_valid():
+			post = request.POST.dict()
+			o = Orte.objects.get(pk=int(post['ort']))
+			strasse = Strassen(	ort=o,
+							strasse=post['strasse'],
+							updated_by = request.user
+					)
+			strasse.save()
+			context['form'] = form		
+			messages.success(request, 'Strasse "<a href="'+request.path+'">'+post['strasse']+' in '+post['ort']+'</a>" wurde erfolgreich hinzugefügt.')
+			context['messages'] = messages
+			return HttpResponseRedirect('/Klienten/strassen/')
+		
+		return render(request, self.template_name, context)	
+
+class StrassenChangeView(MyDetailView):
+	form_class = StrassenChgForm
+
+	def get_context_data(self, request):
+		context = {}
+		context['sidebar_liste'] = get_sidebar(request.user)
+		context['title'] = "Strasse ändern"
+		context['delete_button'] = "Löschen"
+		context['submit_button'] = "Sichern"
+		context['back_button'] = "Abbrechen"
+		return context
+	
+	def get(self, request, *args, **kwargs):
+		context = self.get_context_data(request)
+		form = self.form_class(instance=Strassen.objects.get(pk=kwargs['pk']))
+		context['form'] = form
+		return render(request, self.template_name, context)
+
+	def post(self, request, *args, **kwargs):
+		context = self.get_context_data(request)
+		form = self.form_class(request.POST)
+		if form.is_valid():
+			post = request.POST.dict()
+			o = Orte.objects.get(pk=int(post['ort']))
+			strasse = Strassen.objects.get(pk=kwargs['pk'])
+			strasse.strasse=post['strasse']
+			strasse.ort=o
+			strasse.updated_by = request.user
+			strasse.save()
+			context['form'] = form
+			messages.success(request, 'Strasse "<a href="'+request.path+'">'+post['strasse']+' in '+o.ort+'</a>" wurde erfolgreich geändert.')
+			return HttpResponseRedirect('/Klienten/strassen/')
+		else:
+			messages.error(request, form.errors)
+
+		return render(request, self.template_name, context)		
+
+class StrassenDeleteView(View):
+
+	def get(self, request, *args, **kwargs):
+		k = Strassen.objects.get(pk=kwargs['pk'])
+		k.delete()
+		return HttpResponseRedirect('/Klienten/strassen/')	

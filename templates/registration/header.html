@@ -1,0 +1,93 @@
+{% load i18n static jet_tags %}<!DOCTYPE html>
+{% get_current_language as LANGUAGE_CODE %}{% get_current_language_bidi as LANGUAGE_BIDI %}
+{% jet_get_current_theme as THEME %}
+{% block html %}<html lang="{{ LANGUAGE_CODE|default:"en-us" }}" {% if LANGUAGE_BIDI %}dir="rtl"{% endif %}>
+<head>
+        {% block title %}{% endblock %}
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+        {% load static %}
+        <link rel="stylesheet" type="text/css" href="{% static "/admin/css/base.css" %}" />
+        <link rel="stylesheet" type="text/css" href="{% static "/jet/css/vendor.css" %}" />
+        <link rel="stylesheet" type="text/css" href="{% static "/jet/css/icons/style.css" %}" />
+        <link rel="stylesheet" type="text/css" href="{% static "/jet/css/themes/default/base.css" %}" class="base-stylesheet" />
+        <link rel="stylesheet" type="text/css" href="{% static "/jet/css/themes/default/select2.theme.css" %}" class="select2-stylesheet" />
+        <link rel="stylesheet" type="text/css" href="{% static "/jet/css/themes/default/jquery-ui.theme.css" %}" class="jquery-ui-stylesheet" />
+        <link rel="stylesheet" type="text/css" href="{% static "/admin/css/dashboard.css" %}" />
+        <link rel="stylesheet" type="text/css" href="{% static "/admin/css/forms.css" %}" />
+        <link rel="stylesheet" type="text/css" href="{% static "/admin/css/changelists.css" %}" />
+        <link rel="stylesheet" type="text/css" href="{% static "/project/css/base.css" %}" />
+        <script type="text/javascript" charset="utf-8">
+            var DATE_FORMAT = "%d.%m.%Y";
+            var TIME_FORMAT = "%H:%M:%S";
+            var DATETIME_FORMAT = "%d.%m.%Y %H:%M:%S";
+        </script>
+        <script type="text/javascript" src="/jet/jsi18n/"></script>
+        <script type="text/javascript" src="{% static "/jet/js/build/bundle.min.js" %}"></script>
+        <script type="text/javascript" src="{% static "/jet/js/i18n/jquery-ui/datepicker-de.js" %}"></script>
+        <script type="text/javascript" src="{% static "/jet/js/i18n/jquery-ui-timepicker/jquery.ui.timepicker-de.js" %}"></script>
+        <script type="text/javascript" src="{% static "/jet/js/i18n/select2/de.js" %}"></script>
+        <script type="text/javascript" src="/admin/jsi18n/"></script>
+        <script type="text/javascript" src="{% static "/admin/js/vendor/jquery/jquery.js" %}"></script>
+        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+        <script type="text/javascript" src="{% static "/smart-selects/admin/js/chainedfk.js" %}"></script>
+        <script type="text/javascript" src="{% static "/admin/js/calendar.js" %}"></script>
+        <script type="text/javascript" src="{% static "/admin/js/jquery.init.js" %}"></script>
+        <script type="text/javascript" src="{% static "/smart-selects/admin/js/bindfields.js" %}"></script>
+        <script type="text/javascript" src="{% static "/admin/js/admin/DateTimeShortcuts.js" %}"></script>
+        <script type="text/javascript" src="{% static "/admin/js/core.js" %}"></script>
+        <script type="text/javascript" src="{% static "/admin/js/admin/RelatedObjectLookups.js" %}"></script>
+        <script type="text/javascript" src="{% static "/admin/js/actions.js" %}"></script>
+        <script type="text/javascript" src="{% static "/admin/js/urlify.js" %}"></script>
+        <script type="text/javascript" src="{% static "/admin/js/prepopulate.js" %}"></script>
+        <script type="text/javascript" src="{% static "/admin/js/vendor/xregexp/xregexp.js" %}"></script>
+   </head>
+    <body class="menu-pinned login">
+        <!-- Container -->
+        <div id="container">
+            <!-- Suppress header -->
+                <!-- Header -->
+                <div id="header">
+                    {% block usertools %}
+                    {% if user.is_active and user.is_staff or has_permission %}
+                    <div id="user-tools">
+                        {% block welcome-msg %}
+                            {% trans 'Welcome,' %}
+                            <strong>{% firstof user.get_short_name user.get_username %}</strong>.
+                        {% endblock %}
+                        {% block userlinks %}
+                            {% if user.has_usable_password %}
+                            <a href="{% url 'admin:password_change' %}">{% trans 'Change password' %}</a> /
+                            {% endif %}
+                            <a href="{% url 'admin:logout' %}">abmelden</a>
+                        {% endblock %}
+                    </div>
+                    {% endif %}
+                    {% endblock %}
+                </div>
+                <!-- END Header -->
+                {% block messages %}
+					{% if messages %}
+						<ul class="messagelist">
+							{% for message in messages %}
+							<li  {% if message.tags %} class=" {{ message.tags }} " {% endif %}> {{ message | safe }} </li>
+							{% endfor %}
+						</ul>
+					{% endif %}
+                {% endblock messages %}
+            <!-- Content -->
+            {% if title %}<title>{{ title }}</title>{% endif %}
+			<div id="content" class="{% block coltype %}colM{% endblock %}">
+				{% block pretitle %}{% endblock %}
+				{% block content_title %}{% if title %}<h1>{{ title }}</h1>{% endif %}{% endblock %}
+                {% block content %}
+				{% block object-tools %}{% endblock %}
+				{{ content }}
+				{% endblock %}
+				<br class="clear" />
+			</div>
+    		<!-- END Content -->
+        </body>
+        <footer> </footer>
+    </div>
+    <!-- END Container -->
+</html>{% endblock %}

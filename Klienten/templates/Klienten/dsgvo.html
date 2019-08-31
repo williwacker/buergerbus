@@ -20,4 +20,7 @@ Meine Widerrufserklärung kann ich schriftlich an die Verantwortliche des Bürge
 Unterschrift
 </p>
 {% endif %}
+<!--div class="submit-row"-->
+    {% if back_button %}<br /><br /><a href="javascript:history.go(-1)" class="closelink">{{ back_button }}</a>{% endif %}
+<!--/div-->
 {% endblock %}

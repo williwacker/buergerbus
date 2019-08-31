@@ -100,7 +100,7 @@ class Klienten(models.Model):
 	
 	@property
 	def name_ort(self):
-		return "_".join([self.name, self.ort])
+		return "_".join([self.name, self.ort.ort])
 
 	class Meta():
 		verbose_name_plural = "Klienten"

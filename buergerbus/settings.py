@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'Tour.apps.TourConfig',
     'jet.dashboard',
     'jet',
+    'django_filters',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -49,6 +50,7 @@ INSTALLED_APPS = [
     'multiselectfield',
 #    'formtools',
     'debug_toolbar',
+    'django_tables2',
 ]
 
 MIDDLEWARE = [
@@ -154,6 +156,8 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+STATIC_ROOT = '/var/www/html/buergerbus/static/'
+
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "static"),
 ]
@@ -174,6 +178,7 @@ INTERNAL_IPS = [
 # Klienten von ausserhalb der VG können hinzugefügt werden
 ALLOW_OUTSIDE_CLIENTS = True
 
+# Google maps API key lesen
 import configparser
 cfg = configparser.ConfigParser()
 cfg.optionxform=str

@@ -1,0 +1,35 @@
+{% extends 'Basis/header.html' %}
+{% load render_table from django_tables2 %}
+{% load static %}
+{% block content %}
+<div id="content-main">
+    {% if add %}
+    <ul class="object-tools">
+        <li>
+            <a href="add/" class="addlink">
+                {{ add }} hinzufügen
+            </a>
+        </li>   
+    </ul>
+    {% endif %}
+    {% if table %}
+    <div id="changelist" class="module filtered">
+        <div id="toolbar">
+            {% if filter %}
+            <form action="" method="get">
+                <p>{{ filter.form }}
+                <input type="submit" value="Filtern" /></p>
+            </form>
+            {% endif %}
+        </div>
+        <form id="changelist-form">
+            <div class="results">
+                {% render_table table %}
+            </div>
+        </form>
+    </div>
+    {% else %}
+        <p>Keine {{ title }} eingetragen.</p>
+    {% endif %}
+</div>
+{% endblock %}
