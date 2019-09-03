@@ -52,9 +52,9 @@ def get_sidebar(user):
 	if user.has_perm('Einsatztage.view_bus') or user.has_perm('Einsatztage.view_buero'):
 		value = []
 		if user.has_perm('Einsatztage.view_bus'):
-			value.append({'name':'Fahrer','value':'/Einsatztage/fahrer/'})
+			value.append({'name':'Fahrtage','value':'/Einsatztage/fahrer/'})
 		if user.has_perm('Einsatztage.view_buero'):
-			value.append({'name':'Büro','value':'/Einsatztage/buero/'})
+			value.append({'name':'Bürotage','value':'/Einsatztage/buero/'})
 		sidebar.append({'name':'Einsatztage', 'value':value})
 	
 	if user.has_perm('Tour.view_tour'):

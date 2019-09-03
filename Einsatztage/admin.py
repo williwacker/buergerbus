@@ -25,9 +25,9 @@ class FahrtagAdmin(admin.ModelAdmin):
 
 	def changelist_view(self, request, extra_context=None):
 		if request.user.is_superuser:
-			self.list_display = ['datum', 'team', 'fahrer_vormittag', 'fahrer_nachmittag', 'klienten_anzahl', 'archiv']
+			self.list_display = ['datum', 'team', 'fahrer_vormittag', 'klienten_vormittag', 'fahrer_nachmittag', 'klienten_nachmittag', 'archiv']
 		else:
-			self.list_display = ['datum', 'team', 'fahrer_vormittag', 'fahrer_nachmittag', 'klienten_anzahl']
+			self.list_display = ['datum', 'team', 'fahrer_vormittag', 'klienten_vormittag', 'fahrer_nachmittag', 'klienten_nachmittag']
 		return super(FahrtagAdmin, self).changelist_view(request, extra_context)
 
 	def get_queryset(self, request):

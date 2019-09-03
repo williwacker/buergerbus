@@ -9,10 +9,9 @@ from jet.filters import RelatedFieldAjaxListFilter
 from .forms import FahrgastAddForm, FahrgastChgForm, DienstleisterAddForm, DienstleisterChgForm
 from .forms import OrtAddForm, OrtChgForm
 from .forms import StrassenAddForm, StrassenChgForm
-
 from .models import Klienten, Orte, Strassen
 from .tables import OrteTable, StrassenTable, DienstleisterTable, FahrgaesteTable
-from .filter import StrassenFilter, OrteFilter, FahrgaesteFilter, DienstleisterFilter
+from .filters import StrassenFilter, OrteFilter, FahrgaesteFilter, DienstleisterFilter
 from Einsatzmittel.models import Bus
 from Einsatzmittel.utils import get_bus_list
 from Basis.utils import get_sidebar, render_to_pdf
@@ -306,7 +305,7 @@ class DienstleisterDeleteView(View):
 	def get(self, request, *args, **kwargs):
 		k = Klienten.objects.get(pk=kwargs['pk'])
 		k.delete()
-
+		messages.success(request, 'Dienstleister '+klient.name+' wurde gelöscht.')
 		return HttpResponseRedirect('/Klienten/dienstleister/')	
 
 class OrtView(MyListView):
@@ -390,13 +389,12 @@ class OrtChangeView(MyDetailView):
 		if form.is_valid():
 			post = request.POST.dict()
 			ort = Orte.objects.get(pk=kwargs['pk'])
-			ort.ort=post['ort']
 			if post['bus']:
 				ort.bus=Bus.objects.get(pk=int(post['bus']))
 			ort.updated_by = request.user
 			ort.save()
 			context['form'] = form
-			messages.success(request, 'Ort "<a href="'+request.path+'">'+post['ort']+'</a>" wurde erfolgreich geändert.')
+			messages.success(request, 'Ort "<a href="'+request.path+'">'+str(ort)+'</a>" wurde erfolgreich geändert.')
 			return HttpResponseRedirect('/Klienten/orte/')
 
 		return render(request, self.template_name, context)		
@@ -404,8 +402,9 @@ class OrtChangeView(MyDetailView):
 class OrtDeleteView(View):
 
 	def get(self, request, *args, **kwargs):
-		k = Orte.objects.get(pk=kwargs['pk'])
-		k.delete()
+		ort = Orte.objects.get(pk=kwargs['pk'])
+		ort.delete()
+		messages.success(request, 'Ort '+str(ort)+' wurde gelöscht.')
 		return HttpResponseRedirect('/Klienten/orte/')	
 
 class StrassenView(MyListView):
@@ -459,7 +458,7 @@ class StrassenAddView(MyDetailView):
 					)
 			strasse.save()
 			context['form'] = form		
-			messages.success(request, 'Strasse "<a href="'+request.path+'">'+post['strasse']+' in '+post['ort']+'</a>" wurde erfolgreich hinzugefügt.')
+			messages.success(request, 'Strasse "<a href="'+request.path+'">'+strasse.strasse+' in '+str(strasse.ort)+'</a>" wurde erfolgreich hinzugefügt.')
 			context['messages'] = messages
 			return HttpResponseRedirect('/Klienten/strassen/')
 		
@@ -488,14 +487,12 @@ class StrassenChangeView(MyDetailView):
 		form = self.form_class(request.POST)
 		if form.is_valid():
 			post = request.POST.dict()
-			o = Orte.objects.get(pk=int(post['ort']))
 			strasse = Strassen.objects.get(pk=kwargs['pk'])
 			strasse.strasse=post['strasse']
-			strasse.ort=o
 			strasse.updated_by = request.user
 			strasse.save()
 			context['form'] = form
-			messages.success(request, 'Strasse "<a href="'+request.path+'">'+post['strasse']+' in '+o.ort+'</a>" wurde erfolgreich geändert.')
+			messages.success(request, 'Strasse "<a href="'+request.path+'">'+strasse.strasse+' in '+str(strasse.ort)+'</a>" wurde erfolgreich geändert.')
 			return HttpResponseRedirect('/Klienten/strassen/')
 		else:
 			messages.error(request, form.errors)
@@ -505,6 +502,7 @@ class StrassenChangeView(MyDetailView):
 class StrassenDeleteView(View):
 
 	def get(self, request, *args, **kwargs):
-		k = Strassen.objects.get(pk=kwargs['pk'])
-		k.delete()
+		strasse = Strassen.objects.get(pk=kwargs['pk'])
+		strasse.delete()
+		messages.success(request, 'Strasse '+strasse.strasse+' in '+str(strasse.ort)+' wurde gelöscht.')
 		return HttpResponseRedirect('/Klienten/strassen/')	

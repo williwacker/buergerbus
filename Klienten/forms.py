@@ -58,6 +58,10 @@ class OrtAddForm(ModelForm):
 		fields = ['ort','bus']
 
 class OrtChgForm(ModelForm):
+	def __init__(self, *args, **kwargs):
+		super(OrtChgForm, self).__init__(*args, **kwargs)
+		self.fields['ort'].disabled = True
+		self.fields['ort'].required = False	
 	class Meta:
 		model = Orte
 		fields = ['ort','bus']		
@@ -73,9 +77,10 @@ class StrassenAddForm(ModelForm):
 		fields = ['ort','strasse']	
 
 class StrassenChgForm(ModelForm):
+	def __init__(self, *args, **kwargs):
+		super(StrassenChgForm, self).__init__(*args, **kwargs)
+		self.fields['ort'].disabled = True
+		self.fields['ort'].required = False		
 	class Meta:
 		model = Strassen
-		fields = ['ort','strasse']
-#		widgets = {'ort': forms.TextInput(attrs={'readonly': 'readonly'})}		
-
-	
+		fields = ['ort','strasse']	

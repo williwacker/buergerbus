@@ -20,7 +20,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '7(i0!i@+61n)wi82z!6&whv+7r2s61(#s9fptj5hjjggih6ehh'
+SECRET_KEY = ''
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -101,23 +101,6 @@ DATABASES = {
     }
 }
 
-"""
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql', 
-        'NAME': 'buergerbus',
-        'USER': 'buergerbus',
-        'PASSWORD': 'buergerbus',
-        'HOST': 'localhost',   # Or an IP Address that your DB is hosted on
-        'PORT': '3306',
-        'OPTIONS': {
-            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
-        },
-    }
-}
-"""
-
-
 # Password validation
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
 
@@ -156,8 +139,6 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-STATIC_ROOT = '/var/www/html/buergerbus/static/'
-
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "static"),
 ]
@@ -177,14 +158,11 @@ INTERNAL_IPS = [
 
 # Klienten von ausserhalb der VG können hinzugefügt werden
 ALLOW_OUTSIDE_CLIENTS = True
+# Anzahl planbarer Fahrtage/Bürotage
+COUNT_DRIVING_DAYS = 5
+COUNT_OFFICE_DAYS  = 30
 
-# Google maps API key lesen
-import configparser
-cfg = configparser.ConfigParser()
-cfg.optionxform=str
-cfg.read('secret_googlemaps_key.txt', encoding='utf-8')
-for section in cfg:
-    if (section == 'DEFAULT'):
-        for name, value in cfg.items('DEFAULT'):
-            if (name == 'GOOGLEMAPS_KEY'):
-                GOOGLEMAPS_KEY = value.strip("'")
+# import settings.json
+import json
+overrides = json.loads(open('settings.json').read())
+globals().update(overrides)

@@ -130,5 +130,5 @@ migrations/
 *.txt
 *.csv
 
-secret_googlemaps_key.txt
 Strassennamen.txt
+settings.json

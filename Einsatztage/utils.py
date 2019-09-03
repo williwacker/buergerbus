@@ -2,6 +2,7 @@ import datetime, time
 from django.http import HttpResponse
 from django.template.loader import get_template
 from django.contrib.auth.models import Permission
+from django.conf import settings
 from .models import Fahrtag
 from Einsatzmittel.models import Bus, Buero
 
@@ -53,7 +54,8 @@ class FahrtageSchreiben():
 			existierende_tage = [row for row in rows]
 
 			# die Fahrtage für die nächsten 30 Tage ausrechnen
-			for i in range(1,30):
+			max_days = settings.COUNT_DRIVING_DAYS
+			for i in range(1,max_days):
 				neuer_tag = datetime.date.today() + datetime.timedelta(days=i)
 				if neuer_tag not in existierende_tage:  # Tag ist nicht bereits definiert
 					if neuer_tag not in holiday_list:   # Tag ist kein Feiertag
@@ -97,7 +99,8 @@ class BuerotageSchreiben():
 			existierende_tage = [row for row in rows]
 
 			# die Bürotage für die nächsten 30 Tage ausrechnen
-			for i in range(1,30):
+			max_days = settings.COUNT_OFFICE_DAYS
+			for i in range(1,max_days):
 				neuer_tag = datetime.date.today() + datetime.timedelta(days=i)
 				if neuer_tag not in existierende_tage:  # Tag ist nicht bereits definiert
 					if neuer_tag not in holiday_list:   # Tag ist kein Feiertag

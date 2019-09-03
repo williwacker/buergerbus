@@ -10,9 +10,11 @@ from django.contrib import messages
 from django.conf import settings
 from django import forms
 
-from .models import Fahrtag
+from .tables import FahrtagTable, BuerotagTable
+from .filters import FahrtagFilter, BuerotagFilter
 from .utils import FahrtageSchreiben
-from .forms import FahrtagChgForm
+from .forms import FahrtagChgForm, BuerotagChgForm
+from .models import Fahrtag, Buerotag
 from Tour.models import Tour
 from Team.models import Fahrer, Buerokraft
 from Einsatzmittel.models import Bus
@@ -21,9 +23,13 @@ from Basis.utils import get_sidebar
 
 class MyListView(LoginRequiredMixin, ListView):
 	login_url = settings.LOGIN_URL
+	template_name = 'Basis/simple_table.html'
+	context_object_name = 'table'
 
 class MyDetailView(LoginRequiredMixin, DetailView):
 	login_url = settings.LOGIN_URL
+	initial = {'key': 'value'}
+	template_name = 'Basis/detail.html'
 
 class TourView(MyListView):
 	template_name = 'Einsatztage/tour.html'
@@ -57,7 +63,7 @@ class GeneratePDF(LoginRequiredMixin, View):
 			return response
 		return HttpResponse("Kein Dokument vorhanden")	
 
-class FahrtageView(MyListView):
+class FahrtageListView(MyListView):
 	template_name = 'Einsatztage/fahrer.html'
 	context_object_name = 'einsatz_liste'
 
@@ -71,16 +77,15 @@ class FahrtageView(MyListView):
 		context['title'] = "Fahrtage"
 		return context
 
-class FahrtageDetailView(MyDetailView):
+class FahrtageChangeView(MyDetailView):
 	form_class = FahrtagChgForm
-	initial = {'key': 'value'}
-	template_name = 'Basis/detail.html'
-	context_object_name = 'fahrer'
 	
 	def get_context_data(self):
 		context = {}
 		context['sidebar_liste'] = get_sidebar(self.request.user)
 		context['title'] = "Fahrereinsatz ändern"
+		context['submit_button'] = "Sichern"
+		context['back_button'] = "Abbrechen"
 		return context
 	
 	def get(self, request, *args, **kwargs):
@@ -106,14 +111,60 @@ class FahrtageDetailView(MyDetailView):
 			fahrtag.updated_by = request.user
 			fahrtag.save()
 			context['form'] = form
-			messages.success(request, 'Fahrtag "<a href="'+request.path+'">'+post['datum']+' Bus '+post['team']+'</a>" wurde erfolgreich geändert.')
+			messages.success(request, 'Fahrtag "<a href="'+request.path+'">'+str(fahrtag.datum)+' '+str(fahrtag.team)+'</a>" wurde erfolgreich geändert.')
 			return HttpResponseRedirect('/Einsatztage/fahrer/')
 
 		return render(request, self.template_name, context)		
 
-class BueroView(MyListView):
-	pass
+class BuerotageListView(MyListView):
+	
+	def get_queryset(self):
+		team = self.request.GET.get('team')
+		qs = Buerotag.objects.order_by('team','datum')
+		if team:
+			qs = qs.filter(team=team)
+		table = BuerotagTable(qs)
+		table.paginate(page=self.request.GET.get("page", 1), per_page=20)
+		return table
 
-class BueroDetailView(MyDetailView):
-	pass
+	def get_context_data(self, **kwargs):
+		context = super().get_context_data(**kwargs)
+		context['sidebar_liste'] = get_sidebar(self.request.user)
+		context['title'] = "Bürotage"
+		context['filter'] = BuerotagFilter(self.request.GET, queryset=Buerotag.objects.all())
+		return context
 
+class BuerotageChangeView(MyDetailView):
+	form_class = BuerotagChgForm
+
+	def get_context_data(self, request):
+		context = {}
+		context['sidebar_liste'] = get_sidebar(request.user)
+		context['title'] = "Bürotag ändern"
+		context['submit_button'] = "Sichern"
+		context['back_button'] = "Abbrechen"
+		return context
+	
+	def get(self, request, *args, **kwargs):
+		context = self.get_context_data(request)
+		form = self.form_class(instance=Buerotag.objects.get(pk=kwargs['pk']))
+		context['form'] = form
+		return render(request, self.template_name, context)
+
+	def post(self, request, *args, **kwargs):
+		context = self.get_context_data(request)
+		form = self.form_class(request.POST)
+		if form.is_valid():
+			post = request.POST.dict()
+			buero = Buerotag.objects.get(pk=kwargs['pk'])
+			if post['mitarbeiter'] != "":
+				buero.mitarbeiter=Buerokraft.objects.get(pk=int(post['mitarbeiter']))
+			buero.updated_by = request.user
+			buero.save()
+			context['form'] = form
+			messages.success(request, 'Bürotag "<a href="'+request.path+'">'+str(buero.datum)+' '+str(buero.team)+'</a>" wurde erfolgreich geändert.')
+			return HttpResponseRedirect('/Einsatztage/buero/')
+		else:
+			messages.error(request, form.errors)
+
+		return render(request, self.template_name, context)		
