@@ -36,18 +36,9 @@ class TourAddForm2(forms.Form):
 	
 
 class TourChgForm(TourenForm):
+	fahrgast = forms.CharField(required=False, widget=forms.TextInput(attrs={'readonly':'readonly'}), label='Fahrgast')
+	bus_2    = forms.CharField(required=False, widget=forms.TextInput(attrs={'readonly':'readonly'}), label='Bus')
 	class Meta:
 		model = Tour
-		fields = ['klient','bus','datum','uhrzeit','abholklient','zielklient','entfernung','ankunft']
-		widgets = {'entfernung': forms.HiddenInput(), 'ankunft': forms.HiddenInput()}
-
-	def __init__(self, *args, **kwargs):
-		super(TourChgForm, self).__init__(*args, **kwargs)       
-		instance = getattr(self, 'instance', None)
-
-		# When in EDIT mode.
-		if instance and instance.id:
-			self.fields['klient'].widget.attrs['disabled'] = 'True'
-			self.fields['klient'].required = 'False'
-			self.fields['bus'].widget.attrs['disabled'] = 'True'
-			self.fields['bus'].required = 'False'			
+		fields = ['fahrgast','bus_2','klient','bus','datum','uhrzeit','abholklient','zielklient','entfernung','ankunft']
+		widgets = {'klient': forms.HiddenInput(), 'bus': forms.HiddenInput(), 'entfernung': forms.HiddenInput(), 'ankunft': forms.HiddenInput()}

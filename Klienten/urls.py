@@ -1,8 +1,8 @@
 from django.urls import path
-from Klienten.views import FahrgastView, DienstleisterView, DSGVOView, DSGVOasPDFView, FahrgastAddView, FahrgastChangeView, FahrgastDeleteView
-from Klienten.views import DienstleisterView, DienstleisterAddView, DienstleisterChangeView, DienstleisterDeleteView
-from Klienten.views import OrtView, OrtAddView, OrtChangeView, OrtDeleteView
-from Klienten.views import StrassenView, StrassenAddView, StrassenChangeView, StrassenDeleteView
+from .views import FahrgastView, DienstleisterView, DSGVOView, DSGVOasPDFView, FahrgastAddView, FahrgastChangeView, FahrgastDeleteView
+from .views import DienstleisterView, DienstleisterAddView, DienstleisterChangeView, DienstleisterDeleteView
+from .views import OrtView, OrtAddView, OrtChangeView, OrtDeleteView
+from .views import StrassenView, StrassenAddView, StrassenChangeView, StrassenDeleteView
 
 app_name = 'Klienten'
 urlpatterns = [

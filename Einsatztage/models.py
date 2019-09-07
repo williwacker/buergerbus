@@ -38,12 +38,12 @@ class Fahrtag(models.Model):
 		return str(self.datum)
 	
 	@property
-	def klienten_nachmittag(self):
+	def gaeste_nachmittag(self):
 		from Tour.models import Tour
 		return Tour.objects.filter(datum_id=self.id, uhrzeit__gte=datetime.time(12)).count()
 
 	@property
-	def klienten_vormittag(self):
+	def gaeste_vormittag(self):
 		from Tour.models import Tour
 		return Tour.objects.filter(datum_id=self.id, uhrzeit__lt=datetime.time(12)).count()
 

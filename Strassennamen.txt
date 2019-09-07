@@ -696,7 +696,7 @@
 	Ludwig-Rhumbler-Straße =
 	Margit-Manz-Straße =
 	Martin-Niemöller-Weg =
-	Maxmilian-Kolbe-Straße =
+	Maximilian-Kolbe-Straße =
 	Nikolaus-Eseler-Straße =
 	Otto-Wels-Straße =
 	Peterspforte =
@@ -784,7 +784,7 @@
 	Mehlbergweg =
 	Münch-Braun-Straße =
 	Neugasse =
-	Nibelungen Straße =
+	Nibelungenstraße =
 	Noirestraße =
 	Obere Schanzenstraße =
 	Obermarkt =
@@ -911,4 +911,8 @@
 	Sylvanerweg =
 	Weinbergstraße =
 	Windbergtal =
-	
+[ Kirchheimbolanden = ]
+    Marnheimer Straße =
+    Schlossstraße =
+    Mühlstraße =
+    Gasstraße =

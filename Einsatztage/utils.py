@@ -53,7 +53,7 @@ class FahrtageSchreiben():
 			rows = Fahrtag.objects.filter(team=b, archiv=False).values_list('datum',flat=True)
 			existierende_tage = [row for row in rows]
 
-			# die Fahrtage für die nächsten 30 Tage ausrechnen
+			# die Fahrtage für die nächsten n Tage ausrechnen
 			max_days = settings.COUNT_DRIVING_DAYS
 			for i in range(1,max_days):
 				neuer_tag = datetime.date.today() + datetime.timedelta(days=i)
@@ -68,7 +68,7 @@ class FahrtageSchreiben():
 		rows = Fahrtag.objects.filter(archiv=False).values_list('datum','id')
 		existierende_tage = [row for row in rows]
 		for tag, id in existierende_tage:
-			if tag <= datetime.date.today():
+			if tag < datetime.date.today():
 				t = Fahrtag.objects.get(pk=id)
 				t.archiv=True
 				t.save()
@@ -98,7 +98,7 @@ class BuerotageSchreiben():
 			rows = Buerotag.objects.filter(team=b, archiv=False).values_list('datum',flat=True)
 			existierende_tage = [row for row in rows]
 
-			# die Bürotage für die nächsten 30 Tage ausrechnen
+			# die Bürotage für die nächsten n Tage ausrechnen
 			max_days = settings.COUNT_OFFICE_DAYS
 			for i in range(1,max_days):
 				neuer_tag = datetime.date.today() + datetime.timedelta(days=i)

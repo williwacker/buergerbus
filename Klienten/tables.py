@@ -15,13 +15,13 @@ class FahrgaesteTable(tables.Table):
     dsgvo = tables.TemplateColumn('''
         {% load static %}
         {% if record.dsgvo == '01' %}
-            <a href="{{ record.id }}/dsgvo/"><img src="{% static "/project/img/dsgvo.png" %}" alt="DSGVO anzeigen" title="DSGVO anzeigen"></a>
-            <a href="{{ record.id }}/dsgvoAsPDF/"><img src="{% static "/project/img/icon_pdf.png" %}" alt="PDF erzeugen" title="PDF erzeugen"></a>
+            <a href="{{ record.id }}/dsgvo/"><img src="{% static "project/img/dsgvo.png" %}" alt="DSGVO anzeigen" title="DSGVO anzeigen"></a>
+            <a href="{{ record.id }}/dsgvoAsPDF/"><img src="{% static "project/img/icon_pdf.png" %}" alt="PDF erzeugen" title="PDF erzeugen"></a>
         {% else %}
             {% if klient.dsgvo == '02' %}
-                <img src="{% static "/project/img/pencil.png" %}" alt="DSGVO zur Unterschrift" title="DSGVO zur Unterschrift">
+                <img src="{% static "project/img/pencil.png" %}" alt="DSGVO zur Unterschrift" title="DSGVO zur Unterschrift">
             {% else %}
-                <img src="{% static "/project/img/checkmark.png" %}" alt="DSGVO liegt vor" title="DSGVO liegt vor">
+                <img src="{% static "project/img/checkmark.png" %}" alt="DSGVO liegt vor" title="DSGVO liegt vor">
             {% endif %}
         {% endif %}  
         ''')
@@ -41,7 +41,7 @@ class DienstleisterTable(tables.Table):
     )       
     class Meta:
         model = Klienten
-        fields = ('name','telefon','adresse','bemerkung')
+        fields = ('name','telefon','adresse','bemerkung','kategorie')
 
 
 class OrteTable(tables.Table):

@@ -25,7 +25,7 @@ SECRET_KEY = ''
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost']
 
 
 # Application definition
@@ -161,8 +161,11 @@ ALLOW_OUTSIDE_CLIENTS = True
 # Anzahl planbarer Fahrtage/Bürotage
 COUNT_DRIVING_DAYS = 5
 COUNT_OFFICE_DAYS  = 30
+# Anzahl Navigations-Buttons für die Tour Ansicht. Wert zwischen 2 und 6 gibt Anzahl der Buttons an. Ansonsten werden vorheriger und nächster Tag angeboten.
+TOUR_BAR = 4
 
 # import settings.json
 import json
-overrides = json.loads(open('settings.json').read())
+base_dir = os.path.dirname(__file__)
+overrides = json.loads(open(os.path.join(base_dir,'settings.json')).read())
 globals().update(overrides)

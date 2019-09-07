@@ -152,3 +152,6 @@ ul.pagination li {
     min-width: 20px;
     text-align: center
 }
+.changeform-navigation-button, .changeform-navigation-button:visited, .changeform-navigation-button:hover {
+    width: 10rem;
+}

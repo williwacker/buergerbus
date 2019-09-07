@@ -1,6 +1,8 @@
-from datetime import datetime, timedelta, time
+from datetime import datetime, timedelta, time, date
 import googlemaps
 from django.conf import settings
+from .models import Tour
+from Einsatztage.models import Fahrtag
 
 
 class DistanceMatrix():
@@ -30,3 +32,15 @@ class DistanceMatrix():
 			arrivaltime = time(0,0,0)
 
 		return [dist,dura, arrivaltime]
+
+class TourArchive():
+
+	def __init__(self):
+		rows = Tour.objects.filter(archiv=False).values_list('datum','id')
+		existierende_tage = [row for row in rows]
+		for tag, id in existierende_tage:
+			fahrtag = Fahrtag.objects.get(pk=tag)
+			if fahrtag.datum < date.today():
+				t = Tour.objects.get(pk=id)
+				t.archiv=True
+				t.save()		

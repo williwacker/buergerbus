@@ -12,6 +12,12 @@
         </li>   
     </ul>
     {% endif %}
+    {% if nav_bar %}
+        {{ nav_bar }}
+    {% endif %}
+    {% if pre_table %}
+        {% render_table pre_table %}
+    {% endif %}
     {% if table %}
     <div id="changelist" class="module filtered">
         <div id="toolbar">

@@ -1,23 +1,22 @@
-{% extends 'registration/header.html' %}
+{% extends 'Basis/header.html' %}
 {% load static %}
 {% block content %}
 <div id="content-main">
     <form action="" method="post" id="login-form">
-    {% csrf_token %}
-    {{ form.non_field_errors }}
+        {% csrf_token %}
+        {{ form.non_field_errors }}
 
-    {% for hidden_field in form.hidden_fields %}
-        {{ hidden_field.errors }}
-        {{ hidden_field }}
-    {% endfor %}
-            <div class="form-row">
-                    {{ form.as_p }}
-            </div>
-    <div class="submit-row">
-        <button type="submit">Login</button>
-    </div>
-     
-</form>
+        {% for hidden_field in form.hidden_fields %}
+            {{ hidden_field.errors }}
+            {{ hidden_field }}
+        {% endfor %}
+        <div class="form-row">
+                {{ form.as_p }}
+        </div>
+        <div class="submit-row">
+            <button type="submit">Login</button>
+        </div>
+    </form>
 </div>
 </script>
 {% endblock %}

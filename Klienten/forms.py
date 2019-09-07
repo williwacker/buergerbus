@@ -12,10 +12,6 @@ StammdatenFormSet = modelformset_factory(Klienten, fields=('name','telefon','mob
 AdressFormSet = modelformset_factory(Klienten, fields=('ort','hausnr'))
 InfoFormSet = modelformset_factory(Klienten, fields=('bemerkung',))
 
-#class MyModelForm(ModelForm):
-#	def __init__(self,*args,**kwargs):
-#		super (MyModelForm,self ).__init__(*args,**kwargs) # populates the post
-#		self.fields['ort'].queryset = Orte.objects.order_by('ort').filter(bus__in=get_bus_list(kwargs['request']))
 class KlientenForm(ModelForm):
 
 	def clean_name(self):

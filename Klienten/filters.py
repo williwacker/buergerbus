@@ -19,4 +19,4 @@ class FahrgaesteFilter(django_filters.FilterSet):
 class DienstleisterFilter(django_filters.FilterSet):
     class Meta:
         model = Klienten
-        fields = ['ort']                    
+        fields = ['ort','kategorie']                    

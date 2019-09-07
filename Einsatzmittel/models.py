@@ -73,10 +73,6 @@ class Buero(models.Model):
 		verbose_name = "Büro"
 		ordering = ["buero"]		
 
-#class BusManager(models.Manager):
-#	def get_queryset(self):
-#		return super().get_queryset().filter(bus=4)
-
 class Bus(models.Model):
 	bus         = models.IntegerField(default=1, primary_key=True, verbose_name="Bus")
 	sitzplaetze = models.IntegerField(default=8, verbose_name="Anzahl Sitzplätze") 

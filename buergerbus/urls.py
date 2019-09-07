@@ -37,6 +37,11 @@ urlpatterns = [
     path('__debug__/', include(debug_toolbar.urls)),
 ]
 
+handler400 = 'Basis.views.my_custom_bad_request_view'
+handler403 = 'Basis.views.my_custom_permission_denied_view'
+handler404 = 'Basis.views.my_custom_page_not_found_view'
+handler500 = 'Basis.views.my_custom_error_view'
+
 admin.site.site_header = "Bürgerbus Admin"
 admin.site.site_title = "Alzey-Land Bürgerbus Portal"
 admin.site.index_title = "Willkommen zum Bürgerbus Portal der VG Alzey-Land"

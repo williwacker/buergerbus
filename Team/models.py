@@ -8,10 +8,12 @@ from django.contrib.auth.models import User
 class Fahrer(models.Model):
 	name  = models.CharField(max_length=200)
 	email = models.EmailField(max_length=254)
-	mobil = models.CharField(max_length=30)
+	telefon = models.CharField(max_length=30, null=True, blank=True)
+	mobil = models.CharField(max_length=30, null=True, blank=True)
 	team  = models.ForeignKey('Einsatzmittel.Bus', null=True, on_delete=models.SET_NULL)
 	aktiv = models.BooleanField(max_length=1, default=True)
 	updated_on = models.DateTimeField(auto_now=True, blank=True, null=True)
+	updated_by = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='update_fahrer', null=True, blank=True, on_delete=models.SET_NULL)
 	def __str__(self):
 		return self.name
 
@@ -21,11 +23,12 @@ class Fahrer(models.Model):
 
 class Buerokraft(models.Model):
 	benutzer = models.OneToOneField(User, related_name='benutzer', on_delete=models.CASCADE)
-	mobil = models.CharField(max_length=30)
+	telefon = models.CharField(max_length=30, null=True, blank=True)
+	mobil = models.CharField(max_length=30, null=True, blank=True)
 	team  = models.ForeignKey('Einsatzmittel.Buero', null=True, on_delete=models.SET_NULL)
 	aktiv = models.BooleanField(max_length=1, default=True)
 	updated_on = models.DateTimeField(auto_now=True, blank=True, null=True)
-	updated_by = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='update', null=True, blank=True, on_delete=models.SET_NULL)
+	updated_by = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='update_buero', null=True, blank=True, on_delete=models.SET_NULL)
 
 	def __str__(self):
 		return ", ".join([str(self.benutzer.last_name),str(self.benutzer.first_name)])

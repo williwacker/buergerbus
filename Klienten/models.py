@@ -19,6 +19,11 @@ TYP_AUSWAHL = [
 	('D', 'Dienstleister')
 ]
 
+DIENSTLEISTER_AUSWAHL = [
+	('Friseur', 'Friseur'),
+	('Apotheke', 'Apotheke'),
+]
+
 class Orte(models.Model):
 	ort    = models.CharField(max_length=50)
 	bus    = models.ForeignKey('Einsatzmittel.Bus', null=True, blank=True, on_delete=models.CASCADE)
@@ -76,6 +81,7 @@ class Klienten(models.Model):
 	dsgvo   = models.CharField(choices=DSGVO_AUSWAHL, max_length=2, blank=True, default='01', verbose_name='DSGVO')
 	typ     = models.CharField(choices=TYP_AUSWAHL, max_length=1, default='F') # F=Fahrgast, D=Dienstleister
 	bemerkung = models.TextField(max_length=200, blank=True, null=True)
+	kategorie = models.CharField(choices=DIENSTLEISTER_AUSWAHL,max_length=100, blank=True, null=True)
 	updated_on = models.DateTimeField(auto_now=True, blank=True, null=True)
 	updated_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL)
 	
