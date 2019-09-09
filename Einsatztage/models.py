@@ -4,7 +4,7 @@ from django.forms import ModelForm
 from django.db import models
 from django.conf import settings
 from django.utils import timezone
-from Team.models import Fahrer, Buerokraft
+from Team.models import Fahrer, Koordinator
 from smart_selects.db_fields import ChainedForeignKey, GroupedForeignKey
 
 class Fahrtag(models.Model):
@@ -46,6 +46,7 @@ class Fahrtag(models.Model):
 	def gaeste_vormittag(self):
 		from Tour.models import Tour
 		return Tour.objects.filter(datum_id=self.id, uhrzeit__lt=datetime.time(12)).count()
+#		gaeste_vormittag.short_description = _("Gäste vormittags")
 
 	@property
 	def wochentag(self):
@@ -59,9 +60,8 @@ class Fahrtag(models.Model):
 class Buerotag(models.Model):
 	datum      = models.DateField(blank=True)
 	team       = models.ForeignKey('Einsatzmittel.Buero', on_delete=models.CASCADE)	
-#	mitarbeiter = models.ForeignKey('Team.Buerokraft', blank=True, null=True, on_delete=models.SET_NULL)
-	mitarbeiter     = ChainedForeignKey(
-		Buerokraft, # the model where you're populating your fahrer from
+	koordinator     = ChainedForeignKey(
+		Koordinator, # the model where you're populating your fahrer from
 		chained_field="team", # the field on your own model that this field links to 
 		chained_model_field="team", # the field on the foreign model this links to
 		show_all=False,

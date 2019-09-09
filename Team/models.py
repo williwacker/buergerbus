@@ -21,20 +21,18 @@ class Fahrer(models.Model):
 		verbose_name_plural = "Fahrer"
 		verbose_name = "Fahrer"
 
-class Buerokraft(models.Model):
-	benutzer = models.OneToOneField(User, related_name='benutzer', on_delete=models.CASCADE)
+class Koordinator(models.Model):
+	benutzer = models.OneToOneField(User, related_name='benutzer2', on_delete=models.CASCADE)
 	telefon = models.CharField(max_length=30, null=True, blank=True)
 	mobil = models.CharField(max_length=30, null=True, blank=True)
 	team  = models.ForeignKey('Einsatzmittel.Buero', null=True, on_delete=models.SET_NULL)
 	aktiv = models.BooleanField(max_length=1, default=True)
 	updated_on = models.DateTimeField(auto_now=True, blank=True, null=True)
-	updated_by = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='update_buero', null=True, blank=True, on_delete=models.SET_NULL)
+	updated_by = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='update_buero2', null=True, blank=True, on_delete=models.SET_NULL)
 
 	def __str__(self):
 		return ", ".join([str(self.benutzer.last_name),str(self.benutzer.first_name)])
 
 	class Meta():
-		verbose_name_plural = "Bürokräfte"
-		verbose_name = "Bürokraft"
-
-
+		verbose_name_plural = "Koordinatoren"
+		verbose_name = "Koordinator"

@@ -29,7 +29,7 @@ class BuerotagTable(tables.Table):
     )
     class Meta:
         model = Buerotag
-        fields = ('datum','team','mitarbeiter')
+        fields = ('datum','team','koordinator')
 
 
 class TourTable(tables.Table):

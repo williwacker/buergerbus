@@ -1,7 +1,7 @@
 from django.forms import ModelForm
 from django.shortcuts import render
 from django import forms
-from .models import Buerokraft, Fahrer
+from .models import Fahrer, Koordinator
 
 class FahrerAddForm(ModelForm):
 	def __init__(self, *args, **kwargs):
@@ -19,20 +19,19 @@ class FahrerChgForm(ModelForm):
 		model = Fahrer
 		fields = ['name', 'team', 'email', 'telefon', 'mobil', 'aktiv']
 
-class BuerokraftAddForm(ModelForm):
+class KoordinatorAddForm(ModelForm):
 	def __init__(self, *args, **kwargs):
-		super(BuerokraftAddForm, self).__init__(*args, **kwargs)
+		super(KoordinatorAddForm, self).__init__(*args, **kwargs)
 
 	class Meta:
-		model = Buerokraft
+		model = Koordinator
 		fields = ['benutzer', 'team', 'telefon', 'mobil']
 
-class BuerokraftChgForm(ModelForm):
+class KoordinatorChgForm(ModelForm):
+	name = forms.CharField(required=False, widget=forms.TextInput(attrs={'readonly':'readonly'}), label='Name')
 	def __init__(self, *args, **kwargs):
-		super(BuerokraftChgForm, self).__init__(*args, **kwargs)
-		self.fields['benutzer'].disabled = True
-		self.fields['benutzer'].required = False
+		super(KoordinatorChgForm, self).__init__(*args, **kwargs)
 
 	class Meta:
-		model = Buerokraft
-		fields = ['benutzer', 'team', 'telefon', 'mobil', 'aktiv']		
+		model = Koordinator
+		fields = ['name', 'team', 'telefon', 'mobil', 'aktiv']		

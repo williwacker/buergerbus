@@ -60,11 +60,11 @@ def get_sidebar(user):
 	if user.has_perm('Tour.view_tour'):
 		sidebar.append({'name':'Touren', 'value':({'name':'Touren','value':'/Tour/tour/'},)})
 	
-	if user.has_perm('Team.view_fahrer') or user.has_perm('Team.view_buero'):
+	if user.has_perm('Team.view_fahrer') or user.has_perm('Team.view_koordinator'):
 		value = []
 		if user.has_perm('Team.view_fahrer'):
 			value.append({'name':'Fahrer','value':'/Team/fahrer/'})
-		if user.has_perm('Team.view_buero'):
-			value.append({'name':'Büro','value':'/Team/buero/'})
+		if user.has_perm('Team.view_koordinator'):
+			value.append({'name':'Koordinatoren','value':'/Team/koordinator/'})
 		sidebar.append({'name':'Team', 'value':value})
 	return sidebar

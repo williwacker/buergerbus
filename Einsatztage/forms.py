@@ -23,4 +23,4 @@ class BuerotagChgForm(ModelForm):
 		self.fields['team'].required = False
 	class Meta:
 		model = Buerotag
-		fields = ['datum', 'team', 'mitarbeiter']
+		fields = ['datum', 'team', 'koordinator']

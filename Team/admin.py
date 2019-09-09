@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Fahrer, Buerokraft
+from .models import Fahrer, Koordinator
 
 class FahrerAdmin(admin.ModelAdmin):
 	
@@ -15,7 +15,11 @@ class FahrerAdmin(admin.ModelAdmin):
             return qs
         return qs.filter(aktiv=True)
 
-class BuerokraftAdmin(admin.ModelAdmin):
+admin.site.register(Fahrer, FahrerAdmin)        
+
+# ...............
+
+class KoordinatorAdmin(admin.ModelAdmin):
 	
     list_display = ('benutzer', 'name', 'team', 'mobil', 'aktiv')
     list_filter = ('team',)
@@ -26,10 +30,9 @@ class BuerokraftAdmin(admin.ModelAdmin):
         return ", ".join([obj.benutzer.last_name,obj.benutzer.first_name])
 
     def get_queryset(self, request):
-        qs = super(BuerokraftAdmin, self).get_queryset(request)
+        qs = super(KoordinatorAdmin, self).get_queryset(request)
         if request.user.is_superuser:
             return qs
         return qs.filter(aktiv=True)        
 
-admin.site.register(Fahrer, FahrerAdmin)
-admin.site.register(Buerokraft, BuerokraftAdmin)
+admin.site.register(Koordinator, KoordinatorAdmin)

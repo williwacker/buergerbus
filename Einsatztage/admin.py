@@ -3,7 +3,7 @@ from Einsatzmittel.utils import get_bus_list, get_buero_list
 
 from Einsatztage.models import Fahrtag, Buerotag
 from Einsatzmittel.models import Bus, Buero
-from Team.models import Fahrer, Buerokraft
+from Team.models import Fahrer, Koordinator
 from .utils import FahrtageSchreiben, BuerotageSchreiben
 
 
@@ -89,7 +89,7 @@ class BuerotagAdmin(admin.ModelAdmin):
 
 	def formfield_for_foreignkey(self, db_field, request, **kwargs):
 		if db_field.name == "mitarbeiter":
-			kwargs["queryset"] = Buerokraft.objects.filter(aktiv=True)
+			kwargs["queryset"] = Koordinator.objects.filter(aktiv=True)
 		if db_field.name == "team":		
 			kwargs["queryset"] = Buero.objects.filter(id__in=get_buero_list(request))			
 		return super().formfield_for_foreignkey(db_field, request, **kwargs)

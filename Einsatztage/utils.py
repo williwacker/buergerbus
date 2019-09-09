@@ -47,22 +47,23 @@ class FahrtageSchreiben():
 		# die nächsten Feiertage ausrechnen
 		holiday_list = get_holidays()
 
+		existierende_tage = []
 		bus_tage = self.read_bus_tage()
 		for bus_id in bus_tage:
 			b = Bus.objects.get(pk=int(bus_id))
 			rows = Fahrtag.objects.filter(team=b, archiv=False).values_list('datum',flat=True)
 			existierende_tage = [row for row in rows]
 
-			# die Fahrtage für die nächsten n Tage ausrechnen
-			max_days = settings.COUNT_DRIVING_DAYS
-			for i in range(1,max_days):
-				neuer_tag = datetime.date.today() + datetime.timedelta(days=i)
-				if neuer_tag not in existierende_tage:  # Tag ist nicht bereits definiert
-					if neuer_tag not in holiday_list:   # Tag ist kein Feiertag
-						if neuer_tag.weekday() in bus_tage[bus_id]:   # Tag ist ein Fahrtag
-							if changedate != neuer_tag:
-								t = Fahrtag(datum=neuer_tag, team=b)
-								t.save()
+		# die Fahrtage für die nächsten n Tage ausrechnen
+		max_days = settings.COUNT_DRIVING_DAYS
+		for i in range(1,max_days):
+			neuer_tag = datetime.date.today() + datetime.timedelta(days=i)
+			if neuer_tag not in existierende_tage:  # Tag ist nicht bereits definiert
+				if neuer_tag not in holiday_list:   # Tag ist kein Feiertag
+					if neuer_tag.weekday() in bus_tage[bus_id]:   # Tag ist ein Fahrtag
+						if changedate != neuer_tag:
+							t = Fahrtag(datum=neuer_tag, team=b)
+							t.save()
 
 	def archive_past_fahrtage(self):
 		rows = Fahrtag.objects.filter(archiv=False).values_list('datum','id')
@@ -74,6 +75,10 @@ class FahrtageSchreiben():
 				t.save()
 
 class BuerotageSchreiben():
+
+	def __init__(self):
+		self.write_new_buerotage()
+		self.archive_past_buerotage()
 
 	def read_buero_tage(self):
 		buero_dict = {}
@@ -88,26 +93,27 @@ class BuerotageSchreiben():
 			buero_dict[buero] = tage_nr
 		return(buero_dict)
 
-	def write_new_buerotage(self,changedate):
+	def write_new_buerotage(self,changedate=None):
 		# die nächsten Feiertage ausrechnen
 		holiday_list = get_holidays()
 
+		existierende_tage = []
 		buero_tage = self.read_buero_tage()
 		for id in buero_tage:
 			b = Buero.objects.get(pk=id)
 			rows = Buerotag.objects.filter(team=b, archiv=False).values_list('datum',flat=True)
 			existierende_tage = [row for row in rows]
 
-			# die Bürotage für die nächsten n Tage ausrechnen
-			max_days = settings.COUNT_OFFICE_DAYS
-			for i in range(1,max_days):
-				neuer_tag = datetime.date.today() + datetime.timedelta(days=i)
-				if neuer_tag not in existierende_tage:  # Tag ist nicht bereits definiert
-					if neuer_tag not in holiday_list:   # Tag ist kein Feiertag
-						if neuer_tag.weekday() in buero_tage[id]:   # Tag ist ein Bürotag
-							if changedate != neuer_tag:
-								t = Buerotag(datum=neuer_tag, team=b)
-								t.save()
+		# die Bürotage für die nächsten n Tage ausrechnen
+		max_days = settings.COUNT_OFFICE_DAYS
+		for i in range(1,max_days):
+			neuer_tag = datetime.date.today() + datetime.timedelta(days=i)
+			if neuer_tag not in existierende_tage:  # Tag ist nicht bereits definiert
+				if neuer_tag not in holiday_list:   # Tag ist kein Feiertag
+					if neuer_tag.weekday() in buero_tage[id]:   # Tag ist ein Bürotag
+						if changedate != neuer_tag:
+							t = Buerotag(datum=neuer_tag, team=b)
+							t.save()
 
 	def archive_past_buerotage(self):
 		rows = Buerotag.objects.filter(archiv=False).values_list('datum','id')

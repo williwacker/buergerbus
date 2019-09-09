@@ -17,7 +17,7 @@ from .utils import FahrtageSchreiben, BuerotageSchreiben
 from .forms import FahrtagChgForm, BuerotagChgForm
 from .models import Fahrtag, Buerotag
 from Tour.models import Tour
-from Team.models import Fahrer, Buerokraft
+from Team.models import Fahrer, Koordinator
 from Einsatzmittel.models import Bus
 from Einsatzmittel.utils import get_bus_list, get_buero_list
 from Basis.utils import get_sidebar, has_perm
@@ -161,8 +161,8 @@ class BuerotageChangeView(MyDetailView):
 		if form.is_valid():
 			post = request.POST.dict()
 			buero = Buerotag.objects.get(pk=kwargs['pk'])
-			if post['mitarbeiter'] != "":
-				buero.mitarbeiter=Buerokraft.objects.get(pk=int(post['mitarbeiter']))
+			if post['koordinator'] != "":
+				buero.mitarbeiter=Koordinator.objects.get(pk=int(post['koordinator']))
 			buero.updated_by = request.user
 			buero.save()
 			messages.success(request, 'Bürotag "<a href="'+request.path+'">'+str(buero.datum)+' '+str(buero.team)+'</a>" wurde erfolgreich geändert.')

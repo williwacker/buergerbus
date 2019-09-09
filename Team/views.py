@@ -4,17 +4,16 @@ from django.shortcuts import get_object_or_404, render
 from django.http import HttpResponse
 from django.conf import settings
 from django.contrib import messages
+from django.contrib.auth.models import User
 
-from .models import Fahrer, Buerokraft
+from .models import Fahrer, Koordinator
 from Einsatzmittel.models import Bus, Buero
-from .forms import FahrerAddForm, FahrerChgForm, BuerokraftAddForm, BuerokraftChgForm
-from .tables import FahrerTable, BuerokraftTable
-from .filters import FahrerFilter, BuerokraftFilter
+from .forms import FahrerAddForm, FahrerChgForm, KoordinatorAddForm, KoordinatorChgForm
+from .tables import FahrerTable, KoordinatorTable
+from .filters import FahrerFilter, KoordinatorFilter
 from Basis.utils import get_sidebar
-from Einsatzmittel.utils import get_bus_list
+from Einsatzmittel.utils import get_bus_list, get_buero_list
 from Basis.views import MyListView, MyDetailView, MyView
-
-#from .views import BuerokraftView, BuerokraftAddView, BuerokraftChangeView, BuerokraftDeleteView
 
 register = template.Library()
 
@@ -125,3 +124,115 @@ class FahrerDeleteView(MyView):
 		k.delete()
 		messages.success(request, 'Fahrer '+k.name+' wurde gelöscht.')
 		return HttpResponseRedirect('/Team/fahrer/')
+
+# Koordinatoren 
+
+class KoordinatorView(MyListView):
+	auth_name = 'Team.view_koordinator'
+
+	def get_fg_queryset(self):
+		return Koordinator.objects.order_by('team','benutzer').filter(team__in=get_buero_list(self.request))
+
+	def get_queryset(self):
+		team = self.request.GET.get('team')
+		qs = self.get_fg_queryset()
+		if team:
+			qs = qs.filter(team=team)
+		return KoordinatorTable(qs)
+
+	def get_context_data(self, **kwargs):
+		context = super().get_context_data(**kwargs)
+		context['sidebar_liste'] = get_sidebar(self.request.user)
+		context['title'] = "Koordinator"
+		context['add'] = "Koordinator"
+		context['filter'] = KoordinatorFilter(self.request.GET, queryset=self.get_fg_queryset())
+		return context
+
+class KoordinatorAddView(MyDetailView):
+	form_class = KoordinatorAddForm
+	auth_name = 'Team.change_koordinator'
+
+	def get_context_data(self, request):
+		context = {}
+		context['sidebar_liste'] = get_sidebar(request.user)
+		context['title'] = "Koordinator hinzufügen"
+		context['submit_button'] = "Sichern"
+		context['back_button'] = "Abbrechen"
+		return context
+	
+	def get(self, request, *args, **kwargs):
+		context = self.get_context_data(request)
+		form = self.form_class(initial=self.initial)
+		context['form'] = form
+		return render(request, self.template_name, context)
+
+	def post(self, request, *args, **kwargs):
+		context = self.get_context_data(request)
+		form = self.form_class(request.POST)
+		if form.is_valid():
+			post = request.POST.dict()
+			u = User.objects.get(pk=int(post['benutzer']))
+			koordinator = Koordinator(
+								benutzer=u, 
+#								email=post['email'],
+								telefon=post['telefon'],
+								mobil=post['mobil'],
+								aktiv=True,
+								team=Buero.objects.get(pk=int(post['team'])),
+								updated_by = request.user
+							)
+			koordinator.save()
+			messages.success(request, 'Koordinator "<a href="/Team/koordinator/'+str(koordinator.id)+'/">'+str(koordinator.benutzer)+' '+str(koordinator.team)+'</a>" wurde erfolgreich hinzugefügt.')
+			return HttpResponseRedirect('/Team/koordinator/')
+		return render(request, self.template_name, context)
+
+class KoordinatorChangeView(MyDetailView):
+	form_class = KoordinatorChgForm
+	auth_name = 'Team.change_koordinator'
+
+	def get_context_data(self, request):
+		context = {}
+		context['sidebar_liste'] = get_sidebar(request.user)
+		context['title'] = "Koordinator ändern"
+		context['delete_button'] = "Löschen"
+		context['submit_button'] = "Sichern"
+		context['back_button'] = "Abbrechen"
+		return context
+	
+	def get(self, request, *args, **kwargs):
+		context = self.get_context_data(request)
+		instance = Koordinator.objects.get(pk=kwargs['pk'])
+		form = self.form_class(instance=instance)
+		form.fields['name'].initial = ", ".join([instance.benutzer.last_name, instance.benutzer.first_name])
+		context['form'] = form
+		return render(request, self.template_name, context)
+
+	def post(self, request, *args, **kwargs):
+		context = self.get_context_data(request)
+		form = self.form_class(request.POST)
+		if form.is_valid():
+			post = request.POST.dict()
+			t = Buero.objects.get(pk=int(post['team']))
+			koordinator = Koordinator.objects.get(pk=kwargs['pk'])
+			koordinator.telefon=post['telefon']
+			koordinator.mobil=post['mobil']
+			koordinator.team=t
+			if 'aktiv' in post:
+				koordinator.aktiv = True
+			else:
+				koordinator.aktiv = False
+			koordinator.updated_by = request.user
+			koordinator.save()
+			messages.success(request, 'Koordinator "<a href="'+request.path+'">'+str(", ".join([koordinator.benutzer.last_name,koordinator.benutzer.first_name]))+' im Team '+str(koordinator.team)+'</a>" wurde erfolgreich geändert.')
+			return HttpResponseRedirect('/Team/koordinator/')
+
+		return render(request, self.template_name, context)		
+
+class KoordinatorDeleteView(MyView):
+	auth_name = 'Team.delete_koordinator'
+
+	def get(self, request, *args, **kwargs):
+		k = Koordinator.objects.get(pk=kwargs['pk'])
+		k.delete()
+		messages.success(request, 'Koordinator '+k.name+' wurde gelöscht.')
+		return HttpResponseRedirect('/Team/koordinator/')		

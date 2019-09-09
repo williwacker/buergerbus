@@ -1,7 +1,7 @@
 from django.urls import path
 
 from .views import FahrerView, FahrerAddView, FahrerChangeView, FahrerDeleteView
-#from .views import BuerokraftView, BuerokraftAddView, BuerokraftChangeView, BuerokraftDeleteView
+from .views import KoordinatorView, KoordinatorAddView, KoordinatorChangeView, KoordinatorDeleteView
 
 app_name = 'Team'
 urlpatterns = [
@@ -9,8 +9,8 @@ urlpatterns = [
 	path('fahrer/add/', FahrerAddView.as_view()),
 	path('fahrer/<int:pk>/', FahrerChangeView.as_view()),
 	path('fahrer/<int:pk>/delete/', FahrerDeleteView.as_view()),
-#    path('buerokraft/', BuerokraftView.as_view()),
-#	path('buerokraft/add/', BuerokraftAddView.as_view()),
-#	path('buerokraft/<int:pk>/', BuerokraftChangeView.as_view()),
-#	path('buerokraft/<int:pk>/delete/', BuerokraftDeleteView.as_view()),    
+    path('koordinator/', KoordinatorView.as_view()),
+	path('koordinator/add/', KoordinatorAddView.as_view()),
+	path('koordinator/<int:pk>/', KoordinatorChangeView.as_view()),
+	path('koordinator/<int:pk>/delete/', KoordinatorDeleteView.as_view()),    
 ]
