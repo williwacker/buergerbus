@@ -33,9 +33,9 @@ def get_sidebar(user):
 	if user.has_perm('auth.view_user') or user.has_perm('auth.view_group'):
 		value = []
 		if user.has_perm('auth.view_user'):
-			value.append({'name':'Benutzer','value':'/admin/auth/user/'})
+			value.append({'name':'Benutzer','value':'/Basis/benutzer/'})
 		if user.has_perm('auth.view_group'):
-			value.append({'name':'Gruppen','value':'/admin/auth/group/'})
+			value.append({'name':'Gruppen','value':'/Basis/gruppen/'})
 		sidebar.append({'name':'Autorisierung', 'value':value})	
 	
 	if user.has_perm('Klienten.view_klient') or user.has_perm('Klienten.view_orte') or user.has_perm('Klienten.view_strassen'):
@@ -49,13 +49,21 @@ def get_sidebar(user):
 			value.append({'name':'Strassen','value':'/Klienten/strassen/'})
 		sidebar.append({'name':'Klienten', 'value':value})
 	
+	if user.has_perm('Einsatzmittel.view_bus') or user.has_perm('Einsatzmittel.view_buero'):
+		value = []
+		if user.has_perm('Einsatzmittel.view_bus'):
+			value.append({'name':'Busse','value':'/Einsatzmittel/busse/'})
+		if user.has_perm('Einsatzmittel.view_buero'):
+			value.append({'name':'Büros','value':'/Einsatzmittel/bueros/'})
+		sidebar.append({'name':'Einsatzmittel', 'value':value})
+
 	if user.has_perm('Einsatztage.view_bus') or user.has_perm('Einsatztage.view_buero'):
 		value = []
 		if user.has_perm('Einsatztage.view_bus'):
 			value.append({'name':'Fahrtage','value':'/Einsatztage/fahrer/'})
 		if user.has_perm('Einsatztage.view_buero'):
 			value.append({'name':'Bürotage','value':'/Einsatztage/buero/'})
-		sidebar.append({'name':'Einsatztage', 'value':value})
+		sidebar.append({'name':'Einsatztage', 'value':value})		
 	
 	if user.has_perm('Tour.view_tour'):
 		sidebar.append({'name':'Touren', 'value':({'name':'Touren','value':'/Tour/tour/'},)})

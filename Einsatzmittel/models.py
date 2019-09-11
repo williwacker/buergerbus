@@ -46,11 +46,9 @@ class Buero(models.Model):
 		# der codename enthält nur die ID des Büros und die ändert sich nicht
 			permission = Permission.objects.get(codename=self._permission_codename())
 			permission.name = self._permission_name()
-			print(self._permission_codename())			
 			permission.save()
 		except Permission.DoesNotExist:
 		# Falls es die Permission noch nicht gibt, erzeuge sie
-			print(self._permission_codename())
 			permission = Permission.objects.create(
 				codename=self._permission_codename(),
 				name=self._permission_name(),

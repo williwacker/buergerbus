@@ -23,6 +23,7 @@ from Basis.views import BasisView
 
 urlpatterns = [
     path('', BasisView.as_view()),
+    path('Basis/', include('Basis.urls')),
     path('accounts/', include('django.contrib.auth.urls')),
     path('Einsatzmittel/', include('Einsatzmittel.urls')),
     path('Tour/', include('Tour.urls')),

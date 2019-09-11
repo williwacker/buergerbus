@@ -2,9 +2,17 @@ from django.urls import path
 
 from . import views
 
-app_name = 'Bus'
+from .views import BusView, BusAddView, BusChangeView, BusDeleteView
+from .views import BueroView, BueroAddView, BueroChangeView, BueroDeleteView
+
+app_name = 'Einsatzmittel'
 urlpatterns = [
-    path('', views.index, name='index'),
-    path('<int:bus_id>/', views.detail, name='detail'),
-    path('<int:bus_id>/results/', views.results, name='results'),
+    path('busse/', BusView.as_view()),
+    path('busse/add/', BusAddView.as_view()),
+    path('busse/<int:pk>/', BusChangeView.as_view()),
+    path('busse/<int:pk>/delete/', BusDeleteView.as_view()),
+    path('bueros/', BueroView.as_view()),
+    path('bueros/add/', BueroAddView.as_view()),
+    path('bueros/<int:pk>/', BueroChangeView.as_view()),
+    path('bueros/<int:pk>/delete/', BueroDeleteView.as_view()),
 ]
