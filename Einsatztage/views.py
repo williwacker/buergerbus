@@ -24,7 +24,7 @@ from Basis.utils import get_sidebar, has_perm
 from Basis.views import MyListView, MyDetailView, MyView
 
 class TourView(MyListView):
-	auth_name = 'Tour.view_tour'
+	permission_required = 'Tour.view_tour'
 
 	def get_queryset(self):
 		return TourTable(Tour.objects.order_by('uhrzeit').filter(datum=self.kwargs['id']))
@@ -38,7 +38,7 @@ class TourView(MyListView):
 		return context
 
 class GeneratePDF(MyView):
-	auth_name = 'Tour.view_tour'
+	permission_required = 'Tour.view_tour'
 
 	def get(self, request, id):
 		fahrtag_liste = Fahrtag.objects.filter(pk=id).first()
@@ -59,10 +59,10 @@ class GeneratePDF(MyView):
 		return HttpResponse("Kein Dokument vorhanden")	
 
 class FahrtageListView(MyListView):
-	auth_name = 'Einsatztage.view_bus'
+	permission_required = 'Einsatztage.view_bus'
 
 	def get_queryset(self):
-		FahrtageSchreiben()
+		FahrtageSchreiben(self.request.user)
 		team = self.request.GET.get('team')
 		qs = Fahrtag.objects.order_by('datum','team').filter(archiv=False, team__in=get_bus_list(self.request))
 		if team:
@@ -80,7 +80,7 @@ class FahrtageListView(MyListView):
 
 class FahrtageChangeView(MyDetailView):
 	form_class = FahrtagChgForm
-	auth_name = 'Einsatztage.change_bus'
+	permission_required = 'Einsatztage.change_bus'
 	
 	def get_context_data(self):
 		context = {}
@@ -118,10 +118,10 @@ class FahrtageChangeView(MyDetailView):
 		return render(request, self.template_name, context)		
 
 class BuerotageListView(MyListView):
-	auth_name = 'Einsatztage.view_buero'
+	permission_required = 'Einsatztage.view_buero'
 	
 	def get_queryset(self):
-		BuerotageSchreiben()
+		BuerotageSchreiben(self.request.user)
 		team = self.request.GET.get('team')
 		qs = Buerotag.objects.order_by('team','datum').filter(archiv=False, team__in=get_buero_list(self.request))
 		if team:
@@ -139,7 +139,7 @@ class BuerotageListView(MyListView):
 
 class BuerotageChangeView(MyDetailView):
 	form_class = BuerotagChgForm
-	auth_name = 'Einsatztage.change_buero'
+	permission_required = 'Einsatztage.change_buero'
 
 	def get_context_data(self, request):
 		context = {}

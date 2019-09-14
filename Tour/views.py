@@ -17,9 +17,10 @@ from Einsatzmittel.utils import get_bus_list
 from Basis.utils import get_sidebar, render_to_pdf
 from datetime import datetime, timedelta, time
 from Basis.views import MyListView, MyDetailView, MyView
+from Basis.utils import has_perm
 
 class TourView(MyListView):
-	auth_name = 'Tour.view_tour'
+	permission_required = 'Tour.view_tour'
 
 	def get_queryset(self):
 		TourArchive()
@@ -33,12 +34,12 @@ class TourView(MyListView):
 		context = super().get_context_data(**kwargs)
 		context['sidebar_liste'] = get_sidebar(self.request.user)
 		context['title'] = "Touren"
-		context['add'] = "Tour"
-#		context['filter'] = TourFilter(self.request.GET, Tour.objects.order_by('datum').distinct('datum').filter(archiv=False,bus__in=get_bus_list(self.request)))
-		qs = tour_navbar(Fahrtag.objects.order_by('datum').filter(archiv=False, team__in=get_bus_list(self.request)),self.request.GET.get('datum'))
-		context['nav_bar'] = qs
+		if has_perm(self.request.user, 'Tour.change_tour'):
+			context['add'] = "Tour"
+		context['nav_bar'] = tour_navbar(Fahrtag.objects.order_by('datum').filter(archiv=False, team__in=get_bus_list(self.request)),self.request.GET.get('datum'))
 		return context	
 
+'''
 class TourSave():
 	def save(request):
 		post = request.POST.dict()
@@ -63,12 +64,12 @@ class TourSave():
 		)
 		tour.save()
 		return tour.id
-
+'''
 # Dies ist ein zweistufiger Prozess, der zuerst den Klient auswählen lässt, um im zweiten Bildschirm dann mithilfe des dem Klienten zugeordneten Busses
 # die richtigen Fahrtage auszuwählen für das Datumsfeld. An den zweiten Bildschirm wird über die URL die KlientenId übergeben.
 class TourAddView(MyDetailView):
 	form_class = TourAddForm1
-	auth_name = 'Tour.change_tour'
+	permission_required = 'Tour.change_tour'
 
 	def get_context_data(self):
 		context = {}
@@ -99,7 +100,7 @@ class TourAddView(MyDetailView):
 
 class TourAddView2(MyDetailView):
 	form_class = TourAddForm2
-	auth_name = 'Tour.change_tour'
+	permission_required = 'Tour.change_tour'
 	
 	def get_context_data(self):
 		context = {}
@@ -153,13 +154,14 @@ class TourAddView2(MyDetailView):
 
 class TourChangeView(MyDetailView):
 	form_class = TourChgForm
-	auth_name = 'Tour.change_tour'
+	permission_required = 'Tour.change_tour'
 	
 	def get_context_data(self):
 		context = {}
 		context['sidebar_liste'] = get_sidebar(self.request.user)
 		context['title'] = "Tour ändern"
-		context['delete_button'] = "Löschen"
+		if has_perm(self.request.user, 'Tour.delete_tour'):
+			context['delete_button'] = "Löschen"
 		context['submit_button'] = "Sichern"
 		context['back_button'] = "Abbrechen"		
 		return context
@@ -201,7 +203,7 @@ class TourChangeView(MyDetailView):
 		return render(request, self.template_name, context)		
 
 class TourDeleteView(MyView):
-	auth_name = 'Tour.delete_tour'
+	permission_required = 'Tour.delete_tour'
 
 	def get(self, request, *args, **kwargs):
 		k = Tour.objects.get(pk=kwargs['pk'])

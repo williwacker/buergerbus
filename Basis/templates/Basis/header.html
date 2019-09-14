@@ -15,6 +15,7 @@
         <link rel="stylesheet" type="text/css" href="{% static "admin/css/dashboard.css" %}" />
         <link rel="stylesheet" type="text/css" href="{% static "admin/css/forms.css" %}" />
         <link rel="stylesheet" type="text/css" href="{% static "admin/css/changelists.css" %}" />
+        <link rel="stylesheet" type="text/css" href="{% static "admin/css/login.css" %}" />
         <link rel="stylesheet" type="text/css" href="{% static "project/css/base.css" %}" />
         <script type="text/javascript" charset="utf-8">
             var DATE_FORMAT = "%d.%m.%Y";
@@ -45,30 +46,31 @@
         <!-- Container -->
         <div id="container">
             <!-- Suppress header -->
-            {% if sidebar_liste %}
-                <!-- Header -->
-                <div id="header">
-                    <div id="title">VG Alzey-Land Bürgerbus Portal</div>
+            <!-- Header -->
+            <div id="header">
+                <div id="title">VG Alzey-Land Bürgerbus Portal</div>
 
-                    <div id="branding">
-                        {% block branding %}{% endblock %}
-                    </div>
+                <div id="branding">
+                    {% block branding %}{% endblock %}
+                </div>
+                {% if sidebar_liste %}
                     {% block usertools %}
-                    {% if user.is_active and user.is_staff or has_permission %}
-                    <div id="user-tools">
-                        {% block welcome-msg %}
-                            {% trans 'Welcome,' %}
-                            <strong>{% firstof user.get_short_name user.get_username %}</strong>.
-                        {% endblock %}
-                        {% block userlinks %}
-                            {% if user.has_usable_password %}
-                            <a href="{% url 'admin:password_change' %}">{% trans 'Change password' %}</a> /
-                            {% endif %}
-                            <a href="{% url 'admin:logout' %}">abmelden</a>
-                        {% endblock %}
-                    </div>
-                    {% endif %}
-                    {% endblock %}
+                        {% if user.is_active and user.is_staff or has_permission %}
+                        <div id="user-tools">
+                            {% block welcome-msg %}
+                                {% trans 'Welcome,' %}
+                                <strong>{% firstof user.get_short_name user.get_username %}</strong>.
+                            {% endblock %}
+                            {% block userlinks %}
+                                {% if user.has_usable_password %}
+                                <a href="/accounts/password/change/">{% trans 'Change password' %}</a> /
+                                {% endif %}
+                                <a href="/accounts/logout/">abmelden</a>
+                            {% endblock userlinks %}
+                        </div>
+                        {% endif %} 
+                    {% endblock usertools %}
+                {% endif %}
                 </div>
                 <!-- END Header -->
                 {% block breadcrumbs %}
@@ -76,7 +78,7 @@
                 <!--a href="{% url 'admin:index' %}">{% trans 'Home' %}</a-->
                 {% if title %} &rsaquo; {{ title }}{% endif %}
                 </div>
-                {% endblock %}
+                {% endblock breadcrumbs %}
                 {% block messages %}
 					{% if messages %}
 						<ul class="messagelist">
@@ -86,7 +88,7 @@
 						</ul>
 					{% endif %}
                 {% endblock messages %}
-            {% endif %}
+            
             <!-- END Suppress header -->
             <!-- Content -->
             {% if title %}<title>{{ title }}</title>{% endif %}
@@ -99,30 +101,30 @@
 				{% endblock %}
 				<!-- Sidebar -->
 				{% block sidebar %}
-					{% if sidebar_liste %}
 					<div class="sidebar scrollable">
 						<div class="sidebar-section logo">
 							<img src="{% static "project/img/buergerbus.jpg" %}">
-						</div>
-						{% for sidebar in sidebar_liste %}
-						<div class="sidebar-section">
-							<div class="sidebar-title">
-								<span class="sidebar-title-link">
-									{{ sidebar.name }}
-								</span>
-							</div>
-							{% for sidebarlink in sidebar.value %}
-							<a class="sidebar-link" href="{{ sidebarlink.value }}">
-								<span class="sidebar-right">
-										<span class="sidebar-right-arrow icon-arrow-right"></span>
-								</span>
-								<span class="sidebar-link-label">{{ sidebarlink.name }}</span>
-							</a>
-							{% endfor %}
-						</div>
-						{% endfor %}
+                        </div>
+                        {% if sidebar_liste %}
+                            {% for sidebar in sidebar_liste %}
+                            <div class="sidebar-section">
+                                <div class="sidebar-title">
+                                    <span class="sidebar-title-link">
+                                        {{ sidebar.name }}
+                                    </span>
+                                </div>
+                                {% for sidebarlink in sidebar.value %}
+                                <a class="sidebar-link" href="{{ sidebarlink.value }}">
+                                    <span class="sidebar-right">
+                                            <span class="sidebar-right-arrow icon-arrow-right"></span>
+                                    </span>
+                                    <span class="sidebar-link-label">{{ sidebarlink.name }}</span>
+                                </a>
+                                {% endfor %}
+                            </div>
+                            {% endfor %}
+                        {% endif %}
 					</div>
-					{% endif %}
 				{% endblock %}
 				<!-- END Sidebar -->
 				<br class="clear" />

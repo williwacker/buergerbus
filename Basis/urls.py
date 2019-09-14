@@ -1,4 +1,5 @@
 from django.urls import path
+from django.views.generic import TemplateView
 
 #from . import views
 from .views_auth import UserView, UserAddView, UserChangeView, UserDeleteView
@@ -13,5 +14,6 @@ urlpatterns = [
     path('gruppen/', GroupView.as_view()),
     path('gruppen/add/', GroupAddView.as_view()),
     path('gruppen/<int:pk>/', GroupChangeView.as_view()),
-    path('gruppen/<int:pk>/delete/', GroupDeleteView.as_view()),    
+    path('gruppen/<int:pk>/delete/', GroupDeleteView.as_view()),
+    path('logout_success/', TemplateView.as_view(template_name='Basis/logout_success.html')),
 ]

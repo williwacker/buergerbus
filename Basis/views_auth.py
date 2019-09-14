@@ -11,7 +11,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.views.generic import ListView, DetailView, CreateView, UpdateView
 
 class UserView(MyListView):
-	auth_name = 'auth.view_user'
+	permission_required = 'auth.view_user'
 	
 	def get_queryset(self):
 		qs = User.objects.order_by('username')
@@ -22,12 +22,13 @@ class UserView(MyListView):
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
 		context['sidebar_liste'] = get_sidebar(self.request.user)
-		context['add'] = "Benutzer"
+		if has_perm(self.request.user, 'auth.change_user'):
+			context['add'] = "Benutzer"
 		context['title'] = "Benutzer"
 		return context		
 
 class UserAddView(MyDetailView):
-	auth_name = 'auth.change_user'
+	permission_required = 'auth.change_user'
 	form_class = UserCreationForm
 
 	def get_context_data(self, request):
@@ -58,7 +59,7 @@ class UserAddView(MyDetailView):
 		return render(request, self.template_name, context)
 
 class UserChangeView(MyUpdateView):
-	auth_name = 'auth.change_user'
+	permission_required = 'auth.change_user'
 	form_class = MyUserChangeForm
 	model=User
 	success_url = '/Basis/benutzer/'
@@ -67,13 +68,14 @@ class UserChangeView(MyUpdateView):
 		context = super().get_context_data(**kwargs)
 		context['sidebar_liste'] = get_sidebar(self.request.user)
 		context['title'] = "Benutzer ändern"
-		context['delete_button'] = "Löschen"
+		if has_perm(self.request.user, 'auth.delete_user'):
+			context['delete_button'] = "Löschen"
 		context['submit_button'] = "Sichern"
 		context['back_button'] = "Abbrechen"
 		return context
 	
 class UserDeleteView(MyView):
-	auth_name = 'auth.delete_user'
+	permission_required = 'auth.delete_user'
 	def get(self, request, *args, **kwargs):
 		u = User.objects.get(pk=kwargs['pk'])
 		u.delete()
@@ -83,7 +85,7 @@ class UserDeleteView(MyView):
 # Gruppen
 
 class GroupView(MyListView):
-	auth_name = 'auth.view_group'
+	permission_required = 'auth.view_group'
 	
 	def get_queryset(self):
 		qs = Group.objects.order_by('name')
@@ -94,12 +96,13 @@ class GroupView(MyListView):
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
 		context['sidebar_liste'] = get_sidebar(self.request.user)
-		context['add'] = "Gruppe"
+		if has_perm(self.request.user, 'auth.change_group'):
+			context['add'] = "Gruppe"
 		context['title'] = "Gruppen"
 		return context
 
 class GroupAddView(MyDetailView):
-	auth_name = 'auth.change_group'
+	permission_required = 'auth.change_group'
 	form_class = MyGroupChangeForm
 
 	def get_context_data(self, request):
@@ -130,7 +133,7 @@ class GroupAddView(MyDetailView):
 		return render(request, self.template_name, context)
 
 class GroupChangeView(MyUpdateView):
-	auth_name = 'auth.change_group'
+	permission_required = 'auth.change_group'
 	form_class = MyGroupChangeForm
 	model=Group
 	success_url = '/Basis/gruppen/'
@@ -139,15 +142,42 @@ class GroupChangeView(MyUpdateView):
 		context = super().get_context_data(**kwargs)
 		context['sidebar_liste'] = get_sidebar(self.request.user)
 		context['title'] = "Benutzer ändern"
-		context['delete_button'] = "Löschen"
+		if has_perm(self.request.user, 'auth.delete_group'):
+			context['delete_button'] = "Löschen"
 		context['submit_button'] = "Sichern"
 		context['back_button'] = "Abbrechen"
 		return context
 
 class GroupDeleteView(MyView):
-	auth_name = 'auth.delete_group'
+	permission_required = 'auth.delete_group'
 	def get(self, request, *args, **kwargs):
 		g = Group.objects.get(pk=kwargs['pk'])
 		g.delete()
 		messages.success(request, 'Gruppe '+g.name+' wurde gelöscht.')
 		return HttpResponseRedirect('/Basis/gruppen/')
+
+from django.contrib.auth.views import PasswordChangeView
+from django.views.generic import TemplateView
+
+class MyPasswordChangeView(PasswordChangeView):
+
+	def get_context_data(self, **kwargs):
+		context = super().get_context_data(**kwargs)
+		context.update({
+			'title': self.title,
+			**(self.extra_context or {})
+		})
+		context.update({
+			'sidebar_liste':get_sidebar(self.request.user)
+		})
+		return context
+
+class MyPasswordChangeDoneView(TemplateView):
+	template_name = 'registration/password_change_done.html'
+
+	def get_context_data(self, **kwargs):
+		context = super().get_context_data(**kwargs)
+		context.update({
+			'sidebar_liste':get_sidebar(self.request.user)
+		})
+		return context

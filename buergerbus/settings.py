@@ -156,6 +156,10 @@ INTERNAL_IPS = [
     # ...
 ]
 
+LOGIN_URL           = '/accounts/login/'
+LOGIN_REDIRECT_URL  = '/Basis/'
+LOGOUT_REDIRECT_URL = '/accounts/logout_success/'
+
 # Klienten von ausserhalb der VG können hinzugefügt werden
 ALLOW_OUTSIDE_CLIENTS = True
 # Anzahl planbarer Fahrtage/Bürotage

@@ -12,13 +12,13 @@ from .tables import OrteTable, StrassenTable, DienstleisterTable, FahrgaesteTabl
 from .filters import StrassenFilter, OrteFilter, FahrgaesteFilter, DienstleisterFilter
 from Einsatzmittel.models import Bus
 from Einsatzmittel.utils import get_bus_list
-from Basis.utils import get_sidebar, render_to_pdf
+from Basis.utils import get_sidebar, render_to_pdf, has_perm
 from Basis.views import MyListView, MyDetailView, MyView
 
 register = template.Library()
 
 class FahrgastView(MyListView):
-	auth_name = 'Klienten.view_klienten'
+	permission_required = 'Klienten.view_klienten'
 
 	def get_fg_queryset(self):
 		allow = settings.ALLOW_OUTSIDE_CLIENTS
@@ -42,13 +42,14 @@ class FahrgastView(MyListView):
 		context = super().get_context_data(**kwargs)
 		context['sidebar_liste'] = get_sidebar(self.request.user)
 		context['title'] = "Fahrgäste"
-		context['add'] = "Fahrgast"
+		if has_perm(self.request.user, 'Klienten.change_klienten'):
+			context['add'] = "Fahrgast"
 		context['filter'] = FahrgaesteFilter(self.request.GET, queryset=self.get_fg_queryset())
 		return context
 
 class FahrgastAddView(MyDetailView):
 	form_class = FahrgastAddForm
-	auth_name = 'Klienten.change_klienten'
+	permission_required = 'Klienten.change_klienten'
 
 	def get_context_data(self, request):
 		context = {}
@@ -97,13 +98,14 @@ class FahrgastAddView(MyDetailView):
 
 class FahrgastChangeView(MyDetailView):
 	form_class = FahrgastChgForm
-	auth_name = 'Klienten.change_klienten'
+	permission_required = 'Klienten.change_klienten'
 
 	def get_context_data(self, request):
 		context = {}
 		context['sidebar_liste'] = get_sidebar(request.user)
 		context['title'] = "Fahrgast ändern"
-		context['delete_button'] = "Löschen"
+		if has_perm(self.request.user, 'Klienten.delete_klienten'):
+			context['delete_button'] = "Löschen"
 		context['submit_button'] = "Sichern"
 		context['back_button'] = "Abbrechen"
 		return context
@@ -146,7 +148,7 @@ class FahrgastChangeView(MyDetailView):
 		return render(request, self.template_name, context)		
 
 class FahrgastDeleteView(MyView):
-	auth_name = 'Klienten.delete_klienten'
+	permission_required = 'Klienten.delete_klienten'
 
 	def get(self, request, *args, **kwargs):
 		k = Klienten.objects.get(pk=kwargs['pk'])
@@ -155,7 +157,7 @@ class FahrgastDeleteView(MyView):
 		return HttpResponseRedirect('/Klienten/fahrgaeste/')
 
 class DSGVOView(MyDetailView):
-	auth_name = 'Klienten.view_klienten'
+	permission_required = 'Klienten.view_klienten'
 
 	template_name = 'Klienten/dsgvo.html'
 	context_object_name = 'klient'
@@ -171,7 +173,7 @@ class DSGVOView(MyDetailView):
 		return context
 
 class DSGVOasPDFView(MyView):
-	auth_name = 'Klienten.view_klienten'
+	permission_required = 'Klienten.view_klienten'
 
 	def get(self, request, id):
 		klient = Klienten.objects.get(pk=id)
@@ -189,7 +191,7 @@ class DSGVOasPDFView(MyView):
 		return HttpResponse("Kein Dokument vorhanden")
 
 class DienstleisterView(MyListView):
-	auth_name = 'Klienten.view_klienten'
+	permission_required = 'Klienten.view_klienten'
 
 	def get_queryset(self):
 		name = self.request.GET.get('name')
@@ -208,13 +210,14 @@ class DienstleisterView(MyListView):
 		context = super().get_context_data(**kwargs)
 		context['sidebar_liste'] = get_sidebar(self.request.user)
 		context['title'] = "Dienstleister"
-		context['add'] = "Dienstleister"
+		if has_perm(self.request.user, 'Klienten.change_klienten'):
+			context['add'] = "Dienstleister"
 		context['filter'] = DienstleisterFilter(self.request.GET, queryset=Klienten.objects.order_by('name','ort').filter(typ='D'))
 		return context		
 
 class DienstleisterAddView(MyDetailView):
 	form_class = DienstleisterAddForm
-	auth_name = 'Klienten.change_klienten'
+	permission_required = 'Klienten.change_klienten'
 
 	def get_context_data(self, request):
 		context = {}
@@ -257,13 +260,14 @@ class DienstleisterAddView(MyDetailView):
 
 class DienstleisterChangeView(MyDetailView):
 	form_class = DienstleisterChgForm
-	auth_name = 'Klienten.change_klienten'
+	permission_required = 'Klienten.change_klienten'
 
 	def get_context_data(self, request):
 		context = {}
 		context['sidebar_liste'] = get_sidebar(request.user)
 		context['title'] = "Fahrgast ändern"
-		context['delete_button'] = "Löschen"
+		if has_perm(self.request.user, 'Klienten.delete_klienten'):
+			context['delete_button'] = "Löschen"
 		context['submit_button'] = "Sichern"
 		context['back_button'] = "Abbrechen"
 		return context
@@ -297,7 +301,7 @@ class DienstleisterChangeView(MyDetailView):
 		return render(request, self.template_name, context)		
 
 class DienstleisterDeleteView(MyView):
-	auth_name = 'Klienten.delete_klienten'
+	permission_required = 'Klienten.delete_klienten'
 
 	def get(self, request, *args, **kwargs):
 		k = Klienten.objects.get(pk=kwargs['pk'])
@@ -306,7 +310,7 @@ class DienstleisterDeleteView(MyView):
 		return HttpResponseRedirect('/Klienten/dienstleister/')	
 
 class OrtView(MyListView):
-	auth_name = 'Klienten.view_orte'
+	permission_required = 'Klienten.view_orte'
 	
 	def get_queryset(self):
 		ort = self.request.GET.get('ort')
@@ -322,13 +326,14 @@ class OrtView(MyListView):
 		context = super().get_context_data(**kwargs)
 		context['sidebar_liste'] = get_sidebar(self.request.user)
 		context['title'] = "Orte"
-		context['add'] = "Ort"
+		if has_perm(self.request.user, 'Klienten.change_orte'):
+			context['add'] = "Ort"
 		context['filter'] = OrteFilter(self.request.GET, queryset=Orte.objects.all())
 		return context		
 
 class OrtAddView(MyDetailView):
 	form_class = OrtAddForm
-	auth_name = 'Klienten.change_orte'
+	permission_required = 'Klienten.change_orte'
 
 	def get_context_data(self, request):
 		context = {}
@@ -364,13 +369,14 @@ class OrtAddView(MyDetailView):
 
 class OrtChangeView(MyDetailView):
 	form_class = OrtChgForm
-	auth_name = 'Klienten.change_orte'
+	permission_required = 'Klienten.change_orte'
 
 	def get_context_data(self, request):
 		context = {}
 		context['sidebar_liste'] = get_sidebar(request.user)
 		context['title'] = "Ort ändern"
-		context['delete_button'] = "Löschen"
+		if has_perm(self.request.user, 'Klienten.delete_orte'):
+			context['delete_button'] = "Löschen"
 		context['submit_button'] = "Sichern"
 		context['back_button'] = "Abbrechen"
 		return context
@@ -397,7 +403,7 @@ class OrtChangeView(MyDetailView):
 		return render(request, self.template_name, context)		
 
 class OrtDeleteView(MyView):
-	auth_name = 'Klienten.delete_orte'
+	permission_required = 'Klienten.delete_orte'
 
 	def get(self, request, *args, **kwargs):
 		ort = Orte.objects.get(pk=kwargs['pk'])
@@ -406,7 +412,7 @@ class OrtDeleteView(MyView):
 		return HttpResponseRedirect('/Klienten/orte/')	
 
 class StrassenView(MyListView):
-	auth_name = 'Klienten.view_strassen'
+	permission_required = 'Klienten.view_strassen'
 	
 	def get_queryset(self):
 		ort = self.request.GET.get('ort')
@@ -424,13 +430,14 @@ class StrassenView(MyListView):
 		context = super().get_context_data(**kwargs)
 		context['sidebar_liste'] = get_sidebar(self.request.user)
 		context['title'] = "Strassen"
-		context['add'] = "Strasse"
+		if has_perm(self.request.user, 'Klienten.change_strassen'):
+			context['add'] = "Strasse"
 		context['filter'] = StrassenFilter(self.request.GET, queryset=Strassen.objects.all())
 		return context
 
 class StrassenAddView(MyDetailView):
 	form_class = StrassenAddForm
-	auth_name = 'Klienten.change_strassen'
+	permission_required = 'Klienten.change_strassen'
 
 	def get_context_data(self, request):
 		context = {}
@@ -465,13 +472,14 @@ class StrassenAddView(MyDetailView):
 
 class StrassenChangeView(MyDetailView):
 	form_class = StrassenChgForm
-	auth_name = 'Klienten.change_strassen'
+	permission_required = 'Klienten.change_strassen'
 
 	def get_context_data(self, request):
 		context = {}
 		context['sidebar_liste'] = get_sidebar(request.user)
 		context['title'] = "Strasse ändern"
-		context['delete_button'] = "Löschen"
+		if has_perm(self.request.user, 'Klienten.delete_strassen'):
+			context['delete_button'] = "Löschen"
 		context['submit_button'] = "Sichern"
 		context['back_button'] = "Abbrechen"
 		return context
@@ -499,7 +507,7 @@ class StrassenChangeView(MyDetailView):
 		return render(request, self.template_name, context)		
 
 class StrassenDeleteView(MyView):
-	auth_name = 'Klienten.delete_strassen'
+	permission_required = 'Klienten.delete_strassen'
 
 	def get(self, request, *args, **kwargs):
 		strasse = Strassen.objects.get(pk=kwargs['pk'])

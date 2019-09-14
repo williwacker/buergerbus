@@ -9,13 +9,13 @@ from django.contrib.auth.models import User
 from .models import Bus, Buero
 from .forms import BusChgForm, BueroChgForm
 from .tables import BusTable, BueroTable
-from Basis.utils import get_sidebar
+from Basis.utils import get_sidebar, has_perm
 from Basis.views import MyListView, MyDetailView, MyView, MyUpdateView
 
 register = template.Library()
 
 class BusView(MyListView):
-	auth_name = 'Einsatzmittel.view_bus'
+	permission_required = 'Einsatzmittel.view_bus'
 
 	def get_queryset(self):
 		return(BusTable(Bus.objects.order_by('bus')))
@@ -24,12 +24,13 @@ class BusView(MyListView):
 		context = super().get_context_data(**kwargs)
 		context['sidebar_liste'] = get_sidebar(self.request.user)
 		context['title'] = "Busse"
-		context['add'] = "Bus"
+		if has_perm(self.request.user, 'Einsatzmittel.change_bus'):
+			context['add'] = "Bus"
 		return context
 
 class BusAddView(MyDetailView):
 	form_class = BusChgForm
-	auth_name = 'Einsatzmittel.change_bus'
+	permission_required = 'Einsatzmittel.change_bus'
 
 	def get_context_data(self, request):
 		context = {}
@@ -54,7 +55,7 @@ class BusAddView(MyDetailView):
 		return render(request, self.template_name, context)
 
 class BusChangeView(MyUpdateView):
-	auth_name = 'Einsatzmittel.change_bus'
+	permission_required = 'Einsatzmittel.change_bus'
 	form_class = BusChgForm
 	model=Bus
 	success_url = '/Einsatzmittel/busse/'
@@ -63,13 +64,14 @@ class BusChangeView(MyUpdateView):
 		context = super().get_context_data(**kwargs)
 		context['sidebar_liste'] = get_sidebar(self.request.user)
 		context['title'] = "Bus ändern"
-		context['delete_button'] = "Löschen"
+		if has_perm(self.request.user, 'Einsatzmittel.delete_bus'):
+			context['delete_button'] = "Löschen"
 		context['submit_button'] = "Sichern"
 		context['back_button'] = "Abbrechen"
 		return context
 
 class BusDeleteView(MyView):
-	auth_name = 'Einsatzmittel.delete_bus'
+	permission_required = 'Einsatzmittel.delete_bus'
 
 	def get(self, request, *args, **kwargs):
 		b = Bus.objects.get(pk=kwargs['pk'])
@@ -81,7 +83,7 @@ class BusDeleteView(MyView):
 # Bueros 
 
 class BueroView(MyListView):
-	auth_name = 'Einsatzmittel.view_buero'
+	permission_required = 'Einsatzmittel.view_buero'
 
 	def get_queryset(self):
 		return(BueroTable(Buero.objects.order_by('buero')))
@@ -90,12 +92,13 @@ class BueroView(MyListView):
 		context = super().get_context_data(**kwargs)
 		context['sidebar_liste'] = get_sidebar(self.request.user)
 		context['title'] = "Büros"
-		context['add'] = "Büro"
+		if has_perm(self.request.user, 'Einsatzmittel.change_buero'):
+			context['add'] = "Büro"
 		return context
 
 class BueroAddView(MyDetailView):
 	form_class = BueroChgForm
-	auth_name = 'Einsatzmittel.change_buero'
+	permission_required = 'Einsatzmittel.change_buero'
 
 	def get_context_data(self, request):
 		context = {}
@@ -120,7 +123,7 @@ class BueroAddView(MyDetailView):
 		return render(request, self.template_name, context)
 
 class BueroChangeView(MyUpdateView):
-	auth_name = 'Einsatzmittel.change_buero'
+	permission_required = 'Einsatzmittel.change_buero'
 	form_class = BueroChgForm
 	model=Buero
 	success_url = '/Einsatzmittel/bueros/'
@@ -130,13 +133,14 @@ class BueroChangeView(MyUpdateView):
 		context = super().get_context_data(**kwargs)
 		context['sidebar_liste'] = get_sidebar(self.request.user)
 		context['title'] = "Büro ändern"
-		context['delete_button'] = "Löschen"
+		if has_perm(self.request.user, 'Einsatzmittel.delete_buero'):
+			context['delete_button'] = "Löschen"
 		context['submit_button'] = "Sichern"
 		context['back_button'] = "Abbrechen"
 		return context
 
 class BueroDeleteView(MyView):
-	auth_name = 'Einsatzmittel.delete_buero'
+	permission_required = 'Einsatzmittel.delete_buero'
 
 	def get(self, request, *args, **kwargs):
 		b = Buero.objects.get(pk=kwargs['pk'])

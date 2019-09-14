@@ -17,14 +17,20 @@ from django.contrib import admin
 from django.urls import path, include, reverse_lazy
 from django.conf.urls import url
 from smart_selects import urls as smart_selects_urls
+from django.contrib.auth.views import PasswordChangeView
+from django.views.generic import TemplateView
 import debug_toolbar
 from Basis.views import BasisView
+from Basis.views_auth import MyPasswordChangeView, MyPasswordChangeDoneView
 
 
 urlpatterns = [
     path('', BasisView.as_view()),
     path('Basis/', include('Basis.urls')),
     path('accounts/', include('django.contrib.auth.urls')),
+    url(r'^accounts/password/change/$', MyPasswordChangeView.as_view(), name='password_change'),
+    path('accounts/password/change/done/', MyPasswordChangeDoneView.as_view(), name='password_change_done'), 
+    path('accounts/logout_success/', TemplateView.as_view(template_name='registration/logout_success.html')),  
     path('Einsatzmittel/', include('Einsatzmittel.urls')),
     path('Tour/', include('Tour.urls')),
     path('Einsatztage/', include('Einsatztage.urls')),
@@ -34,6 +40,7 @@ urlpatterns = [
     url(r'^chaining/', include('smart_selects.urls')),
     url(r'^jet/', include('jet.urls', 'jet')),
     url(r'^jet/dashboard/', include('jet.dashboard.urls', 'jet-dashboard')), #˓→Django JET dashboard URLS
+#    url(r'^logout/$', include('django.contrib.auth.views.logout', {'next_page': '/successfully_logged_out/'})),
 #    url(r'^admin/', include('admin.site.urls')),
     path('__debug__/', include(debug_toolbar.urls)),
 ]
