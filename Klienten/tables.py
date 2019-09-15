@@ -30,20 +30,18 @@ class FahrgaesteTable(tables.Table):
         fields = ('name','telefon','adresse','bus','bemerkung','dsgvo')
 
 class DienstleisterTable(tables.Table):
-    name = tables.TemplateColumn(
-        template_code='''<a href="{{ record.id }}">{{ record.name |safe }}</a>'''
-    )
     adresse = tables.TemplateColumn(
-        template_code='''{{ record.ort }}<br/>{{ record.strasse }} {{ record.hausnr }}'''
+       template_code='''{{ record.ort }}<br/>{{ record.strasse }} {{ record.hausnr }}'''
     )
     telefon = tables.TemplateColumn(
         template_code='''{{ record.telefon |default_if_none:"-" }}<br/>{{ record.mobil |default_if_none:"" }}'''
-    )       
+    )
+#    adresse = tables.Column(orderable=False)      
     class Meta:
         model = Klienten
         fields = ('name','telefon','adresse','bemerkung','kategorie')
 
-
+        
 class OrteTable(tables.Table):
     ort = tables.TemplateColumn(
         template_code='''<a href="{{ record.id }}">{{ record.ort |safe }}</a>'''

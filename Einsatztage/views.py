@@ -64,9 +64,12 @@ class FahrtageListView(MyListView):
 	def get_queryset(self):
 		FahrtageSchreiben(self.request.user)
 		team = self.request.GET.get('team')
+		sort = self.request.GET.get('sort')
 		qs = Fahrtag.objects.order_by('datum','team').filter(archiv=False, team__in=get_bus_list(self.request))
 		if team:
 			qs = qs.filter(team=team)
+		if sort:
+			qs = qs.order_by(sort)
 		table = FahrtagTable(qs)
 		table.paginate(page=self.request.GET.get("page", 1), per_page=20)
 		return table
@@ -123,9 +126,12 @@ class BuerotageListView(MyListView):
 	def get_queryset(self):
 		BuerotageSchreiben(self.request.user)
 		team = self.request.GET.get('team')
+		sort = self.request.GET.get('sort')
 		qs = Buerotag.objects.order_by('team','datum').filter(archiv=False, team__in=get_buero_list(self.request))
 		if team:
 			qs = qs.filter(team=team)
+		if sort:
+			qs = qs.order_by(sort)
 		table = BuerotagTable(qs)
 		table.paginate(page=self.request.GET.get("page", 1), per_page=20)
 		return table

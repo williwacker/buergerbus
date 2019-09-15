@@ -29,9 +29,12 @@ class FahrerView(MyListView):
 
 	def get_queryset(self):
 		team = self.request.GET.get('team')
+		sort = self.request.GET.get('sort')
 		qs = self.get_fg_queryset()
 		if team:
 			qs = qs.filter(team=team)
+		if sort:
+			qs = qs.order_by(sort)
 		return FahrerTable(qs)
 
 	def get_context_data(self, **kwargs):
@@ -145,9 +148,13 @@ class KoordinatorView(MyListView):
 
 	def get_queryset(self):
 		team = self.request.GET.get('team')
+		sort = self.request.GET.get('sort')
 		qs = self.get_fg_queryset()
 		if team:
 			qs = qs.filter(team=team)
+		if sort:
+			if sort not in ('email','name'):
+				qs = qs.order_by(sort)
 		return KoordinatorTable(qs)
 
 	def get_context_data(self, **kwargs):

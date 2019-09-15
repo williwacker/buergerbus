@@ -4,7 +4,7 @@ from .models import Bus, Buero
 
 class BusTable(tables.Table):
     bus = tables.TemplateColumn(
-        template_code='''<a href="{{ record.bus }}">{{ record.bus |safe }}</a>'''
+        template_code='''<a href="{{ record.id }}">{{ record.bus |safe }}</a>'''
     )
     class Meta:
         model = Bus

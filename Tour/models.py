@@ -6,7 +6,7 @@ import datetime
 from datetime import date
 
 from Einsatzmittel.models import Bus
-from Klienten.models import Klienten, Orte, KlientenBus
+from Klienten.models import Klienten, Orte
 from Einsatztage.models import Fahrtag
 
 class Tour(models.Model):

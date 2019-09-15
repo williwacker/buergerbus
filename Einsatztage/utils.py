@@ -11,8 +11,6 @@ from Basis.utils import has_perm
 from Basis.berechnung_feiertage import Holidays
 from Einsatztage.models import Fahrtag, Buerotag
 
-wochentage = ['Mo','Di','Mi','Do','Fr','Sa','So']
-
 def get_holidays():
 	# die nächsten Feiertage ausrechnen
 	holiday_list = []
@@ -31,29 +29,17 @@ class FahrtageSchreiben():
 			self.write_new_fahrtage()
 			self.archive_past_fahrtage()
 
-	def read_bus_tage(self):
-		bus_dict = {}
-		rows = Bus.objects.order_by('bus').values_list('bus','fahrtage')
-		array = [row for row in rows]
-		for item in array:
-			bus, fahrtage = item
-			tage_nr = []
-			tage = fahrtage.split(",")
-			for tag in tage:
-				tage_nr.append(wochentage.index(tag))
-			bus_dict[bus] = tage_nr
-		return(bus_dict)
-
 	def write_new_fahrtage(self,changedate=None):
 		# die nächsten Feiertage ausrechnen
 		holiday_list = get_holidays()
 
-		bus_tage = self.read_bus_tage()
-		for bus_id in bus_tage:
-			b = Bus.objects.get(pk=int(bus_id))
+		rows = Bus.objects.order_by('bus').values_list('id','fahrtage')
+		array = [row for row in rows]
+		for item in array:
+			id, fahrtag = item
+			b = Bus.objects.get(pk=id)
 			rows = Fahrtag.objects.filter(team=b, archiv=False).values_list('datum',flat=True)
 			existierende_tage = [row for row in rows]
-			print(existierende_tage)
 
 			# die Fahrtage für die nächsten n Tage ausrechnen
 			max_days = settings.COUNT_DRIVING_DAYS
@@ -61,7 +47,7 @@ class FahrtageSchreiben():
 				neuer_tag = datetime.date.today() + datetime.timedelta(days=i)
 				if neuer_tag not in existierende_tage:  # Tag ist nicht bereits definiert
 					if neuer_tag not in holiday_list:   # Tag ist kein Feiertag
-						if neuer_tag.weekday() in bus_tage[bus_id]:   # Tag ist ein Fahrtag
+						if neuer_tag.weekday() == fahrtag:   # Tag ist ein Fahrtag
 							if changedate != neuer_tag:
 								t = Fahrtag(datum=neuer_tag, team=b)
 								t.save()
@@ -83,25 +69,14 @@ class BuerotageSchreiben():
 			self.write_new_buerotage()
 			self.archive_past_buerotage()
 
-	def read_buero_tage(self):
-		buero_dict = {}
-		rows = Buero.objects.order_by('id').values_list('id','buerotage')
-		array = [row for row in rows]
-		for item in array:
-			buero, buerotage = item
-			tage_nr = []
-			tage = buerotage.split(",")
-			for tag in tage:
-				tage_nr.append(wochentage.index(tag))
-			buero_dict[buero] = tage_nr
-		return(buero_dict)
-
 	def write_new_buerotage(self,changedate=None):
 		# die nächsten Feiertage ausrechnen
 		holiday_list = get_holidays()
 
-		buero_tage = self.read_buero_tage()
-		for id in buero_tage:
+		rows = Buero.objects.order_by('buero').values_list('id','buerotage')
+		array = [row for row in rows]
+		for item in array:
+			id, buerotag = item
 			b = Buero.objects.get(pk=id)
 			rows = Buerotag.objects.filter(team=b, archiv=False).values_list('datum',flat=True)
 			existierende_tage = [row for row in rows]
@@ -112,7 +87,7 @@ class BuerotageSchreiben():
 				neuer_tag = datetime.date.today() + datetime.timedelta(days=i)
 				if neuer_tag not in existierende_tage:  # Tag ist nicht bereits definiert
 					if neuer_tag not in holiday_list:   # Tag ist kein Feiertag
-						if neuer_tag.weekday() in buero_tage[id]:   # Tag ist ein Bürotag
+						if neuer_tag.weekday() == buerotag:   # Tag ist ein Bürotag
 							if changedate != neuer_tag:
 								t = Buerotag(datum=neuer_tag, team=b)
 								t.save()

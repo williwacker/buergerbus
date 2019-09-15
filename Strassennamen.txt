@@ -1,4 +1,4 @@
-[Bechenheim = 1]
+[Bechenheim = Bus 1]
     Am Weinberg = 
     Außenliegende Gebäude = 
     Brunnenstraße = 
@@ -12,7 +12,7 @@
     Obergasse = 
     Steinbruch = 
     Weedegasse = 
-[Erbes-Büdesheim = 1]
+[Erbes-Büdesheim = Bus 1]
     Alzeyer Straße = 
     Am Alzeyer Berg = 
     Am Birngraben = 
@@ -56,7 +56,7 @@
     Weedgasse = 
     Weinheimer Weg = 
     Wingertsweg = 
-[Mauchenheim = 1]
+[Mauchenheim = Bus 1]
     Alzeyer Straße =
     Am Heerpfad =
     An der Mühlwiese =
@@ -80,7 +80,7 @@
     Sioner Straße =
     Weinbergstraße =
     Zum Trappenberg =
-[Nack = 1]
+[Nack = Bus 1]
     Am Wingertsberg = 
     An der Bornwiese = 
     Arnoldsweg = 
@@ -94,7 +94,7 @@
     Wochenendhausgebiet = 
     Zum Ahrenberg = 
     Zur Teufelsrutsch = 
-[Nieder-Wiesen = 1]
+[Nieder-Wiesen = Bus 1]
     Alzeyer Straße = 
     Am Goldhähnchen = 
     Auf der Gibb = 
@@ -120,7 +120,7 @@
     Wendelsheimer Straße = 
     Wilhelm-Grauer-Straße = 
     Zum Röthelstal =
-[Offenheim = 1]
+[Offenheim = Bus 1]
     Alzeyer Straße = 
     An der Pforte = 
     Außerhalb = 
@@ -144,7 +144,7 @@
     Untere Schäfergasse = 
     Untergasse = 
     Vorholz =
-[Albig = 2]
+[Albig = Bus 2]
     Alzeyer Pforte = 
     Am alten Brunnen = 
     Am Dalmusberg = 
@@ -185,7 +185,7 @@
     Turnergäßchen = 
     Wassergasse = 
     Zwerchgasse =
-[Bermersheim v. d. Höhe = 2]
+[Bermersheim v. d. Höhe = Bus 2]
     Albiger Straße = 
     Am Fallthor = 
     Am Hildegardisberg = 
@@ -204,7 +204,7 @@
     Spiesheimer Straße = 
     Spitzgasse = 
     Webergasse =
-[Bornheim = 2]
+[Bornheim = Bus 2]
     Friedhofstraße =
     Am Kissel =
     Am Krughof =
@@ -228,7 +228,7 @@
     Sportfeldring =
     Sportfeldstraße =
     Starenweg =
-[Flonheim = 2]
+[Flonheim = Bus 2]
     Marktplatz =
     Aussiedlerhof Meyer =
     Aussiedlerhof Pauser =
@@ -283,7 +283,7 @@
     Belleneck =
     Untergasse =
     Am Backhausgarten =
-[Lonsheim = 2]
+[Lonsheim = Bus 2]
     Am Kirchgarten =
     Außenliegende Gebäude =
     Bermersheimer Straße =
@@ -306,7 +306,7 @@
     Untergasse =
     Weihergasse =
     Wiesenweg =
-[Bechtolsheim = 3]
+[Bechtolsheim = Bus 3]
     Am Matzenberg = 
     An der Bleiche = 
     Auf dem Teich = 
@@ -343,7 +343,7 @@
     Vor dem Schloß =
     Weinolsheimer Straße = 
     Wilhelm-Hoffmann-Straße = 
-[Biebelnheim = 3]
+[Biebelnheim = Bus 3]
     Am Mühlweg = 
     Am Pilgerpfad = 
     An den Weiden = 
@@ -373,7 +373,7 @@
     Wormser Straße = 
     Wörrstädter Straße = 
     Zum Husarengarten = 
-[Framersheim = 3]
+[Framersheim = Bus 3]
     Alzeyer Weg = 
     Am Wall = 
     Atzelmühle = 
@@ -406,7 +406,7 @@
     Silvanerweg = 
     Wormser Straße = 
     Zehnthofstraße = 
-[Gau-Heppenheim = 3]
+[Gau-Heppenheim = Bus 3]
     Am Weiher = 
     An den Sechzig Morgen = 
     Außerhalb = 
@@ -427,7 +427,7 @@
     Ringstraße = 
     Schloßgasse = 
     Zwerchgasse = 
-[Gau-Odernheim = 3]
+[Gau-Odernheim = Bus 3]
     Wallgasse = 
     Sackgasse = 
     In der Kahlenfels = 
@@ -477,7 +477,7 @@
     Schulstraße = 
     Am Grünen Weg = 
     Selzstraße = 
-[Dintesheim = 4]
+[Dintesheim = Bus 4]
     Auf dem Höhlchen = 
     Außerhalb = 
     Bahnwärterhaus = 
@@ -486,7 +486,7 @@
     Hauptstraße = 
     Huckenhofer Weg = 
     Leimenkauter Weg = 
-[Eppelsheim = 4]
+[Eppelsheim = Bus 4]
     Albert-Schweitzer-Straße =
     Alzeyer Straße =
     Am Hellbrunn = 
@@ -519,7 +519,7 @@
     Weiherwiese = 
     Wormser Straße = 
     Zwerchgasse = 
-[Esselborn = 4]
+[Esselborn = Bus 4]
     Alzeyer Gasse = 
     Außerhalb = 
     Gartenstraße = 
@@ -528,7 +528,7 @@
     Obergasse = 
     Untergasse = 
     Wiesbachstraße = 
-[Flomborn = 4]
+[Flomborn = Bus 4]
     Alzeyer Straße = 
     Am Bergelchen = 
     Am Feuerberg = 
@@ -564,7 +564,7 @@
     Untermühle = 
     Weedegasse = 
     Wormser Straße = 
-[Freimersheim = 4]
+[Freimersheim = Bus 4]
     Aufspringmühle = 
     Bahnhofstraße = 
     Das Schmale Tal = 
@@ -587,7 +587,7 @@
     Spitzenbergstraße = 
     Turnplatz = 
     Wiesenweg = 
-[Kettenheim = 4]
+[Kettenheim = Bus 4]
     Alzeyer Straße =
     Am Bahnhof =
     Am Wöllstein =
@@ -602,7 +602,7 @@
     Weidasser Straße =
     Wiesenmühle =
     Wormser Straße =
-[Ober-Flörsheim = 4]
+[Ober-Flörsheim = Bus 4]
     Alzeyer Straße = 
     Am Kendelgarten = 
     Am Kreuz = 
@@ -640,7 +640,7 @@
     Weedegasse = 
     Weyerstraße = 
     Wormser Straße = 
-[Wahlheim = 4]
+[Wahlheim = Bus 4]
     Alzeyer Straße = 
     Am Aufspringbach = 
     Am Berg = 

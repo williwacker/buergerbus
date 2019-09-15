@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.admin.options import ModelAdmin
 from jet.filters import RelatedFieldAjaxListFilter
 
-from .models import Klienten, Orte, Strassen, KlientenBus
+from .models import Klienten, Orte, Strassen
 #from .forms import KlientenForm
 from .sites import my_admin_site
 from Einsatzmittel.models import Bus
@@ -43,20 +43,21 @@ class KlientenAdmin(admin.ModelAdmin):
 		obj.user = request.user
 		obj.updated_by = request.user
 		super().save_model(request, obj, form, change)
-
+		'''
 		if (KlientenBus.objects.filter(name_id=obj.id).count() == 0):
 			b = KlientenBus(name=obj, bus=obj.bus)
 			b.save()
 		else:
 			KlientenBus.objects.filter(name_id=obj.id).update(bus=obj.bus)
+		'''
 		
 
-
+'''
 class KlientenBusAdmin(admin.ModelAdmin):
 	list_display = ('name','bus')
 	ordering = ('name',)
 #	readonly_fields = ('bus',)
-
+'''
 class OrteAdmin(admin.ModelAdmin):
 	list_display = ('ort','bus')
 	ordering = ('ort',)
@@ -75,6 +76,6 @@ class StrassenAdmin(admin.ModelAdmin):
 			return []
 
 admin.site.register(Klienten, KlientenAdmin)
-admin.site.register(KlientenBus, KlientenBusAdmin)
+#admin.site.register(KlientenBus, KlientenBusAdmin)
 admin.site.register(Orte, OrteAdmin)
 admin.site.register(Strassen, StrassenAdmin)

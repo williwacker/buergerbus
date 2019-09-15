@@ -36,7 +36,6 @@ class AddKlienten():
 		return csv_dict
 
 	def write_clients(self,csv_dict):
-#		o = list(Orte.objects.values_list('ort', flat=True))
 		for name, values in csv_dict.items():
 			print(name)
 			try:
@@ -45,22 +44,18 @@ class AddKlienten():
 				print('{} hat keinen bekannten Ortsnamen: {}'.format(name,values['Ort']))
 				exit()
 			print(o)
-#			ort_id = Instance(Orte.objects.filter(ort=values['Ort']).values_list('id', flat=True))[0]
 			# Strasse und Hausnr aufsplitten
 			z = re.match("(.+)\s(\d+-*\d*)$",values['Strasse'])
 			[strasse, hausnr] = z.groups()
-#			s = list(Strassen.objects.filter(ort=o).values_list('strasse', flat=True))
 			try:
 				s = Strassen.objects.get(ort=o,strasse=strasse.strip())
 #				s.index(strasse)
 			except:
 				print('{} hat keinen bekannten Strassennamen: {}'.format(name,strasse))
 				exit()
-#			strassen_id = list(Strassen.objects.filter(ort=o, strasse=strasse).values_list('id', flat=True))[0]
-#			name = name.replace(' ',', ',1)			
 			print(s)
 			k = Klienten(name=name, ort=o, strasse=s, hausnr=hausnr, kategorie=values['Kategorie'], bemerkung=values['Sparte'], dsgvo='99', typ="D", telefon='-'.join([values['Vorwahl'],values['Tel.Nr.']]))
-#			k.save()
+			k.save()
 			
-#AddKlienten('Dienstleister.csv')
+AddKlienten('Friseur.csv')
 AddKlienten('Apotheke.csv')

@@ -19,6 +19,9 @@ class FahrtagTable(tables.Table):
                         {% endif %}
                     '''
     )
+    gaeste_vormittag = tables.Column(orderable=False)
+    gaeste_nachmittag = tables.Column(orderable=False)
+    tour = tables.Column(orderable=False)
     class Meta:
         model = Fahrtag
         fields = ('datum','team','fahrer_vormittag','gaeste_vormittag','fahrer_nachmittag','gaeste_nachmittag')

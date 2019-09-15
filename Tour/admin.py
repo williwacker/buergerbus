@@ -1,8 +1,7 @@
 from django.contrib import admin
 from django.conf import settings
-#from django import forms
 
-from Klienten.models import Klienten, Orte, Strassen, KlientenBus
+from Klienten.models import Klienten, Orte, Strassen
 from Einsatztage.models import Fahrtag
 from Einsatzmittel.models import Bus
 from .models import Tour
@@ -35,10 +34,6 @@ class DistanceMatrix():
 
 		return [dist,dura, arrivaltime]
 
-#class KlientenInline(admin.TabularInline):
-#	model = Klienten
-#	fk_name = "klient"
-
 class TourAdmin(admin.ModelAdmin):
 
 	list_display = ('klient', 'bus', 'datum', 'uhrzeit', 'abholort', 'zielort', 'entfernung', 'ankunft')
@@ -60,9 +55,6 @@ class TourAdmin(admin.ModelAdmin):
 		else:
 			return ', '.join([obj.zielklient.name, obj.zielklient.ort.ort, obj.zielklient.strasse.strasse +" "+obj.zielklient.hausnr])
 	"""
-	
-#	def klientenbus(self, obj):
-#		return obj.klient.bus
 
 	def formfield_for_foreignkey(self, db_field, request, **kwargs):
 		if db_field.name == "datum":
@@ -73,7 +65,6 @@ class TourAdmin(admin.ModelAdmin):
 		# Entfernung und Fahrzeit aus GoogleMaps holen
 		DM = DistanceMatrix()
 		DM.setUp()
-#		print(obj.datum.datum)
 		googleList = DM.getMatrix(obj.abholklient, obj.zielklient, obj.datum.datum, obj.uhrzeit)
 		obj.entfernung = googleList[0]
 		obj.ankunft = googleList[2]
@@ -89,4 +80,3 @@ class TourInline(admin.TabularInline):
 
 
 admin.site.register(Tour, TourAdmin)
-#admin.site.register(TourInline)

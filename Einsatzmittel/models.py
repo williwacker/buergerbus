@@ -8,21 +8,21 @@ from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 #from .utils import BusManager
 
-TAGE_AUSWAHL = (
-	(None, 'Bitte Einsatztag(e) auswählen'),
-	('Mo,Di,Mi,Do', 'Montag, Dienstag, Mittwoch und Donnerstag'),
-	('Di,Do', 'Dienstag und Donnerstag'),
-	('Mi,Fr', 'Mittwoch und Freitag'),
-	('Mo', 'Montag'),
-	('Di', 'Dienstag'),
-	('Mi', 'Mittwoch'),
-	('Do', 'Donnerstag'),
-	('Fr', 'Freitag'),	
-)
+class Wochentage(models.Model):
+	name = models.CharField(max_length=10, verbose_name = "Wochentag")
+
+	def __str__(self):
+		return self.name
+
+	class Meta():
+		verbose_name_plural = "Wochentage"
+		verbose_name = "Wochentag"
+		ordering = ["id"]	
+
 
 class Buero(models.Model):
 	buero      = models.CharField(max_length=20, verbose_name = "Büro")
-	buerotage  = models.CharField(choices=TAGE_AUSWAHL, max_length=20, default='', verbose_name = "Bürotag")
+	buerotage  = models.ManyToManyField(Wochentage, default='', verbose_name = "Bürotag")
 	updated_on = models.DateTimeField(auto_now=True, blank=True, null=True)
 	updated_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL)
 	
@@ -72,17 +72,14 @@ class Buero(models.Model):
 		ordering = ["buero"]		
 
 class Bus(models.Model):
-	bus         = models.IntegerField(default=1, primary_key=True, verbose_name="Bus")
+	bus         = models.CharField(max_length=25, verbose_name="Bus")
 	sitzplaetze = models.IntegerField(default=8, verbose_name="Anzahl Sitzplätze") 
-	fahrtage    = models.CharField(choices=TAGE_AUSWAHL, max_length=20, default='Di,Do', verbose_name="Fahrtag")
+	fahrtage    = models.ManyToManyField(Wochentage, default='', verbose_name = "Fahrtage")
 	updated_on  = models.DateTimeField(auto_now=True, blank=True, null=True)
 	updated_by  = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL)
 
-#	objects     = BusManager()
-	
 	def __str__(self):
-		return "Bus "+str(self.bus)
-#		return str(self.bus)
+		return str(self.bus)
 
 	def _permission_codename(self):
 		# gibt den codenamen der entsprechenden Berechtigung zurück

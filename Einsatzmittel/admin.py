@@ -1,10 +1,10 @@
 from django.contrib import admin
 
-from .models import Bus, Buero
+from .models import Bus, Buero, Wochentage
 
 class BusAdmin(admin.ModelAdmin):
 	ordering = ('bus',)
-	list_display = ('bus', 'fahrtage', 'sitzplaetze', 'updated_by')
+	list_display = ('bus', 'sitzplaetze', 'updated_by')
 	readonly_fields = ('updated_by',)
 
 	def formfield_for_foreignkey(self, db_field, request, **kwargs):
@@ -19,8 +19,14 @@ class BusAdmin(admin.ModelAdmin):
 
 class BueroAdmin(admin.ModelAdmin):
 	ordering = ('buero',)
-	list_display = ('buero', 'buerotage')	
+	list_display = ('buero',)	
+
+class WochentageAdmin(admin.ModelAdmin):
+	ordering = ('id', )
+	list_display = ('name', )
+
 
 admin.site.register(Bus, BusAdmin)
 admin.site.register(Buero, BueroAdmin)
+admin.site.register(Wochentage, WochentageAdmin)
 

@@ -41,7 +41,7 @@ class ReadNames():
 				except:
 					o = Orte(ort=ort.strip())
 				if (bus != " "):
-					o.bus = Bus.objects.get(pk=int(bus))
+					o.bus = Bus.objects.get(bus=bus.strip())
 				else:
 					o.bus = None
 				o.save()
