@@ -37,8 +37,7 @@ class FahrgastView(MyListView):
 		if bus:
 			qs = qs.filter(bus=bus)
 		if sort:
-			if sort not in ('adresse','dsgvo'):
-				qs = qs.order_by(sort)
+			qs = qs.order_by(sort)
 		return FahrgaesteTable(qs)
 
 
@@ -202,8 +201,7 @@ class DienstleisterView(MyListView):
 		ort = self.request.GET.get('ort')
 		kategorie = self.request.GET.get('kategorie')
 		sort = self.request.GET.get('sort')
-#		qs = Klienten.objects.order_by('name','ort').filter(typ='D')
-		qs = Klienten.objects.order_by('strasse').filter(typ='D')
+		qs = Klienten.objects.order_by('name','ort').filter(typ='D')
 		if ort:
 			qs = qs.filter(ort=ort)
 		if name:
@@ -211,8 +209,7 @@ class DienstleisterView(MyListView):
 		if kategorie:
 			qs = qs.filter(kategorie=kategorie)
 		if sort:
-			if sort != 'adresse':
-				qs = qs.order_by(sort)
+			qs = qs.order_by(sort)
 		return DienstleisterTable(qs)
 
 	def get_context_data(self, **kwargs):

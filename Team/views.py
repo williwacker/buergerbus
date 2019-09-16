@@ -153,8 +153,7 @@ class KoordinatorView(MyListView):
 		if team:
 			qs = qs.filter(team=team)
 		if sort:
-			if sort not in ('email','name'):
-				qs = qs.order_by(sort)
+			qs = qs.order_by(sort)
 		return KoordinatorTable(qs)
 
 	def get_context_data(self, **kwargs):

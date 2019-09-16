@@ -17,14 +17,15 @@ class FahrtagTable(tables.Table):
                         {% else %}
                             &nbsp;
                         {% endif %}
-                    '''
+                    ''',
+        orderable=False
     )
     gaeste_vormittag = tables.Column(orderable=False)
     gaeste_nachmittag = tables.Column(orderable=False)
-    tour = tables.Column(orderable=False)
+    wochentag = tables.Column(orderable=False)
     class Meta:
         model = Fahrtag
-        fields = ('datum','team','fahrer_vormittag','gaeste_vormittag','fahrer_nachmittag','gaeste_nachmittag')
+        fields = ('datum','wochentag','team','fahrer_vormittag','gaeste_vormittag','fahrer_nachmittag','gaeste_nachmittag','tour')
 
 class BuerotagTable(tables.Table):
     datum = tables.TemplateColumn(

@@ -1,7 +1,7 @@
 {% extends 'Basis/header.html' %}
 {% block title %}<title>Tour anzeigen</title>{% endblock %}
 {% block content %}
-        <h1>Fahrplan Bus {{ fahrtag_liste.team.bus }} am {{ fahrtag_liste.datum }}</h1>
+        <h1>Fahrplan {{ fahrtag_liste.team.bus }} am {{ fahrtag_liste.datum }}</h1>
 {%if fahrtag_liste %}
 <table class="headline">
     <tr>

@@ -7,7 +7,8 @@ class FahrgaesteTable(tables.Table):
         template_code='''<a href="{{ record.id }}">{{ record.name |safe }}</a>'''
     )
     adresse = tables.TemplateColumn(
-        template_code='''{{ record.ort }}<br/>{{ record.strasse }} {{ record.hausnr }}'''
+        template_code='''{{ record.ort }}<br/>{{ record.strasse }} {{ record.hausnr }}''',
+        orderable=False
     )
     telefon = tables.TemplateColumn(
         template_code='''{{ record.telefon |default_if_none:"-" }}<br/>{{ record.mobil |default_if_none:"" }}'''
@@ -24,19 +25,20 @@ class FahrgaesteTable(tables.Table):
                 <img src="{% static "project/img/checkmark.png" %}" alt="DSGVO liegt vor" title="DSGVO liegt vor">
             {% endif %}
         {% endif %}  
-        ''')
+        ''',
+        orderable=False)
     class Meta:
         model = Klienten
         fields = ('name','telefon','adresse','bus','bemerkung','dsgvo')
 
 class DienstleisterTable(tables.Table):
     adresse = tables.TemplateColumn(
-       template_code='''{{ record.ort }}<br/>{{ record.strasse }} {{ record.hausnr }}'''
+       template_code='''{{ record.ort }}<br/>{{ record.strasse }} {{ record.hausnr }}''',
+       orderable=False
     )
     telefon = tables.TemplateColumn(
         template_code='''{{ record.telefon |default_if_none:"-" }}<br/>{{ record.mobil |default_if_none:"" }}'''
-    )
-#    adresse = tables.Column(orderable=False)      
+    )   
     class Meta:
         model = Klienten
         fields = ('name','telefon','adresse','bemerkung','kategorie')
