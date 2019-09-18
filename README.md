@@ -15,7 +15,9 @@ python manage.py loaddata Einsatzmittel/fixtures/wochentage.json
 
 python manage.py createsuperuser
 
-add Busses
+Busse per Dialog anlegen
+
+Büros per Dialog anlegen
 
 python schreibe_strassennamen.py
 

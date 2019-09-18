@@ -2,7 +2,7 @@ from django.urls import path
 from django.views.generic import TemplateView
 
 from . import views
-from Einsatztage.views import TourView, GeneratePDF, FahrtageListView, FahrtageChangeView, BuerotageListView, BuerotageChangeView
+from Einsatztage.views import TourView, GeneratePDF,FahrtageListView, FahrtageChangeView, BuerotageListView, BuerotageChangeView
 
 app_name = 'Einsatztage'
 urlpatterns = [

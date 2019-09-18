@@ -24,13 +24,13 @@ class BusView(MyListView):
 		context = super().get_context_data(**kwargs)
 		context['sidebar_liste'] = get_sidebar(self.request.user)
 		context['title'] = "Busse"
-		if has_perm(self.request.user, 'Einsatzmittel.change_bus'):
+		if has_perm(self.request.user, 'Einsatzmittel.add_bus'):
 			context['add'] = "Bus"
 		return context
 
 class BusAddView(MyDetailView):
 	form_class = BusChgForm
-	permission_required = 'Einsatzmittel.change_bus'
+	permission_required = 'Einsatzmittel.add_bus'
 
 	def get_context_data(self, request):
 		context = {}
@@ -92,13 +92,13 @@ class BueroView(MyListView):
 		context = super().get_context_data(**kwargs)
 		context['sidebar_liste'] = get_sidebar(self.request.user)
 		context['title'] = "Büros"
-		if has_perm(self.request.user, 'Einsatzmittel.change_buero'):
+		if has_perm(self.request.user, 'Einsatzmittel.add_buero'):
 			context['add'] = "Büro"
 		return context
 
 class BueroAddView(MyDetailView):
 	form_class = BueroChgForm
-	permission_required = 'Einsatzmittel.change_buero'
+	permission_required = 'Einsatzmittel.add_buero'
 
 	def get_context_data(self, request):
 		context = {}

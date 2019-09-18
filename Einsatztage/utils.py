@@ -47,7 +47,7 @@ class FahrtageSchreiben():
 				neuer_tag = datetime.date.today() + datetime.timedelta(days=i)
 				if neuer_tag not in existierende_tage:  # Tag ist nicht bereits definiert
 					if neuer_tag not in holiday_list:   # Tag ist kein Feiertag
-						if neuer_tag.weekday() == fahrtag:   # Tag ist ein Fahrtag
+						if neuer_tag.isoweekday() == fahrtag:   # Tag ist ein Fahrtag
 							if changedate != neuer_tag:
 								t = Fahrtag(datum=neuer_tag, team=b)
 								t.save()
@@ -87,7 +87,7 @@ class BuerotageSchreiben():
 				neuer_tag = datetime.date.today() + datetime.timedelta(days=i)
 				if neuer_tag not in existierende_tage:  # Tag ist nicht bereits definiert
 					if neuer_tag not in holiday_list:   # Tag ist kein Feiertag
-						if neuer_tag.weekday() == buerotag:   # Tag ist ein Bürotag
+						if neuer_tag.isoweekday() == buerotag:   # Tag ist ein Bürotag
 							if changedate != neuer_tag:
 								t = Buerotag(datum=neuer_tag, team=b)
 								t.save()

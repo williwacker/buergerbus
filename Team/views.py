@@ -41,14 +41,14 @@ class FahrerView(MyListView):
 		context = super().get_context_data(**kwargs)
 		context['sidebar_liste'] = get_sidebar(self.request.user)
 		context['title'] = "Fahrer"
-		if has_perm(self.request.user, 'Team.change_fahrer'):
+		if has_perm(self.request.user, 'Team.add_fahrer'):
 			context['add'] = "Fahrer"
 		context['filter'] = FahrerFilter(self.request.GET, queryset=self.get_fg_queryset())
 		return context
 
 class FahrerAddView(MyDetailView):
 	form_class = FahrerAddForm
-	permission_required = 'Team.change_fahrer'
+	permission_required = 'Team.add_fahrer'
 
 	def get_context_data(self, request):
 		context = {}
@@ -160,14 +160,14 @@ class KoordinatorView(MyListView):
 		context = super().get_context_data(**kwargs)
 		context['sidebar_liste'] = get_sidebar(self.request.user)
 		context['title'] = "Koordinator"
-		if has_perm(self.request.user, 'Team.change_koordinator'):
+		if has_perm(self.request.user, 'Team.add_koordinator'):
 			context['add'] = "Koordinator"
 		context['filter'] = KoordinatorFilter(self.request.GET, queryset=self.get_fg_queryset())
 		return context
 
 class KoordinatorAddView(MyDetailView):
 	form_class = KoordinatorAddForm
-	permission_required = 'Team.change_koordinator'
+	permission_required = 'Team.add_koordinator'
 
 	def get_context_data(self, request):
 		context = {}

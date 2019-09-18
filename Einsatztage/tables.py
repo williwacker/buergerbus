@@ -22,6 +22,24 @@ class FahrtagTable(tables.Table):
     )
     gaeste_vormittag = tables.Column(orderable=False)
     gaeste_nachmittag = tables.Column(orderable=False)
+    fahrer_vormittag = tables.TemplateColumn(
+        template_code='''
+                        {% if record.gaeste_vormittag > 0 and record.fahrer_vormittag == None %}
+                            <span style="color:red; font-weight:bold">KEIN FAHRER EINGETEILT</span>
+                        {% else %}
+                            {{ record.fahrer_vormittag|default_if_none:'' }}
+                        {% endif %}
+                    '''
+    )
+    fahrer_nachmittag = tables.TemplateColumn(
+        template_code='''
+                        {% if record.gaeste_nachmittag > 0 and record.fahrer_nachmittag == None %}
+                            <span style="color:red; font-weight:bold">KEIN FAHRER EINGETEILT</span>
+                        {% else %}
+                            {{ record.fahrer_nachmittag|default_if_none:'' }}
+                        {% endif %}
+                    '''
+    )
     wochentag = tables.Column(orderable=False)
     class Meta:
         model = Fahrtag

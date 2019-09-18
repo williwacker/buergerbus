@@ -1,4 +1,4 @@
-#from django.contrib.admin.widgets import RelatedFieldWidgetWrapper
+from datetime import datetime, timedelta, time
 from django import forms
 from django.forms import ModelForm, modelformset_factory
 from jet.filters import RelatedFieldAjaxListFilter
@@ -28,7 +28,7 @@ class TourAddForm1(forms.Form):
 class TourAddForm2(forms.Form):
 	klient = forms.CharField(required=False, widget=forms.TextInput(attrs={'readonly':'readonly'}), label='Fahrgast')
 	bus = forms.CharField(required=False, widget=forms.TextInput(attrs={'readonly':'readonly'}))
-	datum = forms.ModelChoiceField(queryset=Fahrtag.objects.order_by('datum').filter(archiv=False), empty_label=None)
+	datum = forms.ModelChoiceField(queryset=Fahrtag.objects.order_by('datum').filter(archiv=False, datum__gt=datetime.now()), empty_label=None)
 	uhrzeit = forms.TimeField(widget=forms.TimeInput(attrs={'class':'vTimeField'}))
 	abholklient = forms.ModelChoiceField(queryset=Klienten.objects.order_by('name'))
 	zielklient = forms.ModelChoiceField(queryset=Klienten.objects.order_by('name'))
@@ -40,5 +40,5 @@ class TourChgForm(TourenForm):
 	bus_2    = forms.CharField(required=False, widget=forms.TextInput(attrs={'readonly':'readonly'}), label='Bus')
 	class Meta:
 		model = Tour
-		fields = ['fahrgast','bus_2','klient','bus','datum','uhrzeit','abholklient','zielklient','entfernung','ankunft']
+		fields = ['fahrgast','bus_2','klient','bus','datum','uhrzeit','abholklient','zielklient','entfernung','ankunft','bemerkung']
 		widgets = {'klient': forms.HiddenInput(), 'bus': forms.HiddenInput(), 'entfernung': forms.HiddenInput(), 'ankunft': forms.HiddenInput()}

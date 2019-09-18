@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="iso-8859-1" standalone="no" ?>
+<!DOCTYPE document SYSTEM "rml.dtd">
+{% block content %}
+        <document filename="{{ filename }}">
+            <template rotation="0" showBoundary="0" >
+                <pageTemplate id="main">
+                    <frame id="first" x1="0" y1="20" width="21cm" height="820"/>
+                </pageTemplate>
+            </template>
+            <stylesheet>
+                <blockTableStyle id="myBlockTableStyle1">
+                    <blockAlignment value="LEFT"/>
+                    <blockFont name="Helvetica" size="8"/>
+                    <lineStyle kind="GRID" colorName="black"/>
+                    <lineStyle kind="OUTLINE" colorName="black" thickness="1"/>
+                    <blockBackground colorName="yellow" start="0,0" stop="0,-1"/>
+                    <blockLeftPadding length="5"/>
+                    <blockRightPadding length="5"/>
+                 </blockTableStyle>
+                <blockTableStyle id="myBlockTableStyle2">
+                    <blockAlignment value="LEFT"/>
+                    <blockFont name="Helvetica" size="8"/>
+                    <lineStyle kind="GRID" colorName="black"/>
+                    <lineStyle kind="OUTLINE" colorName="black" thickness="1"/>
+                    <blockBackground colorName="yellow" start="0,0" stop="-1,0"/>
+                    <blockBottomPadding length="30"/>
+                    <!--blockTopPadding length="0"/-->
+                    <blockLeftPadding length="5"/>
+                    <blockRightPadding length="5"/>
+                    <blockValign  value="TOP"/>
+                </blockTableStyle>
+                <paraStyle name="p1"
+                    fontName="Helvetica"
+                    fontSize="8"
+                />
+                <paraStyle name="p2"
+                    fontName="Helvetica"
+                    fontSize="10"
+                    alignment="CENTER"
+                    spaceBefore = "0.1cm"
+                    spaceAfter = "0.1cm"
+                />
+                <paraStyle name="p3"
+                    fontName="Helvetica"
+                    fontSize="16"
+                    alignment="CENTER"
+                    spaceBefore = "0.1cm"
+                    spaceAfter = "0.1cm"
+                />                
+            </stylesheet>
+            <story>
+            <para style="p2">VG Alzey-Land Bürgerbus Portal</para>
+            <para style="p3">Fahrplan {{ fahrtag_liste.team.bus }} am {{ fahrtag_liste.datum }}</para>
+            {%if fahrtag_liste %}
+                <blockTable 
+                            colWidths="4cm,15.2cm"
+                            style="myBlockTableStyle1"
+                            frame="first">
+                    <tr>
+                        <td class="name">Fahrer Vormittag:</td><td class="value">{{ fahrtag_liste.fahrer_vormittag.name|default_if_none:"-" }}</td>
+                    </tr>
+                    <tr>
+                        <td class="name">Fahrer Nachmittag:</td><td class="value">{{ fahrtag_liste.fahrer_nachmittag.name|default_if_none:"-" }}</td>
+                    </tr>
+                </blockTable>
+                <para style="p2">Tourliste</para>
+                <blockTable 
+                            colWidths="2cm,2cm,1.2cm,3.5cm,3.5cm,1.7cm,1.3cm,4cm"
+                            style="myBlockTableStyle2"
+                            frame="second">
+                    <tr>
+                        <td>Klient</td>
+                        <td>Telefon</td>
+                        <td>Uhrzeit</td>
+                        <td>Abholort</td>
+                        <td>Zielort</td>
+                        <td>Entfernung</td>
+                        <td>Ankunft</td>
+                        <td>Bemerkungen</td>
+                    </tr>
+                {% for tour in tour_liste %}
+                    <tr>
+                        <td><para style="p1">{{ tour.klient }}</para></td>
+                        <td><para style="p1">{{ tour.klient.telefon }}<br/>{{ tour.klient.mobil }}</para></td>
+                        <td><para style="p1">{{ tour.uhrzeit }}</para></td>
+                        <td><para style="p1">{% if tour.klient != tour.abholklient %}
+                                {{ tour.abholklient.name }}
+                            {% endif %}
+                            {{ tour.abholklient.ort }}<br/>{{ tour.abholklient.strasse }} {{ tour.abholklient.hausnr }}</para></td>
+                        <td><para style="p1">{% if tour.klient != tour.zielklient %}
+                                {{ tour.zielklient.name }}
+                            {% endif %}
+                            {{ tour.zielklient.ort }}<br/>{{ tour.zielklient.strasse }} {{ tour.zielklient.hausnr }}</para></td>
+                        <td><para style="p1">{{ tour.entfernung|default_if_none:"-" }}</para></td>
+                        <td><para style="p1">{{ tour.ankunft|default_if_none:"-" }}</para></td>
+                        <td><para style="p1">{{ tour.klient.bemerkung|default_if_none:"" }}<br/>{{ tour.bemerkung|default_if_none:"" }}</para></td>  
+                    </tr>
+                {% endfor %}
+                </blockTable>
+            {% else %}
+                    <para>Keine Touren eingetragen</para>
+            {% endif %}
+            </story>
+        </document>
+    
+{% endblock content %}

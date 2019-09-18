@@ -167,6 +167,10 @@ COUNT_DRIVING_DAYS = 5
 COUNT_OFFICE_DAYS  = 30
 # Anzahl Navigations-Buttons für die Tour Ansicht. Wert zwischen 2 und 6 gibt Anzahl der Buttons an. Ansonsten werden vorheriger und nächster Tag angeboten.
 TOUR_BAR = 4
+# Pfad für die Tourlisten zu speichern
+TOUR_PATH = ''
+# Fahrzeit und Ankunftszeit mittels Google Maps errechnen
+USE_GOOGLE = False
 
 # import settings.json
 import json

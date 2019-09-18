@@ -45,14 +45,14 @@ class FahrgastView(MyListView):
 		context = super().get_context_data(**kwargs)
 		context['sidebar_liste'] = get_sidebar(self.request.user)
 		context['title'] = "Fahrgäste"
-		if has_perm(self.request.user, 'Klienten.change_klienten'):
+		if has_perm(self.request.user, 'Klienten.add_klienten'):
 			context['add'] = "Fahrgast"
 		context['filter'] = FahrgaesteFilter(self.request.GET, queryset=self.get_fg_queryset())
 		return context
 
 class FahrgastAddView(MyDetailView):
 	form_class = FahrgastAddForm
-	permission_required = 'Klienten.change_klienten'
+	permission_required = 'Klienten.add_klienten'
 
 	def get_context_data(self, request):
 		context = {}
@@ -216,14 +216,14 @@ class DienstleisterView(MyListView):
 		context = super().get_context_data(**kwargs)
 		context['sidebar_liste'] = get_sidebar(self.request.user)
 		context['title'] = "Dienstleister"
-		if has_perm(self.request.user, 'Klienten.change_klienten'):
+		if has_perm(self.request.user, 'Klienten.add_klienten'):
 			context['add'] = "Dienstleister"
 		context['filter'] = DienstleisterFilter(self.request.GET, queryset=Klienten.objects.order_by('name','ort').filter(typ='D'))
 		return context		
 
 class DienstleisterAddView(MyDetailView):
 	form_class = DienstleisterAddForm
-	permission_required = 'Klienten.change_klienten'
+	permission_required = 'Klienten.add_klienten'
 
 	def get_context_data(self, request):
 		context = {}
@@ -332,14 +332,14 @@ class OrtView(MyListView):
 		context = super().get_context_data(**kwargs)
 		context['sidebar_liste'] = get_sidebar(self.request.user)
 		context['title'] = "Orte"
-		if has_perm(self.request.user, 'Klienten.change_orte'):
+		if has_perm(self.request.user, 'Klienten.add_orte'):
 			context['add'] = "Ort"
 		context['filter'] = OrteFilter(self.request.GET, queryset=Orte.objects.all())
 		return context		
 
 class OrtAddView(MyDetailView):
 	form_class = OrtAddForm
-	permission_required = 'Klienten.change_orte'
+	permission_required = 'Klienten.add_orte'
 
 	def get_context_data(self, request):
 		context = {}
@@ -436,14 +436,14 @@ class StrassenView(MyListView):
 		context = super().get_context_data(**kwargs)
 		context['sidebar_liste'] = get_sidebar(self.request.user)
 		context['title'] = "Strassen"
-		if has_perm(self.request.user, 'Klienten.change_strassen'):
+		if has_perm(self.request.user, 'Klienten.add_strassen'):
 			context['add'] = "Strasse"
 		context['filter'] = StrassenFilter(self.request.GET, queryset=Strassen.objects.all())
 		return context
 
 class StrassenAddView(MyDetailView):
 	form_class = StrassenAddForm
-	permission_required = 'Klienten.change_strassen'
+	permission_required = 'Klienten.add_strassen'
 
 	def get_context_data(self, request):
 		context = {}

@@ -40,8 +40,6 @@ urlpatterns = [
     url(r'^chaining/', include('smart_selects.urls')),
     url(r'^jet/', include('jet.urls', 'jet')),
     url(r'^jet/dashboard/', include('jet.dashboard.urls', 'jet-dashboard')), #˓→Django JET dashboard URLS
-#    url(r'^logout/$', include('django.contrib.auth.views.logout', {'next_page': '/successfully_logged_out/'})),
-#    url(r'^admin/', include('admin.site.urls')),
     path('__debug__/', include(debug_toolbar.urls)),
 ]
 

@@ -34,42 +34,16 @@ class TourView(MyListView):
 		context = super().get_context_data(**kwargs)
 		context['sidebar_liste'] = get_sidebar(self.request.user)
 		context['title'] = "Touren"
-		if has_perm(self.request.user, 'Tour.change_tour'):
+		if has_perm(self.request.user, 'Tour.add_tour'):
 			context['add'] = "Tour"
 		context['nav_bar'] = tour_navbar(Fahrtag.objects.order_by('datum').filter(archiv=False, team__in=get_bus_list(self.request)),self.request.GET.get('datum'))
 		return context	
 
-'''
-class TourSave():
-	def save(request):
-		post = request.POST.dict()
-		klient = Klienten.objects.get(name=post['klient'])
-		fahrtag = Fahrtag.objects.get(pk=int(post['datum']))
-		startzeit = datetime.strptime(post['uhrzeit'], '%H:%M').time()
-		googleList = DistanceMatrix().getMatrix(
-			Klienten.objects.get(pk=int(post['abholklient'])), 
-			Klienten.objects.get(pk=int(post['zielklient'])), 
-			fahrtag.datum, 
-			startzeit)
-		tour = Tour(	
-			klient=klient,
-			datum=fahrtag,
-			uhrzeit=post['uhrzeit'],            
-			abholklient=Klienten.objects.get(pk=int(post['abholklient'])),
-			zielklient=Klienten.objects.get(pk=int(post['zielklient'])),
-			bus=klient.bus,
-			entfernung=googleList[0],
-			ankunft=googleList[2],
-			updated_by=request.user
-		)
-		tour.save()
-		return tour.id
-'''
 # Dies ist ein zweistufiger Prozess, der zuerst den Klient auswählen lässt, um im zweiten Bildschirm dann mithilfe des dem Klienten zugeordneten Busses
 # die richtigen Fahrtage auszuwählen für das Datumsfeld. An den zweiten Bildschirm wird über die URL die KlientenId übergeben.
 class TourAddView(MyDetailView):
 	form_class = TourAddForm1
-	permission_required = 'Tour.change_tour'
+	permission_required = 'Tour.add_tour'
 
 	def get_context_data(self):
 		context = {}
@@ -100,7 +74,7 @@ class TourAddView(MyDetailView):
 
 class TourAddView2(MyDetailView):
 	form_class = TourAddForm2
-	permission_required = 'Tour.change_tour'
+	permission_required = 'Tour.add_tour'
 	
 	def get_context_data(self):
 		context = {}
@@ -116,9 +90,9 @@ class TourAddView2(MyDetailView):
 		klient = Klienten.objects.get(pk=kwargs['pk'])
 		self.initial['klient'] = klient.name
 		self.initial['bus'] = klient.bus
-		form.fields['datum'].queryset = Fahrtag.objects.order_by('datum').filter(archiv=False, team_id=klient.bus)
-		form.fields['abholklient'].queryset = Klienten.objects.order_by('name') 
-		form.fields['zielklient'].queryset = Klienten.objects.order_by('name')
+		form.fields['datum'].queryset = Fahrtag.objects.order_by('datum').filter(archiv=False, team_id=klient.bus, datum__gt=datetime.now())
+#		form.fields['abholklient'].queryset = Klienten.objects.order_by('name') 
+#		form.fields['zielklient'].queryset = Klienten.objects.order_by('name')
 		context['form'] = form
 		return render(request, self.template_name, context)
 
@@ -131,11 +105,13 @@ class TourAddView2(MyDetailView):
 			klient = Klienten.objects.get(name=post['klient'])
 			fahrtag = Fahrtag.objects.get(pk=int(post['datum']))
 			startzeit = datetime.strptime(post['uhrzeit'], '%H:%M').time()
-			googleList = DistanceMatrix().getMatrix(
-				Klienten.objects.get(pk=int(post['abholklient'])), 
-				Klienten.objects.get(pk=int(post['zielklient'])), 
-				fahrtag.datum, 
-				startzeit)
+			googleList = ()
+			if settings.USE_GOOGLE:
+				googleList = DistanceMatrix().getMatrix(
+					Klienten.objects.get(pk=int(post['abholklient'])), 
+					Klienten.objects.get(pk=int(post['zielklient'])), 
+					fahrtag.datum, 
+					startzeit)
 			tour = Tour(	
 				klient=klient,
 				datum=fahrtag,
@@ -143,10 +119,11 @@ class TourAddView2(MyDetailView):
 				abholklient=Klienten.objects.get(pk=int(post['abholklient'])),
 				zielklient=Klienten.objects.get(pk=int(post['zielklient'])),
 				bus=klient.bus,
-				entfernung=googleList[0],
-				ankunft=googleList[2],
 				updated_by=request.user
 			)
+			if googleList:
+				tour.entfernung=googleList[0]
+				tour.ankunft=googleList[2]
 			tour.save()
 			messages.success(request, 'Tour "<a href="/Tour/tour/'+str(tour.id)+'/">'+tour.klient.name+' am '+str(tour.datum)+' um '+str(tour.uhrzeit) +'</a>" wurde erfolgreich hinzugefügt.')
 			return HttpResponseRedirect('/Tour/tour/')
@@ -191,6 +168,7 @@ class TourChangeView(MyDetailView):
 			tour = Tour.objects.get(pk=kwargs['pk'])
 			tour.datum=fahrtag
 			tour.uhrzeit=post['uhrzeit']
+			tour.bemerkung=post['bemerkung']
 			tour.abholklient=Klienten.objects.get(pk=int(post['abholklient']))
 			tour.zielklient=Klienten.objects.get(pk=int(post['zielklient']))
 			tour.entfernung=googleList[0]

@@ -1,12 +1,12 @@
 from django.contrib.auth.models import Permission
 from Einsatzmittel.models import Bus, Buero
-from django.template.loader import get_template
+from django.template import loader, Context
 from django.http import HttpResponse
 from xhtml2pdf import pisa
 from io import BytesIO
 
 def render_to_pdf(template_src, context_dict={}):
-	template = get_template(template_src)
+	template = loader.get_template(template_src)
 	html  = template.render(context_dict)
 	result = BytesIO()
 	pdf = pisa.pisaDocument(BytesIO(html.encode("ISO-8859-1")), result)

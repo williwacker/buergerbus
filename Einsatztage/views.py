@@ -1,5 +1,5 @@
 from Basis.utils import render_to_pdf
-from django.template.loader import get_template
+from django.template import loader, Context
 from django.http import Http404, HttpResponse, HttpResponseRedirect, HttpResponseForbidden
 from django.shortcuts import get_object_or_404, render
 from django.http import HttpResponse
@@ -9,6 +9,7 @@ from django import forms
 from django.utils.safestring import mark_safe
 from django.core.exceptions import PermissionDenied
 from django.contrib.auth.models import Group
+from trml2pdf import trml2pdf
 #import pdfkit 
 
 from .tables import FahrtagTable, BuerotagTable, TourTable, FahrerTable
@@ -40,21 +41,39 @@ class TourView(MyListView):
 class GeneratePDF(MyView):
 	permission_required = 'Tour.view_tour'
 
+	def pdf_render_to_response(self,template_src, context_dict={}, filename=None, prompt=False):
+		response = HttpResponse(content_type='application/pdf')
+		if not filename:
+			filename = template+'.pdf'
+		cd = []
+		if prompt:
+			cd.append('attachment')
+		cd.append('filename=%s' % filename)
+#		response['Content-Disposition'] = '; '.join(cd)
+		template = loader.get_template(template_src)
+		context_dict['filename'] = filename
+#		tc = {'filename': filename}
+#		tc.update(context)
+#		ctx = Context(tc)
+		rml = template.render(context_dict)
+		return trml2pdf.parseString(rml)
+		
 	def get(self, request, id):
 		fahrtag_liste = Fahrtag.objects.filter(pk=id).first()
 		tour_liste = Tour.objects.order_by('uhrzeit').filter(datum=id)
-		context = {'fahrtag_liste':fahrtag_liste,'tour_liste':tour_liste,'skip_nav':1}
-#		html = render(request, self.template_name, context)
-#		pdfkit.from_string(html, 'out.pdf') 
-		pdf = render_to_pdf('Einsatztage/tour_as_pdf.html', context)
+		context = {'fahrtag_liste':fahrtag_liste,'tour_liste':tour_liste}
+		filename = 'Buergerbus_Tour_{}_{}.pdf'.format(str(fahrtag_liste.team).replace(' ','_'), fahrtag_liste.datum)
+		pdf = self.pdf_render_to_response('Einsatztage/tour_as_pdf.rml', context, filename)
 		if pdf:
 			response = HttpResponse(pdf, content_type='application/pdf')
-			filename = "Buergerbus_Tour_Bus_%s_%s.pdf" % (fahrtag_liste.team_id, fahrtag_liste.datum)
 			content = "inline; filename='%s'" %(filename)
+			path = settings.TOUR_PATH + filename
+			with open(path, 'wb') as f:
+				f.write(response.content)
 			download = request.GET.get("download")
 			if download:
 				content = "attachment; filename='%s'" %(filename)
-			response['Content-Disposition'] = content
+				response['Content-Disposition'] = content
 			return response
 		return HttpResponse("Kein Dokument vorhanden")	
 

@@ -13,6 +13,10 @@ class TourTable(tables.Table):
             {% endif %}
         '''
     )
+    bemerkung = tables.TemplateColumn(
+        template_code ='''{{ record.klient.bemerkung  |safe|default_if_none:""  }}<br/>{{ record.bemerkung|default_if_none:""  }} ''',
+        orderable=False
+    )
     class Meta:
         model = Tour
-        fields = ('fahrgast','bus','datum','uhrzeit','abholort','zielort','entfernung','ankunft')
+        fields = ('fahrgast','bus','datum','uhrzeit','abholort','zielort','entfernung','ankunft','bemerkung')
