@@ -67,6 +67,7 @@ class FahrerAddView(MyDetailView):
 	def post(self, request, *args, **kwargs):
 		context = self.get_context_data(request)
 		form = self.form_class(request.POST)
+		context['form'] = form
 		if form.is_valid():
 			post = request.POST.dict()
 			fahrer = Fahrer(	name=post['name'], 
@@ -105,6 +106,7 @@ class FahrerChangeView(MyDetailView):
 	def post(self, request, *args, **kwargs):
 		context = self.get_context_data(request)
 		form = self.form_class(request.POST)
+		context['form'] = form
 		if form.is_valid():
 			post = request.POST.dict()
 			t = Bus.objects.get(pk=int(post['team']))
@@ -186,6 +188,7 @@ class KoordinatorAddView(MyDetailView):
 	def post(self, request, *args, **kwargs):
 		context = self.get_context_data(request)
 		form = self.form_class(request.POST)
+		context['form'] = form
 		if form.is_valid():
 			post = request.POST.dict()
 			u = User.objects.get(pk=int(post['benutzer']))
@@ -230,6 +233,7 @@ class KoordinatorChangeView(MyDetailView):
 	def post(self, request, *args, **kwargs):
 		context = self.get_context_data(request)
 		form = self.form_class(request.POST)
+		context['form'] = form
 		if form.is_valid():
 			post = request.POST.dict()
 			t = Buero.objects.get(pk=int(post['team']))
