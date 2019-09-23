@@ -77,6 +77,7 @@ class FahrgastAddView(MyDetailView):
 	def post(self, request, *args, **kwargs):
 		context = self.get_context_data(request)
 		form = self.form_class(request.POST)
+		context['form'] = form
 		if form.is_valid():
 			post = request.POST.dict()
 			o = Orte.objects.get(pk=int(post['ort']))
@@ -129,6 +130,7 @@ class FahrgastChangeView(MyDetailView):
 	def post(self, request, *args, **kwargs):
 		context = self.get_context_data(request)
 		form = self.form_class(request.POST)
+		context['form'] = form
 		if form.is_valid():
 			post = request.POST.dict()
 			o = Orte.objects.get(pk=int(post['ort']))
@@ -242,6 +244,7 @@ class DienstleisterAddView(MyDetailView):
 	def post(self, request, *args, **kwargs):
 		context = self.get_context_data(request)
 		form = self.form_class(request.POST)
+		context['form'] = form
 		if form.is_valid():
 			post = request.POST.dict()
 			o = Orte.objects.get(pk=int(post['ort']))
@@ -287,6 +290,7 @@ class DienstleisterChangeView(MyDetailView):
 	def post(self, request, *args, **kwargs):
 		context = self.get_context_data(request)
 		form = self.form_class(request.POST)
+		context['form'] = form
 		if form.is_valid():
 			post = request.POST.dict()
 			o = Orte.objects.get(pk=int(post['ort']))
@@ -358,6 +362,7 @@ class OrtAddView(MyDetailView):
 	def post(self, request, *args, **kwargs):
 		context = self.get_context_data(request)
 		form = self.form_class(request.POST)
+		context['form'] = form
 		if form.is_valid():
 			post = request.POST.dict()
 			ort = Orte(	
@@ -396,6 +401,7 @@ class OrtChangeView(MyDetailView):
 	def post(self, request, *args, **kwargs):
 		context = self.get_context_data(request)
 		form = self.form_class(request.POST)
+		context['form'] = form
 		if form.is_valid():
 			post = request.POST.dict()
 			ort = Orte.objects.get(pk=kwargs['pk'])
@@ -462,6 +468,7 @@ class StrassenAddView(MyDetailView):
 	def post(self, request, *args, **kwargs):
 		context = self.get_context_data(request)
 		form = self.form_class(request.POST)
+		context['form'] = form
 		if form.is_valid():
 			post = request.POST.dict()
 			o = Orte.objects.get(pk=int(post['ort']))
@@ -499,6 +506,7 @@ class StrassenChangeView(MyDetailView):
 	def post(self, request, *args, **kwargs):
 		context = self.get_context_data(request)
 		form = self.form_class(request.POST)
+		context['form'] = form
 		if form.is_valid():
 			post = request.POST.dict()
 			strasse = Strassen.objects.get(pk=kwargs['pk'])
