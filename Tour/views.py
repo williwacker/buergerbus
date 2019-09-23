@@ -21,7 +21,7 @@ from Basis.utils import has_perm
 
 class TourView(MyListView):
 	permission_required = 'Tour.view_tour'
-
+	
 	def get_queryset(self):
 		TourArchive()
 		datum = self.request.GET.get('datum')
