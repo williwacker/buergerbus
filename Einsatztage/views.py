@@ -121,6 +121,7 @@ class FahrtageChangeView(MyDetailView):
 	def post(self, request, *args, **kwargs):
 		context = self.get_context_data()
 		form = self.form_class(request.POST)
+		context['form'] = form
 		if form.is_valid():
 			post = request.POST.dict()
 			fahrtag = Fahrtag.objects.get(pk=kwargs['pk'])
@@ -183,6 +184,7 @@ class BuerotageChangeView(MyDetailView):
 	def post(self, request, *args, **kwargs):
 		context = self.get_context_data(request)
 		form = self.form_class(request.POST)
+		context['form'] = formp
 		if form.is_valid():
 			post = request.POST.dict()
 			buero = Buerotag.objects.get(pk=kwargs['pk'])
