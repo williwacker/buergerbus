@@ -49,6 +49,7 @@ class BusAddView(MyDetailView):
 	def post(self, request, *args, **kwargs):
 		context = self.get_context_data(request)
 		form = self.form_class(request.POST)
+		context['form'] = form
 		if form.is_valid():
 			form.save()
 			return HttpResponseRedirect('/Einsatzmittel/busse/')
@@ -117,6 +118,7 @@ class BueroAddView(MyDetailView):
 	def post(self, request, *args, **kwargs):
 		context = self.get_context_data(request)
 		form = self.form_class(request.POST)
+		context['form'] = form
 		if form.is_valid():
 			form.save()
 			return HttpResponseRedirect('/Einsatzmittel/bueros/')
