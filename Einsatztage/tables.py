@@ -6,7 +6,7 @@ from Tour.models import Tour
 
 class FahrtagTable(tables.Table):
     datum = tables.TemplateColumn(
-        template_code='''<a href="{{ record.id }}">{{ record.datum |safe }}</a>'''
+        template_code='''<a href="{{ record.id }}/{{ url_args }}">{{ record.datum |safe }}</a>'''
     )
     tour = tables.TemplateColumn(
         template_code='''
@@ -47,7 +47,7 @@ class FahrtagTable(tables.Table):
 
 class BuerotagTable(tables.Table):
     datum = tables.TemplateColumn(
-        template_code='''<a href="{{ record.id }}">{{ record.datum |safe }}</a>'''
+        template_code='''<a href="{{ record.id }}/{{ url_args }}">{{ record.datum |safe }}</a>'''
     )
     class Meta:
         model = Buerotag

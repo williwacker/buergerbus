@@ -12,7 +12,7 @@ from .tables import OrteTable, StrassenTable, DienstleisterTable, FahrgaesteTabl
 from .filters import StrassenFilter, OrteFilter, FahrgaesteFilter, DienstleisterFilter
 from Einsatzmittel.models import Bus
 from Einsatzmittel.utils import get_bus_list
-from Basis.utils import get_sidebar, render_to_pdf, has_perm
+from Basis.utils import get_sidebar, render_to_pdf, has_perm, url_args
 from Basis.views import MyListView, MyDetailView, MyView
 
 register = template.Library()
@@ -47,12 +47,14 @@ class FahrgastView(MyListView):
 		context['title'] = "Fahrgäste"
 		if has_perm(self.request.user, 'Klienten.add_klienten'):
 			context['add'] = "Fahrgast"
+		context['url_args'] = url_args(self.request)
 		context['filter'] = FahrgaesteFilter(self.request.GET, queryset=self.get_fg_queryset())
 		return context
 
 class FahrgastAddView(MyDetailView):
 	form_class = FahrgastAddForm
 	permission_required = 'Klienten.add_klienten'
+	success_url = '/Klienten/fahrgaeste/'
 
 	def get_context_data(self, request):
 		context = {}
@@ -95,14 +97,15 @@ class FahrgastAddView(MyDetailView):
 								updated_by = request.user
 							)
 			klient.save()
-			messages.success(request, 'Fahrgast "<a href="/Klienten/fahrgaeste/'+str(klient.id)+'/">'+klient.name+'</a>" wurde erfolgreich hinzugefügt.')
-			return HttpResponseRedirect('/Klienten/fahrgaeste/')
+			messages.success(request, 'Fahrgast "<a href="'+self.success_url+str(klient.id)+'/'+url_args(request)+'">'+klient.name+'</a>" wurde erfolgreich hinzugefügt.')
+			return HttpResponseRedirect(self.success_url+url_args(request))
 		
 		return render(request, self.template_name, context)
 
 class FahrgastChangeView(MyDetailView):
 	form_class = FahrgastChgForm
 	permission_required = 'Klienten.change_klienten'
+	success_url = '/Klienten/fahrgaeste/'
 
 	def get_context_data(self, request):
 		context = {}
@@ -112,6 +115,7 @@ class FahrgastChangeView(MyDetailView):
 			context['delete_button'] = "Löschen"
 		context['submit_button'] = "Sichern"
 		context['back_button'] = "Abbrechen"
+		context['url_args'] = url_args(request)
 		return context
 	
 	def get(self, request, *args, **kwargs):
@@ -147,19 +151,20 @@ class FahrgastChangeView(MyDetailView):
 				klient.bus=Bus.objects.get(pk=int(post['bus']))
 			klient.updated_by = request.user
 			klient.save()
-			messages.success(request, 'Fahrgast "<a href="'+request.path+'">'+klient.name+'</a>" wurde erfolgreich geändert.')
-			return HttpResponseRedirect('/Klienten/fahrgaeste/')
+			messages.success(request, 'Fahrgast "<a href="'+request.path+url_args(request)+'">'+klient.name+'</a>" wurde erfolgreich geändert.')
+			return HttpResponseRedirect(self.success_url+url_args(request))
 
 		return render(request, self.template_name, context)		
 
 class FahrgastDeleteView(MyView):
 	permission_required = 'Klienten.delete_klienten'
+	success_url = '/Klienten/fahrgaeste/'
 
 	def get(self, request, *args, **kwargs):
 		k = Klienten.objects.get(pk=kwargs['pk'])
 		k.delete()
 		messages.success(request, 'Fahrgast '+k.name+' wurde gelöscht.')
-		return HttpResponseRedirect('/Klienten/fahrgaeste/')
+		return HttpResponseRedirect(self.success_url+url_args(request))
 
 class DSGVOView(MyDetailView):
 	permission_required = 'Klienten.view_klienten'
@@ -221,11 +226,13 @@ class DienstleisterView(MyListView):
 		if has_perm(self.request.user, 'Klienten.add_klienten'):
 			context['add'] = "Dienstleister"
 		context['filter'] = DienstleisterFilter(self.request.GET, queryset=Klienten.objects.order_by('name','ort').filter(typ='D'))
+		context['url_args'] = url_args(self.request)
 		return context		
 
 class DienstleisterAddView(MyDetailView):
 	form_class = DienstleisterAddForm
 	permission_required = 'Klienten.add_klienten'
+	success_url = '/Klienten/dienstleister/'
 
 	def get_context_data(self, request):
 		context = {}
@@ -261,15 +268,16 @@ class DienstleisterAddView(MyDetailView):
 								updated_by = request.user
 							)
 			klient.save()
-			messages.success(request, 'Dienstleister "<a href="/Klienten/dienstleister/'+str(klient.id)+'/">'+klient.name+'</a>" wurde erfolgreich hinzugefügt.')
+			messages.success(request, 'Dienstleister "<a href="'+self.success_url+str(klient.id)+'/'+url_args(request)+'">'+klient.name+'</a>" wurde erfolgreich hinzugefügt.')
 			context['messages'] = messages
-			return HttpResponseRedirect('/Klienten/dienstleister/')
+			return HttpResponseRedirect(self.success_url+url_args(request))
 		
 		return render(request, self.template_name, context)
 
 class DienstleisterChangeView(MyDetailView):
 	form_class = DienstleisterChgForm
 	permission_required = 'Klienten.change_klienten'
+	success_url = '/Klienten/dienstleister/'
 
 	def get_context_data(self, request):
 		context = {}
@@ -279,6 +287,7 @@ class DienstleisterChangeView(MyDetailView):
 			context['delete_button'] = "Löschen"
 		context['submit_button'] = "Sichern"
 		context['back_button'] = "Abbrechen"
+		context['url_args'] = url_args(request)
 		return context
 	
 	def get(self, request, *args, **kwargs):
@@ -305,19 +314,20 @@ class DienstleisterChangeView(MyDetailView):
 			klient.bemerkung=post['bemerkung']
 			klient.updated_by = request.user
 			klient.save()
-			messages.success(request, 'Dienstleister "<a href="'+request.path+'">'+klient.name+'</a>" wurde erfolgreich geändert.')
-			return HttpResponseRedirect('/Klienten/dienstleister/')
+			messages.success(request, 'Dienstleister "<a href="'+request.path+url_args(request)+'">'+klient.name+'</a>" wurde erfolgreich geändert.')
+			return HttpResponseRedirect(self.success_url+url_args(request))
 
 		return render(request, self.template_name, context)		
 
 class DienstleisterDeleteView(MyView):
 	permission_required = 'Klienten.delete_klienten'
+	success_url = '/Klienten/dienstleister/'
 
 	def get(self, request, *args, **kwargs):
 		k = Klienten.objects.get(pk=kwargs['pk'])
 		k.delete()
 		messages.success(request, 'Dienstleister '+k.name+' wurde gelöscht.')
-		return HttpResponseRedirect('/Klienten/dienstleister/')	
+		return HttpResponseRedirect(self.success_url+url_args(request))	
 
 class OrtView(MyListView):
 	permission_required = 'Klienten.view_orte'
@@ -339,11 +349,13 @@ class OrtView(MyListView):
 		if has_perm(self.request.user, 'Klienten.add_orte'):
 			context['add'] = "Ort"
 		context['filter'] = OrteFilter(self.request.GET, queryset=Orte.objects.all())
+		context['url_args'] = url_args(self.request)
 		return context		
 
 class OrtAddView(MyDetailView):
 	form_class = OrtAddForm
 	permission_required = 'Klienten.add_orte'
+	success_url = '/Klienten/orte/'
 
 	def get_context_data(self, request):
 		context = {}
@@ -373,14 +385,15 @@ class OrtAddView(MyDetailView):
 				ort.bus=Bus.objects.get(pk=int(post['bus']))
 			
 			ort.save()
-			messages.success(request, 'Ort "<a href="/Klienten/orte/'+str(ort.id)+'/">'+str(ort)+'</a>" wurde erfolgreich hinzugefügt.')
-			return HttpResponseRedirect('/Klienten/orte/')
+			messages.success(request, 'Ort "<a href="'+self.success_url+str(ort.id)+'/'+url_args(request)+'">'+str(ort)+'</a>" wurde erfolgreich hinzugefügt.')
+			return HttpResponseRedirect(self.success_url+url_args(request))
 		
 		return render(request, self.template_name, context)
 
 class OrtChangeView(MyDetailView):
 	form_class = OrtChgForm
 	permission_required = 'Klienten.change_orte'
+	success_url = '/Klienten/orte/'
 
 	def get_context_data(self, request):
 		context = {}
@@ -390,6 +403,7 @@ class OrtChangeView(MyDetailView):
 			context['delete_button'] = "Löschen"
 		context['submit_button'] = "Sichern"
 		context['back_button'] = "Abbrechen"
+		context['url_args'] = url_args(request)
 		return context
 	
 	def get(self, request, *args, **kwargs):
@@ -409,19 +423,20 @@ class OrtChangeView(MyDetailView):
 				ort.bus=Bus.objects.get(pk=int(post['bus']))
 			ort.updated_by = request.user
 			ort.save()
-			messages.success(request, 'Ort "<a href="'+request.path+'">'+ort.ort+'</a>" wurde erfolgreich geändert.')
-			return HttpResponseRedirect('/Klienten/orte/')
+			messages.success(request, 'Ort "<a href="'+request.path+url_args(request)+'">'+ort.ort+'</a>" wurde erfolgreich geändert.')
+			return HttpResponseRedirect(self.success_url+url_args(request))
 
 		return render(request, self.template_name, context)		
 
 class OrtDeleteView(MyView):
 	permission_required = 'Klienten.delete_orte'
+	success_url = '/Klienten/orte/'
 
 	def get(self, request, *args, **kwargs):
 		ort = Orte.objects.get(pk=kwargs['pk'])
 		ort.delete()
 		messages.success(request, 'Ort '+str(ort)+' wurde gelöscht.')
-		return HttpResponseRedirect('/Klienten/orte/')	
+		return HttpResponseRedirect(self.success_url+url_args(request))	
 
 class StrassenView(MyListView):
 	permission_required = 'Klienten.view_strassen'
@@ -445,11 +460,13 @@ class StrassenView(MyListView):
 		if has_perm(self.request.user, 'Klienten.add_strassen'):
 			context['add'] = "Strasse"
 		context['filter'] = StrassenFilter(self.request.GET, queryset=Strassen.objects.all())
+		context['url_args'] = url_args(self.request)
 		return context
 
 class StrassenAddView(MyDetailView):
 	form_class = StrassenAddForm
 	permission_required = 'Klienten.add_strassen'
+	success_url = '/Klienten/strassen/'
 
 	def get_context_data(self, request):
 		context = {}
@@ -477,15 +494,16 @@ class StrassenAddView(MyDetailView):
 							updated_by = request.user
 					)
 			strasse.save()
-			messages.success(request, 'Strasse "<a href="/Klienten/strassen/'+str(strasse.id)+'/">'+strasse.strasse+' in '+str(strasse.ort)+'</a>" wurde erfolgreich hinzugefügt.')
+			messages.success(request, 'Strasse "<a href="'+self.success_url+str(strasse.id)+'/'+url_args(request)+'">'+strasse.strasse+' in '+str(strasse.ort)+'</a>" wurde erfolgreich hinzugefügt.')
 			context['messages'] = messages
-			return HttpResponseRedirect('/Klienten/strassen/')
+			return HttpResponseRedirect(self.success_url+url_args(request))
 		
 		return render(request, self.template_name, context)	
 
 class StrassenChangeView(MyDetailView):
 	form_class = StrassenChgForm
 	permission_required = 'Klienten.change_strassen'
+	success_url = '/Klienten/strassen/'
 
 	def get_context_data(self, request):
 		context = {}
@@ -495,6 +513,7 @@ class StrassenChangeView(MyDetailView):
 			context['delete_button'] = "Löschen"
 		context['submit_button'] = "Sichern"
 		context['back_button'] = "Abbrechen"
+		context['url_args'] = url_args(request)
 		return context
 	
 	def get(self, request, *args, **kwargs):
@@ -513,8 +532,8 @@ class StrassenChangeView(MyDetailView):
 			strasse.strasse=post['strasse']
 			strasse.updated_by = request.user
 			strasse.save()
-			messages.success(request, 'Strasse "<a href="'+request.path+'">'+strasse.strasse+' in '+str(strasse.ort)+'</a>" wurde erfolgreich geändert.')
-			return HttpResponseRedirect('/Klienten/strassen/')
+			messages.success(request, 'Strasse "<a href="'+request.path+url_args(request)+'">'+strasse.strasse+' in '+str(strasse.ort)+'</a>" wurde erfolgreich geändert.')
+			return HttpResponseRedirect(self.success_url+url_args(request))
 		else:
 			messages.error(request, form.errors)
 
@@ -522,9 +541,10 @@ class StrassenChangeView(MyDetailView):
 
 class StrassenDeleteView(MyView):
 	permission_required = 'Klienten.delete_strassen'
+	success_url = '/Klienten/strassen/'
 
 	def get(self, request, *args, **kwargs):
 		strasse = Strassen.objects.get(pk=kwargs['pk'])
 		strasse.delete()
 		messages.success(request, 'Strasse '+strasse.strasse+' in '+str(strasse.ort)+' wurde gelöscht.')
-		return HttpResponseRedirect('/Klienten/strassen/')	
+		return HttpResponseRedirect(self.success_url+url_args(request))	

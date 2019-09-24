@@ -4,7 +4,7 @@ from .models import Orte, Strassen, Klienten
 
 class FahrgaesteTable(tables.Table):
     name = tables.TemplateColumn(
-        template_code='''<a href="{{ record.id }}">{{ record.name |safe }}</a>'''
+        template_code='''<a href="{{ record.id }}/{{ url_args }}">{{ record.name |safe }}</a>'''
     )
     adresse = tables.TemplateColumn(
         template_code='''{{ record.ort }}<br/>{{ record.strasse }} {{ record.hausnr }}''',
@@ -32,6 +32,9 @@ class FahrgaesteTable(tables.Table):
         fields = ('name','telefon','adresse','bus','bemerkung','dsgvo')
 
 class DienstleisterTable(tables.Table):
+    name = tables.TemplateColumn(
+        template_code='''<a href="{{ record.id }}/{{ url_args }}">{{ record.name |safe }}</a>'''
+    )
     adresse = tables.TemplateColumn(
        template_code='''{{ record.ort }}<br/>{{ record.strasse }} {{ record.hausnr }}''',
        orderable=False
@@ -46,7 +49,7 @@ class DienstleisterTable(tables.Table):
         
 class OrteTable(tables.Table):
     ort = tables.TemplateColumn(
-        template_code='''<a href="{{ record.id }}">{{ record.ort |safe }}</a>'''
+        template_code='''<a href="{{ record.id }}/{{ url_args }}">{{ record.ort |safe }}</a>'''
     )
     class Meta:
         model = Orte
@@ -54,7 +57,7 @@ class OrteTable(tables.Table):
 
 class StrassenTable(tables.Table):
     ort = tables.TemplateColumn(
-        template_code='''<a href="{{ record.id }}">{{ record.ort |safe }}</a>'''
+        template_code='''<a href="{{ record.id }}/{{ url_args }}">{{ record.ort |safe }}</a>'''
     )
     class Meta:
         model = Strassen

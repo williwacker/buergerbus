@@ -1,9 +1,12 @@
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
+#from django.urls import reverse
 #from django.conf import settings
 from django.contrib.auth.models import User, Group
 from django.contrib import messages
-from .utils import has_perm, get_sidebar
+from django.contrib.auth.views import PasswordChangeView
+from django.views.generic import TemplateView
+from .utils import has_perm, get_sidebar, url_args
 from .tables import UserTable, GroupTable
 from .views import MyListView, MyDetailView, MyUpdateView, MyView
 from .forms import MyUserChangeForm, MyGroupChangeForm
@@ -25,11 +28,13 @@ class UserView(MyListView):
 		if has_perm(self.request.user, 'auth.change_user'):
 			context['add'] = "Benutzer"
 		context['title'] = "Benutzer"
-		return context		
+		context['url_args'] = url_args(self.request)
+		return context
 
 class UserAddView(MyDetailView):
 	permission_required = 'auth.change_user'
 	form_class = UserCreationForm
+	success_url = '/Basis/benutzer/'
 
 	def get_context_data(self, request):
 		context = {}
@@ -50,10 +55,9 @@ class UserAddView(MyDetailView):
 		form = self.form_class(request.POST)
 		context['form'] = form
 		if form.is_valid():
-			form.save()	
-#			messages.success(request, 'Benutzer "<a href="'+request.path+'">'+user.username+'</a>" wurde erfolgreich hinzugefügt.')
-			context['messages'] = messages
-			return HttpResponseRedirect('/Basis/benutzer/')
+			instance = form.save()
+			messages.success(request, 'Benutzer "<a href="'+self.success_url+str(instance.id)+'">'+instance.username+'</a>" wurde erfolgreich angelegt.')
+			return HttpResponseRedirect(self.success_url+url_args(request))
 		else:
 			messages.error(request, form.errors)
 		
@@ -73,15 +77,18 @@ class UserChangeView(MyUpdateView):
 			context['delete_button'] = "Löschen"
 		context['submit_button'] = "Sichern"
 		context['back_button'] = "Abbrechen"
+		context['url_args'] = url_args(self.request)
 		return context
-	
+
 class UserDeleteView(MyView):
 	permission_required = 'auth.delete_user'
+	success_url = '/Basis/benutzer/'
+
 	def get(self, request, *args, **kwargs):
-		u = User.objects.get(pk=kwargs['pk'])
-		u.delete()
-		messages.success(request, 'Benutzer '+u.username+' wurde gelöscht.')
-		return HttpResponseRedirect('/Basis/benutzer/')
+		instance = User.objects.get(pk=kwargs['pk'])
+		instance.delete()
+		messages.success(request, 'Benutzer '+instance.username+' wurde gelöscht.')
+		return HttpResponseRedirect(self.success_url+url_args(request))
 
 # Gruppen
 
@@ -100,11 +107,13 @@ class GroupView(MyListView):
 		if has_perm(self.request.user, 'auth.change_group'):
 			context['add'] = "Gruppe"
 		context['title'] = "Gruppen"
+		context['url_args'] = url_args(self.request)
 		return context
 
 class GroupAddView(MyDetailView):
 	permission_required = 'auth.change_group'
 	form_class = MyGroupChangeForm
+	success_url = '/Basis/gruppen/'
 
 	def get_context_data(self, request):
 		context = {}
@@ -125,10 +134,9 @@ class GroupAddView(MyDetailView):
 		form = self.form_class(request.POST)
 		context['form'] = form
 		if form.is_valid():
-			form.save()	
-#			messages.success(request, 'Gruppe "<a href="'+request.path+'">'+user.username+'</a>" wurde erfolgreich hinzugefügt.')
-			context['messages'] = messages
-			return HttpResponseRedirect('/Basis/gruppen/')
+			instance = form.save()
+			messages.success(request, 'Gruppe "<a href="'+self.success_url+str(instance.id)+'">'+instance.name+'</a>" wurde erfolgreich hinzugefügt.')
+			return HttpResponseRedirect(self.success_url+url_args(request))
 		else:
 			messages.error(request, form.errors)
 		
@@ -148,18 +156,18 @@ class GroupChangeView(MyUpdateView):
 			context['delete_button'] = "Löschen"
 		context['submit_button'] = "Sichern"
 		context['back_button'] = "Abbrechen"
+		context['url_args'] = url_args(self.request)
 		return context
 
 class GroupDeleteView(MyView):
 	permission_required = 'auth.delete_group'
+	success_url = '/Basis/gruppen/'
+
 	def get(self, request, *args, **kwargs):
 		g = Group.objects.get(pk=kwargs['pk'])
 		g.delete()
 		messages.success(request, 'Gruppe '+g.name+' wurde gelöscht.')
-		return HttpResponseRedirect('/Basis/gruppen/')
-
-from django.contrib.auth.views import PasswordChangeView
-from django.views.generic import TemplateView
+		return HttpResponseRedirect(self.success_url+url_args(request))
 
 class MyPasswordChangeView(PasswordChangeView):
 

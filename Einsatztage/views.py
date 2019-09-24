@@ -10,7 +10,6 @@ from django.utils.safestring import mark_safe
 from django.core.exceptions import PermissionDenied
 from django.contrib.auth.models import Group
 from trml2pdf import trml2pdf
-#import pdfkit 
 
 from .tables import FahrtagTable, BuerotagTable, TourTable, FahrerTable
 from .filters import FahrtagFilter, BuerotagFilter
@@ -21,7 +20,7 @@ from Tour.models import Tour
 from Team.models import Fahrer, Koordinator
 from Einsatzmittel.models import Bus
 from Einsatzmittel.utils import get_bus_list, get_buero_list
-from Basis.utils import get_sidebar, has_perm
+from Basis.utils import get_sidebar, has_perm, url_args
 from Basis.views import MyListView, MyDetailView, MyView
 
 class TourView(MyListView):
@@ -78,7 +77,7 @@ class GeneratePDF(MyView):
 		return HttpResponse("Kein Dokument vorhanden")	
 
 class FahrtageListView(MyListView):
-	permission_required = 'Einsatztage.view_bus'
+	permission_required = 'Einsatztage.view_fahrtag'
 
 	def get_queryset(self):
 		FahrtageSchreiben(self.request.user)
@@ -98,11 +97,13 @@ class FahrtageListView(MyListView):
 		context['sidebar_liste'] = get_sidebar(self.request.user)
 		context['title'] = "Fahrtage"
 		context['filter'] = FahrtagFilter(self.request.GET, queryset=Fahrtag.objects.filter(archiv=False, team__in=get_bus_list(self.request)))
+		context['url_args'] = url_args(self.request)
 		return context
 
 class FahrtageChangeView(MyDetailView):
 	form_class = FahrtagChgForm
-	permission_required = 'Einsatztage.change_bus'
+	permission_required = 'Einsatztage.change_fahrtag'
+	success_url = '/Einsatztage/fahrer/'
 	
 	def get_context_data(self):
 		context = {}
@@ -110,6 +111,7 @@ class FahrtageChangeView(MyDetailView):
 		context['title'] = "Fahrereinsatz ändern"
 		context['submit_button'] = "Sichern"
 		context['back_button'] = "Abbrechen"
+		context['url_args'] = url_args(self.request)
 		return context
 	
 	def get(self, request, *args, **kwargs):
@@ -135,13 +137,13 @@ class FahrtageChangeView(MyDetailView):
 				fahrtag.fahrer_nachmittag=None
 			fahrtag.updated_by = request.user
 			fahrtag.save()
-			messages.success(request, 'Fahrtag "<a href="'+request.path+'">'+str(fahrtag.datum)+' '+str(fahrtag.team)+'</a>" wurde erfolgreich geändert.')
-			return HttpResponseRedirect('/Einsatztage/fahrer/')
+			messages.success(request, 'Fahrtag "<a href="'+request.path+url_args(request)+'">'+str(fahrtag.datum)+' '+str(fahrtag.team)+'</a>" wurde erfolgreich geändert.')
+			return HttpResponseRedirect(self.success_url+url_args(request))
 
 		return render(request, self.template_name, context)		
 
 class BuerotageListView(MyListView):
-	permission_required = 'Einsatztage.view_buero'
+	permission_required = 'Einsatztage.view_buerotag'
 	
 	def get_queryset(self):
 		BuerotageSchreiben(self.request.user)
@@ -161,11 +163,13 @@ class BuerotageListView(MyListView):
 		context['sidebar_liste'] = get_sidebar(self.request.user)
 		context['title'] = "Bürotage"
 		context['filter'] = BuerotagFilter(self.request.GET, queryset=Buerotag.objects.filter(archiv=False, team__in=get_buero_list(self.request)))
+		context['url_args'] = url_args(self.request)
 		return context
 
 class BuerotageChangeView(MyDetailView):
 	form_class = BuerotagChgForm
-	permission_required = 'Einsatztage.change_buero'
+	permission_required = 'Einsatztage.change_buerotag'
+	success_url = '/Einsatztage/buero/'
 
 	def get_context_data(self, request):
 		context = {}
@@ -173,6 +177,7 @@ class BuerotageChangeView(MyDetailView):
 		context['title'] = "Bürotag ändern"
 		context['submit_button'] = "Sichern"
 		context['back_button'] = "Abbrechen"
+		context['url_args'] = url_args(self.request)
 		return context
 	
 	def get(self, request, *args, **kwargs):
@@ -184,7 +189,7 @@ class BuerotageChangeView(MyDetailView):
 	def post(self, request, *args, **kwargs):
 		context = self.get_context_data(request)
 		form = self.form_class(request.POST)
-		context['form'] = formp
+		context['form'] = form
 		if form.is_valid():
 			post = request.POST.dict()
 			buero = Buerotag.objects.get(pk=kwargs['pk'])
@@ -192,8 +197,8 @@ class BuerotageChangeView(MyDetailView):
 				buero.mitarbeiter=Koordinator.objects.get(pk=int(post['koordinator']))
 			buero.updated_by = request.user
 			buero.save()
-			messages.success(request, 'Bürotag "<a href="'+request.path+'">'+str(buero.datum)+' '+str(buero.team)+'</a>" wurde erfolgreich geändert.')
-			return HttpResponseRedirect('/Einsatztage/buero/')
+			messages.success(request, 'Bürotag "<a href="'+request.path+url_args(request)+'">'+str(buero.datum)+' '+str(buero.team)+'</a>" wurde erfolgreich geändert.')
+			return HttpResponseRedirect(self.success_url+url_args(request))
 		else:
 			messages.error(request, form.errors)
 

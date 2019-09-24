@@ -28,7 +28,7 @@
     <div class="submit-row">
         {% if back_button %}<a href="javascript:history.go(-1)" class="closelink">{{ back_button|upper }}</a>{% endif %}
         <input type="submit" value="{{ submit_button|default:'Sichern' }}" class="default" name="_save">
-        {% if delete_button %}<p class="deletelink-box"><a href="delete/" class="deletelink">{{ delete_button }}</a></p>{% endif %}
+        {% if delete_button %}<p class="deletelink-box"><a href="delete/{{ url_args }}" class="deletelink">{{ delete_button }}</a></p>{% endif %}
     </div>
      
 </form>

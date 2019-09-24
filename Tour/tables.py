@@ -9,7 +9,7 @@ class TourTable(tables.Table):
             {% if record.is_today %}
                 {{ record.klient |safe }}
             {% else %}
-                <a href="{{ record.id }}">{{ record.klient |safe }}</a>
+                <a href="{{ record.id }}/{{ url_args }}">{{ record.klient |safe }}</a>
             {% endif %}
         '''
     )

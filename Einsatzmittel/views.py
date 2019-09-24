@@ -9,7 +9,7 @@ from django.contrib.auth.models import User
 from .models import Bus, Buero
 from .forms import BusChgForm, BueroChgForm
 from .tables import BusTable, BueroTable
-from Basis.utils import get_sidebar, has_perm
+from Basis.utils import get_sidebar, has_perm, url_args
 from Basis.views import MyListView, MyDetailView, MyView, MyUpdateView
 
 register = template.Library()
@@ -31,6 +31,7 @@ class BusView(MyListView):
 class BusAddView(MyDetailView):
 	form_class = BusChgForm
 	permission_required = 'Einsatzmittel.add_bus'
+	success_url = '/Einsatzmittel/busse/'
 
 	def get_context_data(self, request):
 		context = {}
@@ -73,6 +74,7 @@ class BusChangeView(MyUpdateView):
 
 class BusDeleteView(MyView):
 	permission_required = 'Einsatzmittel.delete_bus'
+	success_url = '/Einsatzmittel/busse/'
 
 	def get(self, request, *args, **kwargs):
 		b = Bus.objects.get(pk=kwargs['pk'])

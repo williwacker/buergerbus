@@ -11,7 +11,7 @@ from Einsatzmittel.models import Bus, Buero
 from .forms import FahrerAddForm, FahrerChgForm, KoordinatorAddForm, KoordinatorChgForm
 from .tables import FahrerTable, KoordinatorTable
 from .filters import FahrerFilter, KoordinatorFilter
-from Basis.utils import get_sidebar, has_perm
+from Basis.utils import get_sidebar, has_perm, url_args
 from Einsatzmittel.utils import get_bus_list, get_buero_list
 from Basis.views import MyListView, MyDetailView, MyView
 
@@ -44,11 +44,13 @@ class FahrerView(MyListView):
 		if has_perm(self.request.user, 'Team.add_fahrer'):
 			context['add'] = "Fahrer"
 		context['filter'] = FahrerFilter(self.request.GET, queryset=self.get_fg_queryset())
+		context['url_args'] = url_args(self.request)
 		return context
 
 class FahrerAddView(MyDetailView):
 	form_class = FahrerAddForm
 	permission_required = 'Team.add_fahrer'
+	success_url = '/Team/fahrer/'
 
 	def get_context_data(self, request):
 		context = {}
@@ -79,13 +81,14 @@ class FahrerAddView(MyDetailView):
 								updated_by = request.user
 							)
 			fahrer.save()
-			messages.success(request, 'Fahrer "<a href="/Team/fahrer/'+str(fahrer.id)+'/">'+fahrer.name+' '+str(fahrer.team)+'</a>" wurde erfolgreich hinzugefügt.')
-			return HttpResponseRedirect('/Team/fahrer/')
+			messages.success(request, 'Fahrer "<a href="'+self.success_url+str(fahrer.id)+url_args(request)+'/">'+fahrer.name+' '+str(fahrer.team)+'</a>" wurde erfolgreich hinzugefügt.')
+			return HttpResponseRedirect(self.success_url+url_args(request))
 		return render(request, self.template_name, context)
 
 class FahrerChangeView(MyDetailView):
 	form_class = FahrerChgForm
 	permission_required = 'Team.change_fahrer'
+	success_url = '/Team/fahrer/'
 
 	def get_context_data(self, request):
 		context = {}
@@ -95,6 +98,7 @@ class FahrerChangeView(MyDetailView):
 			context['delete_button'] = "Löschen"
 		context['submit_button'] = "Sichern"
 		context['back_button'] = "Abbrechen"
+		context['url_args'] = url_args(self.request)
 		return context
 	
 	def get(self, request, *args, **kwargs):
@@ -122,19 +126,20 @@ class FahrerChangeView(MyDetailView):
 				fahrer.aktiv = False
 			fahrer.updated_by = request.user
 			fahrer.save()
-			messages.success(request, 'Fahrer "<a href="'+request.path+'">'+fahrer.name+' '+str(fahrer.team)+'</a>" wurde erfolgreich geändert.')
-			return HttpResponseRedirect('/Team/fahrer/')
+			messages.success(request, 'Fahrer "<a href="'+request.path+url_args(request)+'">'+fahrer.name+' '+str(fahrer.team)+'</a>" wurde erfolgreich geändert.')
+			return HttpResponseRedirect(self.success_url+url_args(request))
 
 		return render(request, self.template_name, context)		
 
 class FahrerDeleteView(MyView):
 	permission_required = 'Team.delete_fahrer'
+	success_url = '/Team/fahrer/'
 
 	def get(self, request, *args, **kwargs):
 		k = Fahrer.objects.get(pk=kwargs['pk'])
 		k.delete()
 		messages.success(request, 'Fahrer '+k.name+' wurde gelöscht.')
-		return HttpResponseRedirect('/Team/fahrer/')
+		return HttpResponseRedirect(self.success_url+url_args(request))
 
 # Koordinatoren 
 
@@ -165,11 +170,13 @@ class KoordinatorView(MyListView):
 		if has_perm(self.request.user, 'Team.add_koordinator'):
 			context['add'] = "Koordinator"
 		context['filter'] = KoordinatorFilter(self.request.GET, queryset=self.get_fg_queryset())
+		context['url_args'] = url_args(self.request)
 		return context
 
 class KoordinatorAddView(MyDetailView):
 	form_class = KoordinatorAddForm
 	permission_required = 'Team.add_koordinator'
+	success_url = '/Team/koordinator/'
 
 	def get_context_data(self, request):
 		context = {}
@@ -202,8 +209,8 @@ class KoordinatorAddView(MyDetailView):
 								updated_by = request.user
 							)
 			koordinator.save()
-			messages.success(request, 'Koordinator "<a href="/Team/koordinator/'+str(koordinator.id)+'/">'+str(koordinator.benutzer)+' '+str(koordinator.team)+'</a>" wurde erfolgreich hinzugefügt.')
-			return HttpResponseRedirect('/Team/koordinator/')
+			messages.success(request, 'Koordinator "<a href="'+self.success_url+str(koordinator.id)+'/'+url_args(request)+'">'+str(koordinator.benutzer)+' '+str(koordinator.team)+'</a>" wurde erfolgreich hinzugefügt.')
+			return HttpResponseRedirect(self.success_url+url_args(request))
 		else:
 			messages.error(request, form.errors)
 		return render(request, self.template_name, context)
@@ -211,6 +218,7 @@ class KoordinatorAddView(MyDetailView):
 class KoordinatorChangeView(MyDetailView):
 	form_class = KoordinatorChgForm
 	permission_required = 'Team.change_koordinator'
+	success_url = '/Team/koordinator/'
 
 	def get_context_data(self, request):
 		context = {}
@@ -220,6 +228,7 @@ class KoordinatorChangeView(MyDetailView):
 			context['delete_button'] = "Löschen"
 		context['submit_button'] = "Sichern"
 		context['back_button'] = "Abbrechen"
+		context['url_args'] = url_args(self.request)
 		return context
 	
 	def get(self, request, *args, **kwargs):
@@ -247,16 +256,17 @@ class KoordinatorChangeView(MyDetailView):
 				koordinator.aktiv = False
 			koordinator.updated_by = request.user
 			koordinator.save()
-			messages.success(request, 'Koordinator "<a href="'+request.path+'">'+str(", ".join([koordinator.benutzer.last_name,koordinator.benutzer.first_name]))+' im Team '+str(koordinator.team)+'</a>" wurde erfolgreich geändert.')
-			return HttpResponseRedirect('/Team/koordinator/')
+			messages.success(request, 'Koordinator "<a href="'+request.path+url_args(request)+'">'+str(", ".join([koordinator.benutzer.last_name,koordinator.benutzer.first_name]))+' im Team '+str(koordinator.team)+'</a>" wurde erfolgreich geändert.')
+			return HttpResponseRedirect(self.success_url+url_args(request))
 
 		return render(request, self.template_name, context)		
 
 class KoordinatorDeleteView(MyView):
 	permission_required = 'Team.delete_koordinator'
+	success_url = '/Team/koordinator/'
 
 	def get(self, request, *args, **kwargs):
 		k = Koordinator.objects.get(pk=kwargs['pk'])
 		k.delete()
 		messages.success(request, 'Koordinator '+k.name+' wurde gelöscht.')
-		return HttpResponseRedirect('/Team/koordinator/')		
+		return HttpResponseRedirect(self.success_url+url_args(request))		

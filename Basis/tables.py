@@ -4,7 +4,7 @@ from django.contrib.auth.models import User, Group
 
 class UserTable(tables.Table):
     username = tables.TemplateColumn(
-        template_code='''<a href="{{ record.id }}">{{ record.username |safe }}</a>'''
+        template_code='''<a href="{{ record.id }}/{{ url_args }}">{{ record.username |safe }}</a>'''
     )
     class Meta:
         model = User
@@ -12,7 +12,7 @@ class UserTable(tables.Table):
 
 class GroupTable(tables.Table):
     name = tables.TemplateColumn(
-        template_code='''<a href="{{ record.id }}">{{ record.name |safe }}</a>'''
+        template_code='''<a href="{{ record.id }}/{{ url_args }}">{{ record.name |safe }}</a>'''
     )
     class Meta:
         model = Group

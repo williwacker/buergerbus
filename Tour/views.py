@@ -14,7 +14,7 @@ from Klienten.models import Klienten
 from Einsatztage.models import Fahrtag
 
 from Einsatzmittel.utils import get_bus_list
-from Basis.utils import get_sidebar, render_to_pdf
+from Basis.utils import get_sidebar, render_to_pdf, url_args
 from datetime import datetime, timedelta, time
 from Basis.views import MyListView, MyDetailView, MyView
 from Basis.utils import has_perm
@@ -37,6 +37,7 @@ class TourView(MyListView):
 		if has_perm(self.request.user, 'Tour.add_tour'):
 			context['add'] = "Tour"
 		context['nav_bar'] = tour_navbar(Fahrtag.objects.order_by('datum').filter(archiv=False, team__in=get_bus_list(self.request)),self.request.GET.get('datum'))
+		context['url_args'] = url_args(self.request)
 		return context	
 
 # Dies ist ein zweistufiger Prozess, der zuerst den Klient auswählen lässt, um im zweiten Bildschirm dann mithilfe des dem Klienten zugeordneten Busses
@@ -44,6 +45,7 @@ class TourView(MyListView):
 class TourAddView(MyDetailView):
 	form_class = TourAddForm1
 	permission_required = 'Tour.add_tour'
+	success_url = '/Tour/tour/'
 
 	def get_context_data(self):
 		context = {}
@@ -68,13 +70,14 @@ class TourAddView(MyDetailView):
 		context['form'] = form
 		if form.is_valid():
 			post = request.POST.dict()
-			return HttpResponseRedirect('/Tour/tour/add/'+post['fahrgast'])
+			return HttpResponseRedirect(self.success_url+'add/'+post['fahrgast']+url_args(request))
 
 		return render(request, self.template_name, context)
 
 class TourAddView2(MyDetailView):
 	form_class = TourAddForm2
 	permission_required = 'Tour.add_tour'
+	success_url = '/Tour/tour/'
 	
 	def get_context_data(self):
 		context = {}
@@ -125,13 +128,14 @@ class TourAddView2(MyDetailView):
 				tour.entfernung=googleList[0]
 				tour.ankunft=googleList[2]
 			tour.save()
-			messages.success(request, 'Tour "<a href="/Tour/tour/'+str(tour.id)+'/">'+tour.klient.name+' am '+str(tour.datum)+' um '+str(tour.uhrzeit) +'</a>" wurde erfolgreich hinzugefügt.')
-			return HttpResponseRedirect('/Tour/tour/')
+			messages.success(request, 'Tour "<a href="'+self.success_url+str(tour.id)+'/">'+tour.klient.name+' am '+str(tour.datum)+' um '+str(tour.uhrzeit) +'</a>" wurde erfolgreich hinzugefügt.')
+			return HttpResponseRedirect(self.success_url+url_args(request))
 		return render(request, self.template_name, context)
 
 class TourChangeView(MyDetailView):
 	form_class = TourChgForm
 	permission_required = 'Tour.change_tour'
+	success_url = '/Tour/tour/'
 	
 	def get_context_data(self):
 		context = {}
@@ -140,7 +144,8 @@ class TourChangeView(MyDetailView):
 		if has_perm(self.request.user, 'Tour.delete_tour'):
 			context['delete_button'] = "Löschen"
 		context['submit_button'] = "Sichern"
-		context['back_button'] = "Abbrechen"		
+		context['back_button'] = "Abbrechen"
+		context['url_args'] = url_args(self.request)	
 		return context
 	
 	def get(self, request, *args, **kwargs):
@@ -175,16 +180,17 @@ class TourChangeView(MyDetailView):
 			tour.ankunft=googleList[2]
 			tour.updated_by=request.user
 			tour.save()
-			messages.success(request, 'Tour "<a href="'+request.path+'">'+tour.klient.name+' am '+str(tour.datum)+' um '+str(tour.uhrzeit) +'</a>" wurde erfolgreich geändert.')
-			return HttpResponseRedirect('/Tour/tour/')
+			messages.success(request, 'Tour "<a href="'+request.path+url_args(request)+'">'+tour.klient.name+' am '+str(tour.datum)+' um '+str(tour.uhrzeit) +'</a>" wurde erfolgreich geändert.')
+			return HttpResponseRedirect(self.success_url+url_args(request))
 
 		return render(request, self.template_name, context)		
 
 class TourDeleteView(MyView):
 	permission_required = 'Tour.delete_tour'
+	success_url = '/Tour/tour/'
 
 	def get(self, request, *args, **kwargs):
 		k = Tour.objects.get(pk=kwargs['pk'])
 		k.delete()
 		messages.success(request, 'Tour '+k.klient.name+' am '+str(k.datum)+' um '+str(k.uhrzeit)+' wurde gelöscht.')
-		return HttpResponseRedirect('/Tour/tour/')
+		return HttpResponseRedirect(self.success_url+url_args(request))
