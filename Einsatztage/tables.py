@@ -12,8 +12,11 @@ class FahrtagTable(tables.Table):
         template_code='''
                         {% if record.gaeste_vormittag > 0 or record.gaeste_nachmittag > 0 %}
                             {% load static %}
-                            <a href="/Einsatztage/fahrer/{{ record.id }}/tour/"><img src="{% static "project/img/fahrplan.png" %}" alt="Tour anzeigen" title="Tour anzeigen"></a>
-                            <a href="/Einsatztage/fahrer/{{ record.id }}/tourAsPDF/"><img src="{% static "project/img/icon_pdf.png" %}" alt="PDF erzeugen" title="PDF erzeugen"></a>
+                            <a href="/Einsatztage/fahrer/{{ record.id }}/fahrplan/"><img src="{% static "project/img/fahrplan.png" %}" alt="Fahrplan anzeigen" title="Fahrplan anzeigen"></a>
+                            <a href="/Einsatztage/fahrer/{{ record.id }}/fahrplanAsPDF/"><img src="{% static "project/img/icon_pdf.png" %}" alt="Fahrplan als PDF erzeugen" title="Fahrplan als PDF erzeugen"></a>
+                            {% if record.hat_fahrer %}
+                                <a href="/Einsatztage/fahrer/{{ record.id }}/fahrplanAsEmail/"><img src="{% static "project/img/send.png" %}" alt="Fahrplan als Email verschicken" title="Fahrplan als Email verschicken"></a>
+                            {% endif %}
                         {% else %}
                             &nbsp;
                         {% endif %}

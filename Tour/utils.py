@@ -3,6 +3,8 @@ import googlemaps
 from django.conf import settings
 from .models import Tour
 from Einsatztage.models import Fahrtag
+from Einsatzmittel.models import Bus
+from Klienten.models import Klienten
 
 
 class DistanceMatrix():
@@ -32,6 +34,25 @@ class DistanceMatrix():
 			arrivaltime = time(0,0,0)
 
 		return [dist,dura, arrivaltime]
+
+class DepartureTime():
+
+	def time(self, cleaned_data):
+		uhrzeit = cleaned_data['uhrzeit']
+		datum   = cleaned_data['datum']
+		bus     = cleaned_data['bus']
+		bus_id  = Bus.objects.get(bus=bus)
+		abholklient = cleaned_data['abholklient']
+		abholklient_id = Klienten.objects.get(name=abholklient)
+		instance = Tour.objects.order_by('uhrzeit').filter(bus=bus_id, datum=datum, uhrzeit__lt=uhrzeit).last()
+		if instance and instance.ankunft:
+			googleList = DistanceMatrix().getMatrix(
+					instance.zielklient, 
+					Klienten.objects.get(name=abholklient), 
+					instance.datum.datum, 
+					instance.ankunft)
+			return googleList[2]
+		return time(0,0,0)
 
 class TourArchive():
 

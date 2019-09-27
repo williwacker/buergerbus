@@ -53,7 +53,6 @@ class TourAddView(MyDetailView):
 		context['title'] = "Tour hinzufügen"
 		context['submit_button'] = "Weiter"
 		context['back_button'] = "Abbrechen"
-
 		return context
 
 	def get(self, request, *args, **kwargs):
@@ -70,8 +69,11 @@ class TourAddView(MyDetailView):
 		context['form'] = form
 		if form.is_valid():
 			post = request.POST.dict()
+			storage = messages.get_messages(request)
+			storage.used = True
 			return HttpResponseRedirect(self.success_url+'add/'+post['fahrgast']+url_args(request))
-
+		else:
+			messages.error(request, form.errors)
 		return render(request, self.template_name, context)
 
 class TourAddView2(MyDetailView):
@@ -94,8 +96,6 @@ class TourAddView2(MyDetailView):
 		self.initial['klient'] = klient.name
 		self.initial['bus'] = klient.bus
 		form.fields['datum'].queryset = Fahrtag.objects.order_by('datum').filter(archiv=False, team_id=klient.bus, datum__gt=datetime.now())
-#		form.fields['abholklient'].queryset = Klienten.objects.order_by('name') 
-#		form.fields['zielklient'].queryset = Klienten.objects.order_by('name')
 		context['form'] = form
 		return render(request, self.template_name, context)
 
@@ -128,8 +128,12 @@ class TourAddView2(MyDetailView):
 				tour.entfernung=googleList[0]
 				tour.ankunft=googleList[2]
 			tour.save()
+			storage = messages.get_messages(request)
+			storage.used = True
 			messages.success(request, 'Tour "<a href="'+self.success_url+str(tour.id)+'/">'+tour.klient.name+' am '+str(tour.datum)+' um '+str(tour.uhrzeit) +'</a>" wurde erfolgreich hinzugefügt.')
 			return HttpResponseRedirect(self.success_url+url_args(request))
+		else:
+			messages.error(request, form.errors)
 		return render(request, self.template_name, context)
 
 class TourChangeView(MyDetailView):
@@ -165,24 +169,30 @@ class TourChangeView(MyDetailView):
 			post = request.POST.dict()
 			fahrtag = Fahrtag.objects.get(pk=int(post['datum']))
 			startzeit = datetime.strptime(post['uhrzeit'][:5], '%H:%M').time()
-			googleList = DistanceMatrix().getMatrix(
-				Klienten.objects.get(pk=int(post['abholklient'])), 
-				Klienten.objects.get(pk=int(post['zielklient'])), 
-				fahrtag.datum, 
-				startzeit)
+			googleList = ()
+			if settings.USE_GOOGLE:
+				googleList = DistanceMatrix().getMatrix(
+					Klienten.objects.get(pk=int(post['abholklient'])), 
+					Klienten.objects.get(pk=int(post['zielklient'])), 
+					fahrtag.datum, 
+					startzeit)
 			tour = Tour.objects.get(pk=kwargs['pk'])
 			tour.datum=fahrtag
 			tour.uhrzeit=post['uhrzeit']
 			tour.bemerkung=post['bemerkung']
 			tour.abholklient=Klienten.objects.get(pk=int(post['abholklient']))
 			tour.zielklient=Klienten.objects.get(pk=int(post['zielklient']))
-			tour.entfernung=googleList[0]
-			tour.ankunft=googleList[2]
+			if googleList:
+				tour.entfernung=googleList[0]
+				tour.ankunft=googleList[2]
 			tour.updated_by=request.user
 			tour.save()
+			storage = messages.get_messages(request)
+			storage.used = True
 			messages.success(request, 'Tour "<a href="'+request.path+url_args(request)+'">'+tour.klient.name+' am '+str(tour.datum)+' um '+str(tour.uhrzeit) +'</a>" wurde erfolgreich geändert.')
 			return HttpResponseRedirect(self.success_url+url_args(request))
-
+		else:
+			messages.error(request, form.errors)		
 		return render(request, self.template_name, context)		
 
 class TourDeleteView(MyView):

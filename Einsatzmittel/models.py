@@ -2,11 +2,8 @@
 from django.db.models import DEFERRED
 from django.utils import timezone
 from django.conf import settings
-#from django.contrib.postgres.fields import ArrayField
-#from multiselectfield import MultiSelectField
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
-#from .utils import BusManager
 
 class Wochentage(models.Model):
 	name = models.CharField(max_length=10, verbose_name = "Wochentag")
@@ -24,7 +21,7 @@ class Buero(models.Model):
 	buero      = models.CharField(max_length=20, verbose_name = "Büro")
 	buerotage  = models.ManyToManyField(Wochentage, default='', verbose_name = "Bürotag")
 	updated_on = models.DateTimeField(auto_now=True, blank=True, null=True)
-	updated_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL)
+	updated_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, related_name="buero_updated_by", on_delete=models.SET_NULL)
 	
 	def __str__(self):
 		return str(self.buero)
@@ -75,8 +72,9 @@ class Bus(models.Model):
 	bus         = models.CharField(max_length=25, verbose_name="Bus")
 	sitzplaetze = models.IntegerField(default=8, verbose_name="Anzahl Sitzplätze") 
 	fahrtage    = models.ManyToManyField(Wochentage, default='', verbose_name = "Fahrtage")
+	email 		= models.EmailField(max_length=254, blank=True, null=True)
 	updated_on  = models.DateTimeField(auto_now=True, blank=True, null=True)
-	updated_by  = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL)
+	updated_by  = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, related_name="bus_updated_by", on_delete=models.SET_NULL)
 
 	def __str__(self):
 		return str(self.bus)

@@ -1,4 +1,5 @@
 import datetime, time
+from os import environ,getcwd
 from django.http import HttpResponse
 from django.template.loader import get_template
 from django.contrib.auth.models import Permission
@@ -25,7 +26,8 @@ def get_holidays():
 class FahrtageSchreiben():
 
 	def __init__(self, user):
-		if has_perm(user, 'Einsatztage.change_fahrtage'):
+		os_user = (lambda: environ["USERNAME"] if "D:" in getcwd() else environ["USER"])()
+		if os_user in ('Werner','root') or has_perm(user, 'Einsatztage.change_fahrtage'):
 			self.write_new_fahrtage()
 			self.archive_past_fahrtage()
 
@@ -65,7 +67,8 @@ class FahrtageSchreiben():
 class BuerotageSchreiben():
 
 	def __init__(self,user):
-		if has_perm(user, 'Einsatztage.change_buerotage'):
+		os_user = (lambda: environ["USERNAME"] if "D:" in getcwd() else environ["USER"])()
+		if os_user in ('Werner','root') or has_perm(user, 'Einsatztage.change_buerotage'):
 			self.write_new_buerotage()
 			self.archive_past_buerotage()
 

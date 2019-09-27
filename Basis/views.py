@@ -33,7 +33,7 @@ class MyView(LoginRequiredMixin, PermissionRequiredMixin, View):
 	login_url = settings.LOGIN_URL
 	template_name = 'Basis/simple_table.html'
 
-class MyUpdateView(LoginRequiredMixin, PermissionRequiredMixin, SuccessMessageMixin, UpdateView):
+class MyUpdateView(SuccessMessageMixin, LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
 	login_url = settings.LOGIN_URL
 	auth_name = 'auth.change_user'
 	template_name = 'Basis/detail.html'
@@ -41,8 +41,6 @@ class MyUpdateView(LoginRequiredMixin, PermissionRequiredMixin, SuccessMessageMi
 class BasisView(LoginRequiredMixin, ListView):
 	login_url = settings.LOGIN_URL
 	template_name = 'Basis/index.html'
-#	redirect_to = '/admin/'
-#	redirect_field_name = 'redirect_to'
 
 	def get_queryset(self):
 		return None

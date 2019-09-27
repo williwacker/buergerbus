@@ -1,7 +1,5 @@
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
-#from django.urls import reverse
-#from django.conf import settings
 from django.contrib.auth.models import User, Group
 from django.contrib import messages
 from django.contrib.auth.views import PasswordChangeView
@@ -56,6 +54,8 @@ class UserAddView(MyDetailView):
 		context['form'] = form
 		if form.is_valid():
 			instance = form.save()
+			storage = messages.get_messages(request)
+			storage.used = True			
 			messages.success(request, 'Benutzer "<a href="'+self.success_url+str(instance.id)+'">'+instance.username+'</a>" wurde erfolgreich angelegt.')
 			return HttpResponseRedirect(self.success_url+url_args(request))
 		else:
@@ -79,6 +79,13 @@ class UserChangeView(MyUpdateView):
 		context['back_button'] = "Abbrechen"
 		context['url_args'] = url_args(self.request)
 		return context
+
+	def form_valid(self, form):
+		instance = form.save()
+		storage = messages.get_messages(self.request)
+		storage.used = True			
+		messages.success(self.request, 'Benutzer "<a href="'+self.success_url+str(instance.id)+'">'+instance.username+'</a>" wurde erfolgreich geändert.')
+		return super(UserChangeView, self).form_valid(form) 
 
 class UserDeleteView(MyView):
 	permission_required = 'auth.delete_user'
@@ -135,11 +142,12 @@ class GroupAddView(MyDetailView):
 		context['form'] = form
 		if form.is_valid():
 			instance = form.save()
+			storage = messages.get_messages(request)
+			storage.used = True			
 			messages.success(request, 'Gruppe "<a href="'+self.success_url+str(instance.id)+'">'+instance.name+'</a>" wurde erfolgreich hinzugefügt.')
 			return HttpResponseRedirect(self.success_url+url_args(request))
 		else:
-			messages.error(request, form.errors)
-		
+			messages.error(request, form.errors)	
 		return render(request, self.template_name, context)
 
 class GroupChangeView(MyUpdateView):
@@ -158,6 +166,15 @@ class GroupChangeView(MyUpdateView):
 		context['back_button'] = "Abbrechen"
 		context['url_args'] = url_args(self.request)
 		return context
+	
+	def form_valid(self, form):
+		instance = form.save()
+		storage = messages.get_messages(self.request)
+		storage.used = True			
+		messages.success(self.request, 'Gruppe "<a href="'+self.success_url+str(instance.id)+'">'+instance.name+'</a>" wurde erfolgreich geändert.')
+		return super(GroupChangeView, self).form_valid(form) 
+
+
 
 class GroupDeleteView(MyView):
 	permission_required = 'auth.delete_group'

@@ -97,9 +97,12 @@ class FahrgastAddView(MyDetailView):
 								updated_by = request.user
 							)
 			klient.save()
+			storage = messages.get_messages(request)
+			storage.used = True			
 			messages.success(request, 'Fahrgast "<a href="'+self.success_url+str(klient.id)+'/'+url_args(request)+'">'+klient.name+'</a>" wurde erfolgreich hinzugefügt.')
 			return HttpResponseRedirect(self.success_url+url_args(request))
-		
+		else:
+			messages.error(request, form.errors)		
 		return render(request, self.template_name, context)
 
 class FahrgastChangeView(MyDetailView):
@@ -151,9 +154,12 @@ class FahrgastChangeView(MyDetailView):
 				klient.bus=Bus.objects.get(pk=int(post['bus']))
 			klient.updated_by = request.user
 			klient.save()
+			storage = messages.get_messages(request)
+			storage.used = True			
 			messages.success(request, 'Fahrgast "<a href="'+request.path+url_args(request)+'">'+klient.name+'</a>" wurde erfolgreich geändert.')
 			return HttpResponseRedirect(self.success_url+url_args(request))
-
+		else:
+			messages.error(request, form.errors)
 		return render(request, self.template_name, context)		
 
 class FahrgastDeleteView(MyView):
@@ -182,23 +188,24 @@ class DSGVOView(MyDetailView):
 		context['back_button'] = "Zurück"
 		return context
 
+from Einsatztage.views import FahrplanAsPDF
+
 class DSGVOasPDFView(MyView):
 	permission_required = 'Klienten.view_klienten'
 
 	def get(self, request, id):
 		klient = Klienten.objects.get(pk=id)
 		context = {'klient':klient}
-		pdf = render_to_pdf('Klienten/dsgvo.html', context)
+		filename = "DSGVO_{}_{}.pdf".format(klient.nachname, klient.vorname)
+		pdf = FahrplanAsPDF().pdf_render_to_response('Klienten/dsgvo.rml', context, filename)
 		if pdf:
 			response = HttpResponse(pdf, content_type='application/pdf')
-			filename = "DSGVO_{}_{}.pdf".format(klient.nachname, klient.vorname)
 			content = "inline; filename='%s'" %(filename)
-			download = request.GET.get("download")
-			if download:
-				content = "attachment; filename='%s'" %(filename)
-			response['Content-Disposition'] = content
+			filepath = settings.DSGVO_PATH + filename
+			with open(filepath, 'wb') as f:
+				f.write(response.content)
 			return response
-		return HttpResponse("Kein Dokument vorhanden")
+		return HttpResponse("Kein Dokument vorhanden")		
 
 class DienstleisterView(MyListView):
 	permission_required = 'Klienten.view_klienten'
@@ -268,10 +275,13 @@ class DienstleisterAddView(MyDetailView):
 								updated_by = request.user
 							)
 			klient.save()
+			storage = messages.get_messages(request)
+			storage.used = True			
 			messages.success(request, 'Dienstleister "<a href="'+self.success_url+str(klient.id)+'/'+url_args(request)+'">'+klient.name+'</a>" wurde erfolgreich hinzugefügt.')
 			context['messages'] = messages
 			return HttpResponseRedirect(self.success_url+url_args(request))
-		
+		else:
+			messages.error(request, form.errors)		
 		return render(request, self.template_name, context)
 
 class DienstleisterChangeView(MyDetailView):
@@ -314,9 +324,12 @@ class DienstleisterChangeView(MyDetailView):
 			klient.bemerkung=post['bemerkung']
 			klient.updated_by = request.user
 			klient.save()
+			storage = messages.get_messages(request)
+			storage.used = True			
 			messages.success(request, 'Dienstleister "<a href="'+request.path+url_args(request)+'">'+klient.name+'</a>" wurde erfolgreich geändert.')
 			return HttpResponseRedirect(self.success_url+url_args(request))
-
+		else:
+			messages.error(request, form.errors)
 		return render(request, self.template_name, context)		
 
 class DienstleisterDeleteView(MyView):
@@ -385,9 +398,12 @@ class OrtAddView(MyDetailView):
 				ort.bus=Bus.objects.get(pk=int(post['bus']))
 			
 			ort.save()
+			storage = messages.get_messages(request)
+			storage.used = True			
 			messages.success(request, 'Ort "<a href="'+self.success_url+str(ort.id)+'/'+url_args(request)+'">'+str(ort)+'</a>" wurde erfolgreich hinzugefügt.')
 			return HttpResponseRedirect(self.success_url+url_args(request))
-		
+		else:
+			messages.error(request, form.errors)		
 		return render(request, self.template_name, context)
 
 class OrtChangeView(MyDetailView):
@@ -423,9 +439,12 @@ class OrtChangeView(MyDetailView):
 				ort.bus=Bus.objects.get(pk=int(post['bus']))
 			ort.updated_by = request.user
 			ort.save()
+			storage = messages.get_messages(request)
+			storage.used = True			
 			messages.success(request, 'Ort "<a href="'+request.path+url_args(request)+'">'+ort.ort+'</a>" wurde erfolgreich geändert.')
 			return HttpResponseRedirect(self.success_url+url_args(request))
-
+		else:
+			messages.error(request, form.errors)
 		return render(request, self.template_name, context)		
 
 class OrtDeleteView(MyView):
@@ -494,10 +513,13 @@ class StrassenAddView(MyDetailView):
 							updated_by = request.user
 					)
 			strasse.save()
+			storage = messages.get_messages(request)
+			storage.used = True			
 			messages.success(request, 'Strasse "<a href="'+self.success_url+str(strasse.id)+'/'+url_args(request)+'">'+strasse.strasse+' in '+str(strasse.ort)+'</a>" wurde erfolgreich hinzugefügt.')
 			context['messages'] = messages
 			return HttpResponseRedirect(self.success_url+url_args(request))
-		
+		else:
+			messages.error(request, form.errors)		
 		return render(request, self.template_name, context)	
 
 class StrassenChangeView(MyDetailView):
@@ -532,11 +554,12 @@ class StrassenChangeView(MyDetailView):
 			strasse.strasse=post['strasse']
 			strasse.updated_by = request.user
 			strasse.save()
+			storage = messages.get_messages(request)
+			storage.used = True			
 			messages.success(request, 'Strasse "<a href="'+request.path+url_args(request)+'">'+strasse.strasse+' in '+str(strasse.ort)+'</a>" wurde erfolgreich geändert.')
 			return HttpResponseRedirect(self.success_url+url_args(request))
 		else:
 			messages.error(request, form.errors)
-
 		return render(request, self.template_name, context)		
 
 class StrassenDeleteView(MyView):

@@ -1,4 +1,3 @@
-from Basis.utils import render_to_pdf
 from django.template import loader, Context
 from django.http import Http404, HttpResponse, HttpResponseRedirect, HttpResponseForbidden
 from django.shortcuts import get_object_or_404, render
@@ -10,11 +9,12 @@ from django.utils.safestring import mark_safe
 from django.core.exceptions import PermissionDenied
 from django.contrib.auth.models import Group
 from trml2pdf import trml2pdf
+from django.core.mail import EmailMessage
 
 from .tables import FahrtagTable, BuerotagTable, TourTable, FahrerTable
 from .filters import FahrtagFilter, BuerotagFilter
 from .utils import FahrtageSchreiben, BuerotageSchreiben
-from .forms import FahrtagChgForm, BuerotagChgForm
+from .forms import FahrtagChgForm, BuerotagChgForm, FahrplanEmailForm
 from .models import Fahrtag, Buerotag
 from Tour.models import Tour
 from Team.models import Fahrer, Koordinator
@@ -23,7 +23,7 @@ from Einsatzmittel.utils import get_bus_list, get_buero_list
 from Basis.utils import get_sidebar, has_perm, url_args
 from Basis.views import MyListView, MyDetailView, MyView
 
-class TourView(MyListView):
+class FahrplanView(MyListView):
 	permission_required = 'Tour.view_tour'
 
 	def get_queryset(self):
@@ -37,7 +37,7 @@ class TourView(MyListView):
 		context['title'] = 'Fahrplan {} am {}'.format(ft.first().team,ft.first())
 		return context
 
-class GeneratePDF(MyView):
+class FahrplanAsPDF(MyView):
 	permission_required = 'Tour.view_tour'
 
 	def pdf_render_to_response(self,template_src, context_dict={}, filename=None, prompt=False):
@@ -48,20 +48,16 @@ class GeneratePDF(MyView):
 		if prompt:
 			cd.append('attachment')
 		cd.append('filename=%s' % filename)
-#		response['Content-Disposition'] = '; '.join(cd)
 		template = loader.get_template(template_src)
 		context_dict['filename'] = filename
-#		tc = {'filename': filename}
-#		tc.update(context)
-#		ctx = Context(tc)
 		rml = template.render(context_dict)
 		return trml2pdf.parseString(rml)
 		
 	def get(self, request, id):
-		fahrtag_liste = Fahrtag.objects.filter(pk=id).first()
+		fahrtag_liste = Fahrtag.objects.get(pk=id)
 		tour_liste = Tour.objects.order_by('uhrzeit').filter(datum=id)
 		context = {'fahrtag_liste':fahrtag_liste,'tour_liste':tour_liste}
-		filename = 'Buergerbus_Tour_{}_{}.pdf'.format(str(fahrtag_liste.team).replace(' ','_'), fahrtag_liste.datum)
+		filename = 'Buergerbus_Fahrplan_{}_{}.pdf'.format(str(fahrtag_liste.team).replace(' ','_'), fahrtag_liste.datum)
 		pdf = self.pdf_render_to_response('Einsatztage/tour_as_pdf.rml', context, filename)
 		if pdf:
 			response = HttpResponse(pdf, content_type='application/pdf')
@@ -69,12 +65,76 @@ class GeneratePDF(MyView):
 			path = settings.TOUR_PATH + filename
 			with open(path, 'wb') as f:
 				f.write(response.content)
-			download = request.GET.get("download")
-			if download:
-				content = "attachment; filename='%s'" %(filename)
-				response['Content-Disposition'] = content
 			return response
-		return HttpResponse("Kein Dokument vorhanden")	
+		return HttpResponse("Kein Dokument vorhanden")
+
+class FahrplanEmailView(MyDetailView):
+	form_class = FahrplanEmailForm
+	permission_required = 'Tour.view_tour'
+	success_url = '/Einsatztage/fahrer/'
+
+	def get_context_data(self):
+		context = {}
+		context['sidebar_liste'] = get_sidebar(self.request.user)
+		ft = Fahrtag.objects.get(pk=self.kwargs['id'])
+		context['fahrtag_liste'] = ft
+		context['tour_liste'] = Tour.objects.order_by('uhrzeit').filter(datum=self.kwargs['id'])
+		context['title'] = 'Fahrplan {} am {} versenden'.format(ft.team,ft.datum)
+		context['submit_button'] = "Senden"
+		context['back_button'] = "Abbrechen"
+		context['url_args'] = url_args(self.request)
+		context['filename'] = 'Buergerbus_Fahrplan_{}_{}.pdf'.format(str(context['fahrtag_liste'].team).replace(' ','_'), context['fahrtag_liste'].datum)
+		return context
+	
+	def get(self, request, *args, **kwargs):
+		context = self.get_context_data()
+		pdf = FahrplanAsPDF().pdf_render_to_response('Einsatztage/tour_as_pdf.rml', context, context['filename'])
+		if pdf:
+			response = HttpResponse(pdf, content_type='application/pdf')
+			content = "inline; filename='%s'" %(context['filename'])
+			path = settings.TOUR_PATH + context['filename']
+			with open(path, 'wb') as f:
+				f.write(response.content)
+		form = self.form_class(initial=self.initial)
+		self.initial['von'] = settings.EMAIL_HOST_USER
+		ft = context['fahrtag_liste']
+		email_to = []
+		if ft.fahrer_vormittag:
+			email_to.append(ft.fahrer_vormittag.email)
+		if ft.fahrer_nachmittag:
+			email_to.append(ft.fahrer_nachmittag.email)
+		if ft.team.email:
+			email_to.append(ft.team.email)	
+		self.initial['an'] = "; ".join(email_to)
+		self.initial['betreff'] = '[Bürgerbus] Fahrplan {} am {}'.format(ft.team,ft.datum)
+		self.initial['datei'] = settings.TOUR_PATH + context['filename']
+		context['form'] = form
+		return render(request, self.template_name, context)
+
+	def post(self, request, *args, **kwargs):
+		context = self.get_context_data()
+		form = self.form_class(request.POST)
+		context['form'] = form
+		if form.is_valid():
+			post = request.POST.dict()
+			email = EmailMessage(
+				post['betreff'],
+				post['text'],
+				post['von'],
+				post['an'].split(";"),
+				reply_to=post['von'].split(";"),
+			)
+			if post['cc']:
+				email.cc = post['cc'].split(";")
+			email.attach_file(settings.TOUR_PATH + context['filename'])
+			email.send(fail_silently=False)
+			storage = messages.get_messages(request)
+			storage.used = True			
+			messages.success(request, post['betreff']+' wurde erfolgreich versandt.')
+			return HttpResponseRedirect(self.success_url+url_args(request))
+		else:
+			messages.error(request, form.errors)			
+		return render(request, self.template_name, context)
 
 class FahrtageListView(MyListView):
 	permission_required = 'Einsatztage.view_fahrtag'
@@ -137,9 +197,12 @@ class FahrtageChangeView(MyDetailView):
 				fahrtag.fahrer_nachmittag=None
 			fahrtag.updated_by = request.user
 			fahrtag.save()
+			storage = messages.get_messages(request)
+			storage.used = True			
 			messages.success(request, 'Fahrtag "<a href="'+request.path+url_args(request)+'">'+str(fahrtag.datum)+' '+str(fahrtag.team)+'</a>" wurde erfolgreich geändert.')
 			return HttpResponseRedirect(self.success_url+url_args(request))
-
+		else:
+			messages.error(request, form.errors)			
 		return render(request, self.template_name, context)		
 
 class BuerotageListView(MyListView):
@@ -197,6 +260,8 @@ class BuerotageChangeView(MyDetailView):
 				buero.mitarbeiter=Koordinator.objects.get(pk=int(post['koordinator']))
 			buero.updated_by = request.user
 			buero.save()
+			storage = messages.get_messages(request)
+			storage.used = True			
 			messages.success(request, 'Bürotag "<a href="'+request.path+url_args(request)+'">'+str(buero.datum)+' '+str(buero.team)+'</a>" wurde erfolgreich geändert.')
 			return HttpResponseRedirect(self.success_url+url_args(request))
 		else:

@@ -46,12 +46,22 @@ class Fahrtag(models.Model):
 	def gaeste_vormittag(self):
 		from Tour.models import Tour
 		return Tour.objects.filter(datum_id=self.id, uhrzeit__lt=datetime.time(12)).count()
-#		gaeste_vormittag.short_description = _("Gäste vormittags")
 
 	@property
 	def wochentag(self):
 		wochentage = ['Mo','Di','Mi','Do','Fr','Sa','So']
 		return wochentage[self.datum.weekday()]
+
+	@property
+	def hat_fahrer(self):
+		if self.gaeste_vormittag == 0 and self.gaeste_nachmittag == 0:
+			return False
+		if self.gaeste_vormittag > 0 and not self.fahrer_vormittag:
+			return False
+		if self.gaeste_nachmittag > 0 and not self.fahrer_nachmittag:
+			return False
+		return True
+			
 
 	class Meta():
 		verbose_name_plural = "Fahrtage"

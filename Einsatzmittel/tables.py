@@ -8,7 +8,7 @@ class BusTable(tables.Table):
     )
     class Meta:
         model = Bus
-        fields = ('bus','sitzplaetze','fahrtage')
+        fields = ('bus','sitzplaetze','fahrtage','email')
 
 class BueroTable(tables.Table):
     buero = tables.TemplateColumn(

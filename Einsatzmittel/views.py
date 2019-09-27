@@ -52,8 +52,13 @@ class BusAddView(MyDetailView):
 		form = self.form_class(request.POST)
 		context['form'] = form
 		if form.is_valid():
-			form.save()
+			instance = form.save()
+			storage = messages.get_messages(request)
+			storage.used = True
+			messages.success(request, 'Bus "<a href="'+self.success_url+str(instance.id)+'">'+instance.bus+'</a>" wurde erfolgreich hinzugefügt.')	
 			return HttpResponseRedirect('/Einsatzmittel/busse/')
+		else:
+			messages.error(request, form.errors)			
 		return render(request, self.template_name, context)
 
 class BusChangeView(MyUpdateView):
@@ -71,6 +76,14 @@ class BusChangeView(MyUpdateView):
 		context['submit_button'] = "Sichern"
 		context['back_button'] = "Abbrechen"
 		return context
+
+	def form_valid(self, form):
+		instance = form.save()
+		storage = messages.get_messages(self.request)
+		storage.used = True			
+		messages.success(self.request, 'Bus "<a href="'+self.success_url+str(instance.id)+'">'+instance.bus+'</a>" wurde erfolgreich geändert.')
+		return super(BusChangeView, self).form_valid(form) 
+
 
 class BusDeleteView(MyView):
 	permission_required = 'Einsatzmittel.delete_bus'
@@ -102,6 +115,7 @@ class BueroView(MyListView):
 class BueroAddView(MyDetailView):
 	form_class = BueroChgForm
 	permission_required = 'Einsatzmittel.add_buero'
+	success_url = '/Einsatzmittel/bueros/'
 
 	def get_context_data(self, request):
 		context = {}
@@ -122,8 +136,13 @@ class BueroAddView(MyDetailView):
 		form = self.form_class(request.POST)
 		context['form'] = form
 		if form.is_valid():
-			form.save()
-			return HttpResponseRedirect('/Einsatzmittel/bueros/')
+			instance = form.save()
+			storage = messages.get_messages(request)
+			storage.used = True
+			messages.success(request, 'Büro "<a href="'+self.success_url+str(instance.id)+'">'+instance.buero+'</a>" wurde erfolgreich hinzugefügt.')		
+			return HttpResponseRedirect(self.success_url)
+		else:
+			messages.error(request, form.errors)			
 		return render(request, self.template_name, context)
 
 class BueroChangeView(MyUpdateView):
@@ -131,7 +150,6 @@ class BueroChangeView(MyUpdateView):
 	form_class = BueroChgForm
 	model=Buero
 	success_url = '/Einsatzmittel/bueros/'
-	success_message = 'Büro erfolgreich geändert'
 	
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
@@ -142,6 +160,14 @@ class BueroChangeView(MyUpdateView):
 		context['submit_button'] = "Sichern"
 		context['back_button'] = "Abbrechen"
 		return context
+
+	def form_valid(self, form):
+		instance = form.save()
+		storage = messages.get_messages(self.request)
+		storage.used = True			
+		messages.success(self.request, 'Büro "<a href="'+self.success_url+str(instance.id)+'">'+instance.buero+'</a>" wurde erfolgreich geändert.')
+		return super(BueroChangeView, self).form_valid(form) 
+
 
 class BueroDeleteView(MyView):
 	permission_required = 'Einsatzmittel.delete_buero'

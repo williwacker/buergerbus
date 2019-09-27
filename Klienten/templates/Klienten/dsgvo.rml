@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="iso-8859-1" standalone="no" ?>
+<!DOCTYPE document SYSTEM "rml.dtd">
+{% block content %}
+    <document filename="{{ filename }}">
+        <template rotation="0" showBoundary="0" >
+            <pageTemplate id="main">
+                <frame id="first" x1="0" y1="20" width="21cm" height="820"/>
+            </pageTemplate>
+        </template>
+        <stylesheet>
+            <paraStyle name="p1"
+                fontName="Helvetica"
+                fontSize="8"
+                alignment="CENTER"
+                spaceBefore = "0.1cm"
+                spaceAfter = "0.3cm"
+            />
+            <paraStyle name="p2"
+                fontName="Helvetica"
+                fontSize="8"
+                alignment="JUSTIFY"
+                spaceBefore = "0.1cm"
+                spaceAfter = "0.1cm"
+            />            
+            <paraStyle name="p3"
+                fontName="Helvetica"
+                fontSize="12"
+                alignment="CENTER"
+                spaceBefore = "0.2cm"
+                spaceAfter = "0.5cm"
+            />                
+        </stylesheet>
+        <story>
+            <para style="p1">VG Alzey-Land Bürgerbus Portal</para>
+            <para style="p3">Datenschutzerklärung zwecks Beförderung mit dem Bürgerbus der VG Alzey-Land</para>
+            {% if klient %}
+                <para style="p2">
+                    Hiermit willige ich,
+                    <b>{{ klient.vorname }} {{ klient.nachname }}, {{ klient.ort }} {{ klient.strasse}} {{ klient.hausnr }}</b>, in die Verarbeitung meiner 
+                    folgenden personenbezogenen Daten <br /><br /><b>Name<br />Anschrift<br />Telefon-Nr.<br />Bemerkungen</b><br /><br /> durch die Verbandsgemeinde Alzey-Land ein.
+                    Die Datenverarbeitung erfolgt ausschließlich zum Zweck der Planung der Fahrten mit dem VG Bürgerbus.<br />
+                    Die Einwilligung erfolgt auf freiwilliger Basis und ich kann sie jederzeit mit Wirkung für die Zukunft widerrufen. 
+                    Ab Zugang der Widerrufserklärung dürfen meine Daten nicht weiterverarbeitet werden. Sie sind unverzüglich zu löschen. 
+                    Durch den Widerruf meiner Einwilligung wird die Rechtmäßigkeit der bis dahin erfolgten Verarbeitung nicht berührt.<br />
+                    <b>Ein weiterer Transport mit dem Bürgerbus ist damit aber ausgeschlossen.</b><br />
+                    Meine Widerrufserklärung kann ich schriftlich an die Verantwortliche des Bürgerbusses (Frau Kerstin Rupp, VG Alzey-Land) richten.<br /><br />
+                    <b>{{ klient.vorname }} {{ klient.nachname }}</b><br />
+                    <b>{{ klient.ort }}, den ____________________________</b><br />
+                    <br /><br />
+                    <b>__________________________________________________</b><br />
+                    Unterschrift
+                </para>
+            {% endif %}
+        </story>
+    </document>
+{% endblock content %}

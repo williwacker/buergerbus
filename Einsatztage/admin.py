@@ -69,16 +69,16 @@ class BuerotagAdmin(admin.ModelAdmin):
 
 	def get_form(self, request, obj=None, **kwargs):
 		if request.user.is_superuser:
-			self.fields = ['datum', 'wochentag', 'team', 'mitarbeiter', 'archiv']
+			self.fields = ['datum', 'wochentag', 'team', 'koordinator', 'archiv']
 		else:
-			self.fields = ['datum', 'wochentag', 'team', 'mitarbeiter']
+			self.fields = ['datum', 'wochentag', 'team', 'koordinator']
 		return super(BuerotagAdmin, self).get_form(request, obj=None, **kwargs)
 
 	def changelist_view(self, request, extra_context=None):
 		if request.user.is_superuser:
-			self.list_display = ['datum', 'wochentag', 'team', 'mitarbeiter', 'archiv']
+			self.list_display = ['datum', 'wochentag', 'team', 'koordinator', 'archiv']
 		else:
-			self.list_display = ['datum', 'wochentag', 'team', 'mitarbeiter']
+			self.list_display = ['datum', 'wochentag', 'team', 'koordinator']
 		return super(BuerotagAdmin, self).changelist_view(request, extra_context)
 
 	def get_queryset(self, request):

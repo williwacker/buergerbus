@@ -53,18 +53,6 @@ class Strassen(models.Model):
 		verbose_name_plural = "Strassen"
 		verbose_name = "Strasse"
 
-'''
-class KlientenBus(models.Model):
-	name    = models.ForeignKey('Klienten', null=True, blank=True, on_delete=models.CASCADE)
-	bus     = models.ForeignKey('Einsatzmittel.Bus', null=True, blank=True, on_delete=models.CASCADE)
-
-	def __str__(self):
-		return str(self.bus)
-
-	class Meta():
-		verbose_name_plural = "Busse"
-		verbose_name = "Bus"		
-'''
 class Klienten(models.Model):
 	name    = models.CharField(max_length=200, help_text="Name, Vorname")
 	name.short_description = "Name des Klienten"
@@ -95,7 +83,7 @@ class Klienten(models.Model):
 	def vorname(self):
 		try:
 			nachname, vorname = self.name.split(',')
-			return vorname
+			return vorname.lstrip()
 		except:
 			return ''
 

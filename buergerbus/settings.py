@@ -48,13 +48,13 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'multiselectfield',
-#    'formtools',
-    'debug_toolbar',
+#    'debug_toolbar',
     'django_tables2',
+    'django_cron',
 ]
 
 MIDDLEWARE = [
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
+#    'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -62,6 +62,10 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+]
+
+CRON_CLASSES = [
+    'Basis.cron.EinsatztageCronJob',
 ]
 
 ROOT_URLCONF = 'buergerbus.urls'
@@ -160,17 +164,18 @@ LOGIN_URL           = '/accounts/login/'
 LOGIN_REDIRECT_URL  = '/Basis/'
 LOGOUT_REDIRECT_URL = '/accounts/logout_success/'
 
+
 # Klienten von ausserhalb der VG können hinzugefügt werden
 ALLOW_OUTSIDE_CLIENTS = True
 # Anzahl planbarer Fahrtage/Bürotage
-COUNT_DRIVING_DAYS = 5
+COUNT_DRIVING_DAYS = 6
 COUNT_OFFICE_DAYS  = 30
 # Anzahl Navigations-Buttons für die Tour Ansicht. Wert zwischen 2 und 6 gibt Anzahl der Buttons an. Ansonsten werden vorheriger und nächster Tag angeboten.
-TOUR_BAR = 4
+TOUR_BAR = 6
 # Pfad für die Tourlisten zu speichern
 TOUR_PATH = ''
 # Fahrzeit und Ankunftszeit mittels Google Maps errechnen
-USE_GOOGLE = False
+USE_GOOGLE = True
 
 # import settings.json
 import json

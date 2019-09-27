@@ -81,8 +81,12 @@ class FahrerAddView(MyDetailView):
 								updated_by = request.user
 							)
 			fahrer.save()
+			storage = messages.get_messages(request)
+			storage.used = True			
 			messages.success(request, 'Fahrer "<a href="'+self.success_url+str(fahrer.id)+url_args(request)+'/">'+fahrer.name+' '+str(fahrer.team)+'</a>" wurde erfolgreich hinzugefügt.')
 			return HttpResponseRedirect(self.success_url+url_args(request))
+		else:
+			messages.error(request, form.errors)			
 		return render(request, self.template_name, context)
 
 class FahrerChangeView(MyDetailView):
@@ -126,9 +130,12 @@ class FahrerChangeView(MyDetailView):
 				fahrer.aktiv = False
 			fahrer.updated_by = request.user
 			fahrer.save()
+			storage = messages.get_messages(request)
+			storage.used = True			
 			messages.success(request, 'Fahrer "<a href="'+request.path+url_args(request)+'">'+fahrer.name+' '+str(fahrer.team)+'</a>" wurde erfolgreich geändert.')
 			return HttpResponseRedirect(self.success_url+url_args(request))
-
+		else:
+			messages.error(request, form.errors)
 		return render(request, self.template_name, context)		
 
 class FahrerDeleteView(MyView):
@@ -209,6 +216,8 @@ class KoordinatorAddView(MyDetailView):
 								updated_by = request.user
 							)
 			koordinator.save()
+			storage = messages.get_messages(request)
+			storage.used = True			
 			messages.success(request, 'Koordinator "<a href="'+self.success_url+str(koordinator.id)+'/'+url_args(request)+'">'+str(koordinator.benutzer)+' '+str(koordinator.team)+'</a>" wurde erfolgreich hinzugefügt.')
 			return HttpResponseRedirect(self.success_url+url_args(request))
 		else:
@@ -256,9 +265,12 @@ class KoordinatorChangeView(MyDetailView):
 				koordinator.aktiv = False
 			koordinator.updated_by = request.user
 			koordinator.save()
+			storage = messages.get_messages(request)
+			storage.used = True
 			messages.success(request, 'Koordinator "<a href="'+request.path+url_args(request)+'">'+str(", ".join([koordinator.benutzer.last_name,koordinator.benutzer.first_name]))+' im Team '+str(koordinator.team)+'</a>" wurde erfolgreich geändert.')
 			return HttpResponseRedirect(self.success_url+url_args(request))
-
+		else:
+			messages.error(request, form.errors)
 		return render(request, self.template_name, context)		
 
 class KoordinatorDeleteView(MyView):
