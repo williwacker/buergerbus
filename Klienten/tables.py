@@ -19,17 +19,25 @@ class FahrgaesteTable(tables.Table):
             <a href="{{ record.id }}/dsgvo/"><img src="{% static "project/img/dsgvo.png" %}" alt="DSGVO anzeigen" title="DSGVO anzeigen"></a>
             <a href="{{ record.id }}/dsgvoAsPDF/"><img src="{% static "project/img/icon_pdf.png" %}" alt="PDF erzeugen" title="PDF erzeugen"></a>
         {% else %}
-            {% if klient.dsgvo == '02' %}
+            {% if record.dsgvo == '02' %}
                 <img src="{% static "project/img/pencil.png" %}" alt="DSGVO zur Unterschrift" title="DSGVO zur Unterschrift">
             {% else %}
                 <img src="{% static "project/img/checkmark.png" %}" alt="DSGVO liegt vor" title="DSGVO liegt vor">
             {% endif %}
         {% endif %}  
         ''',
-        orderable=False)
+        orderable=False
+    )
+    tour = tables.TemplateColumn('''
+        {% load static %}
+        <a href="/Tour/tour/add/{{ record.id }}/"><img src="{% static "project/img/fahrplan.png" %}" alt="Tour hinzuf&uuml;gen" title="Tour hinzuf&uuml;gen"></a>
+        ''',
+        orderable=False
+    )
+
     class Meta:
         model = Klienten
-        fields = ('name','telefon','adresse','bus','bemerkung','dsgvo')
+        fields = ('name','telefon','adresse','bus','bemerkung','tour','dsgvo')
 
 class DienstleisterTable(tables.Table):
     name = tables.TemplateColumn(

@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta, time
 from django import forms
+from django.conf import settings
 from django.forms import ModelForm, modelformset_factory
 from jet.filters import RelatedFieldAjaxListFilter
 from django.utils.translation import ugettext_lazy as _
@@ -47,7 +48,8 @@ class TourChgForm(TourenForm):
 	class Meta:
 		model = Tour
 		fields = ['fahrgast','bus_2','klient','bus','datum','uhrzeit','abholklient','zielklient','entfernung','ankunft','bemerkung']
-		widgets = {'klient': forms.HiddenInput(), 'bus': forms.HiddenInput(), 'entfernung': forms.HiddenInput(), 'ankunft': forms.HiddenInput()}
+		widgets = {'klient': forms.HiddenInput(), 'bus': forms.HiddenInput(), 'entfernung': forms.HiddenInput(), 'ankunft': forms.HiddenInput(),
+				   'uhrzeit': forms.TimeInput(attrs={'class':'vTimeField'})}
 
 	def clean(self):
 		frueheste_abfahrt = DepartureTime().time(self.cleaned_data)

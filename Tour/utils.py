@@ -27,7 +27,9 @@ class DistanceMatrix():
 
 			dist  = matrix['rows'][0]['elements'][0]['distance']['text']
 			dura  = matrix['rows'][0]['elements'][0]['duration']['text']
-			arrivaltime = (startuhrzeit + timedelta(seconds=matrix['rows'][0]['elements'][0]['duration']['value'])).time()
+			arrivaltime = (startuhrzeit + 
+							timedelta(seconds=matrix['rows'][0]['elements'][0]['duration']['value']) +
+							timedelta(minutes=settings.TRANSFER_TIME)).time()
 		except:
 			dist = "unbekannt"
 			dura = "unbekannt"

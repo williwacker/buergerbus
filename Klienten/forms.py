@@ -33,20 +33,18 @@ class FahrgastAddForm(KlientenForm):
 class FahrgastChgForm(KlientenForm):
 	class Meta:
 		model = Klienten
-		fields = ['name','telefon','mobil','ort','strasse','hausnr','bemerkung','dsgvo','bus','typ']
-		widgets = {'dsgvo': forms.Select(choices=DSGVO_AUSWAHL), 'typ': forms.HiddenInput()}	
-
-class DienstleisterChgForm(ModelForm):	
-	class Meta:
-		model = Klienten
-		fields = ['name','telefon','mobil','ort','strasse','hausnr','bemerkung','dsgvo','bus','typ']
-		widgets = {'dsgvo': forms.HiddenInput(), 'bus': forms.HiddenInput(), 'typ': forms.HiddenInput()}		
+		fields = ['name','telefon','mobil','ort','strasse','hausnr','bemerkung','dsgvo','bus']
+#		widgets = {'dsgvo': forms.Select(choices=DSGVO_AUSWAHL), 'typ': forms.HiddenInput()}	
 
 class DienstleisterAddForm(ModelForm):
 	class Meta:
 		model = Klienten
-		fields = ['name','telefon','mobil','ort','strasse','hausnr','bemerkung','dsgvo','bus','typ']
-		widgets = {'dsgvo': forms.HiddenInput(), 'bus': forms.HiddenInput(), 'typ': forms.HiddenInput()}
+		fields = ['name','telefon','mobil','ort','strasse','hausnr','bemerkung']
+
+class DienstleisterChgForm(ModelForm):	
+	class Meta:
+		model = Klienten
+		fields = ['name','telefon','mobil','ort','strasse','hausnr','bemerkung']
 
 class OrtAddForm(ModelForm):
 	class Meta:
@@ -58,6 +56,7 @@ class OrtChgForm(ModelForm):
 		super(OrtChgForm, self).__init__(*args, **kwargs)
 		self.fields['ort'].disabled = True
 		self.fields['ort'].required = False	
+	
 	class Meta:
 		model = Orte
 		fields = ['ort','bus']		

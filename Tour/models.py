@@ -2,8 +2,7 @@ from django.db import models
 from django.core.exceptions import ValidationError
 from smart_selects.db_fields import ChainedForeignKey, GroupedForeignKey
 from django.conf import settings
-import datetime
-from datetime import date
+from datetime import datetime, date, timedelta
 
 from Einsatzmittel.models import Bus
 from Klienten.models import Klienten, Orte
@@ -17,7 +16,7 @@ class Tour(models.Model):
 		chained_field="bus", # the field on your own model that this field links to 
 		chained_model_field="team", # the field on the model that corresponds to chained_field
 		related_name="datum1",
-		limit_choices_to={"archiv": False},
+		limit_choices_to={"archiv": False, "datum__lte": datetime.now()+timedelta(settings.COUNT_TOUR_DAYS)},
 		show_all=False,
 		auto_choose=True,
 		sort=True)
@@ -65,14 +64,8 @@ class Tour(models.Model):
 	def klienten_bus(self):
 		return str(self.klient.bus)
 
-
-
 	def __str__(self):
 		return ' '.join([self.klient.name,str(self.klienten_bus()),str(self.datum),str(self.uhrzeit)])
-
-#	def clean(self):
-#		if (self.einsatz_bus() != self.klienten_bus()):
-#			raise ValidationError(" ".join([str(self.einsatz_bus()), 'ist nicht dem Klienten zugeordnet']))
 
 	class Meta():
 		verbose_name_plural = "Touren"

@@ -31,4 +31,4 @@ class FahrplanEmailForm(forms.Form):
 	cc = forms.EmailField(required=False, help_text='Email Adressen mit ; trennen', widget=forms.TextInput(attrs={'style':'width:800px;'}))
 	betreff = forms.CharField(max_length=50, required=False, widget=forms.TextInput(attrs={'readonly':'readonly','style':'width:800px;'}))
 	text = forms.CharField(max_length=400, required=False, widget=forms.Textarea(attrs={'style':'width:800px;'}))
-	datei = forms.CharField(max_length=200, widget=forms.TextInput(attrs={'readonly':'readonly','style':'width:800px;'}))
+	datei = forms.CharField(max_length=400, widget=forms.Textarea(attrs={'readonly':'readonly','style':'width:800px;'}), label='Datei(en)')

@@ -57,6 +57,7 @@ MIDDLEWARE = [
 #    'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django_session_timeout.middleware.SessionTimeoutMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -164,18 +165,29 @@ LOGIN_URL           = '/accounts/login/'
 LOGIN_REDIRECT_URL  = '/Basis/'
 LOGOUT_REDIRECT_URL = '/accounts/logout_success/'
 
+# Expire nach 30 min
+SESSION_EXPIRE_SECONDS = 1800
+# Expire nach Aktivität
+SESSION_EXPIRE_AFTER_LAST_ACTIVITY = True
+
 
 # Klienten von ausserhalb der VG können hinzugefügt werden
 ALLOW_OUTSIDE_CLIENTS = True
-# Anzahl planbarer Fahrtage/Bürotage
-COUNT_DRIVING_DAYS = 6
+# Anzahl planbarer Fahrtage (Fahrer) /Bürotage (Koordinatoren)
+COUNT_DRIVING_DAYS = 30
 COUNT_OFFICE_DAYS  = 30
+# Anzahl planbarer Tage für Touren
+COUNT_TOUR_DAYS = 6
 # Anzahl Navigations-Buttons für die Tour Ansicht. Wert zwischen 2 und 6 gibt Anzahl der Buttons an. Ansonsten werden vorheriger und nächster Tag angeboten.
 TOUR_BAR = 6
 # Pfad für die Tourlisten zu speichern
 TOUR_PATH = ''
 # Fahrzeit und Ankunftszeit mittels Google Maps errechnen
 USE_GOOGLE = True
+# Ein/Aussteigezeit in Minuten (nur relevant mit USE_GOOGLE)
+TRANSFER_TIME = 3
+# DSGVO mit dem Fahrplan versenden
+SEND_DSGVO = True
 
 # import settings.json
 import json

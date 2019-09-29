@@ -49,15 +49,10 @@ def get_sidebar(user):
 	if user.has_perm('Klienten.view_strassen'):
 		value.append({'name':'Strassen','value':'/Klienten/strassen/'})
 	if value:
-		sidebar.append({'name':'Klienten', 'value':value})
+		sidebar.append({'name':'Klienten', 'value':value})	
 	
-	value = []
-	if user.has_perm('Einsatzmittel.view_bus'):
-		value.append({'name':'Busse','value':'/Einsatzmittel/busse/'})
-	if user.has_perm('Einsatzmittel.view_buero'):
-		value.append({'name':'Büros','value':'/Einsatzmittel/bueros/'})
-	if value:
-		sidebar.append({'name':'Einsatzmittel', 'value':value})
+	if user.has_perm('Tour.view_tour'):
+		sidebar.append({'name':'Touren', 'value':({'name':'Touren','value':'/Tour/tour/'},)})
 
 	value = []
 	if user.has_perm('Einsatztage.view_fahrtag'):
@@ -65,11 +60,8 @@ def get_sidebar(user):
 	if user.has_perm('Einsatztage.view_buerotag'):
 		value.append({'name':'Bürotage','value':'/Einsatztage/buero/'})
 	if value:
-		sidebar.append({'name':'Einsatztage', 'value':value})		
-	
-	if user.has_perm('Tour.view_tour'):
-		sidebar.append({'name':'Touren', 'value':({'name':'Touren','value':'/Tour/tour/'},)})
-	
+		sidebar.append({'name':'Einsatztage', 'value':value})	
+
 	value = []
 	if user.has_perm('Team.view_fahrer'):
 		value.append({'name':'Fahrer','value':'/Team/fahrer/'})
@@ -77,6 +69,14 @@ def get_sidebar(user):
 		value.append({'name':'Koordinatoren','value':'/Team/koordinator/'})
 	if value:
 		sidebar.append({'name':'Team', 'value':value})
+		
+	value = []
+	if user.has_perm('Einsatzmittel.view_bus'):
+		value.append({'name':'Busse','value':'/Einsatzmittel/busse/'})
+	if user.has_perm('Einsatzmittel.view_buero'):
+		value.append({'name':'Büros','value':'/Einsatzmittel/bueros/'})
+	if value:
+		sidebar.append({'name':'Einsatzmittel', 'value':value})
 
 	return sidebar
 

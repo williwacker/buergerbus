@@ -150,6 +150,7 @@ class FahrgastChangeView(MyDetailView):
 			klient.strasse=s
 			klient.hausnr=post['hausnr']
 			klient.bemerkung=post['bemerkung']
+			klient.dsgvo=post['dsgvo']
 			if (o.bus == None) & (post['bus'] != ''):
 				klient.bus=Bus.objects.get(pk=int(post['bus']))
 			klient.updated_by = request.user

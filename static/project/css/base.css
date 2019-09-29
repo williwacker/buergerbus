@@ -155,3 +155,14 @@ ul.pagination li {
 .changeform-navigation-button, .changeform-navigation-button:visited, .changeform-navigation-button:hover {
     width: 10rem;
 }
+.flow {
+    float: left;
+    background-color: #59677e;
+    margin-top: -15px;
+}
+.flow .sidebar-section {
+    margin-top: -20px;
+}
+.flow .sidebar-title {
+    margin-top: 10px;
+}

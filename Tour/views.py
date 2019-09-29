@@ -95,7 +95,7 @@ class TourAddView2(MyDetailView):
 		klient = Klienten.objects.get(pk=kwargs['pk'])
 		self.initial['klient'] = klient.name
 		self.initial['bus'] = klient.bus
-		form.fields['datum'].queryset = Fahrtag.objects.order_by('datum').filter(archiv=False, team_id=klient.bus, datum__gt=datetime.now())
+		form.fields['datum'].queryset = Fahrtag.objects.order_by('datum').filter(archiv=False, team_id=klient.bus, datum__gt=datetime.now(), datum__lte=datetime.now()+timedelta(settings.COUNT_TOUR_DAYS))
 		context['form'] = form
 		return render(request, self.template_name, context)
 
@@ -131,7 +131,9 @@ class TourAddView2(MyDetailView):
 			storage = messages.get_messages(request)
 			storage.used = True
 			messages.success(request, 'Tour "<a href="'+self.success_url+str(tour.id)+'/">'+tour.klient.name+' am '+str(tour.datum)+' um '+str(tour.uhrzeit) +'</a>" wurde erfolgreich hinzugefügt.')
-			return HttpResponseRedirect(self.success_url+url_args(request))
+			if url_args(request):
+				return HttpResponseRedirect(self.success_url+url_args(request)+'&datum='+post['datum'])
+			return HttpResponseRedirect(self.success_url+'?datum='+post['datum'])
 		else:
 			messages.error(request, form.errors)
 		return render(request, self.template_name, context)
@@ -154,6 +156,7 @@ class TourChangeView(MyDetailView):
 	
 	def get(self, request, *args, **kwargs):
 		context = self.get_context_data()
+		klient = Klienten.objects.get(pk=kwargs['pk'])
 		instance=Tour.objects.get(pk=kwargs['pk'])
 		form = self.form_class(instance=instance)
 		form.fields["fahrgast"].initial = instance.klient.name

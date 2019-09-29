@@ -11,7 +11,7 @@ DSGVO_AUSWAHL = [
 	('01', 'Neu'),
 	('02', 'Versandt'),
 	('03', 'Unterschrieben'),
-	('99', 'Nicht notwendig'),
+#	('99', 'Nicht notwendig'),
 ]
 
 TYP_AUSWAHL = [
