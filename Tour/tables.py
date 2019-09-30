@@ -6,10 +6,14 @@ from .models import Tour
 class TourTable(tables.Table):
     fahrgast = tables.TemplateColumn(
         template_code='''
-            {% if record.is_today %}
-                {{ record.klient |safe }}
+            {% if perms.Tour.change_tour %}
+                {% if record.is_today %}
+                    {{ record.klient |safe }}
+                {% else %}
+                    <a href="{{ record.id }}/{{ url_args }}">{{ record.klient |safe }}</a>
+                {% endif %}
             {% else %}
-                <a href="{{ record.id }}/{{ url_args }}">{{ record.klient |safe }}</a>
+                {{ record.klient |safe }}
             {% endif %}
         '''
     )

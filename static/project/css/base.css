@@ -159,6 +159,10 @@ ul.pagination li {
     float: left;
     background-color: #59677e;
     margin-top: -15px;
+    border-radius: 0.28571rem;
+    position: absolute;
+    min-height: 96%;
+    max-width: 250px;
 }
 .flow .sidebar-section {
     margin-top: -20px;

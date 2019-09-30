@@ -11,7 +11,7 @@ from Einsatzmittel.models import Bus, Buero
 from .forms import FahrerAddForm, FahrerChgForm, KoordinatorAddForm, KoordinatorChgForm
 from .tables import FahrerTable, KoordinatorTable
 from .filters import FahrerFilter, KoordinatorFilter
-from Basis.utils import get_sidebar, has_perm, url_args
+from Basis.utils import get_sidebar, url_args
 from Einsatzmittel.utils import get_bus_list, get_buero_list
 from Basis.views import MyListView, MyDetailView, MyView
 
@@ -21,7 +21,7 @@ class FahrerView(MyListView):
 	permission_required = 'Team.view_fahrer'
 
 	def get_fg_queryset(self):
-		if has_perm(self.request.user, 'Einsatzmittel.change_bus'):
+		if self.request.user.has_perm('Einsatzmittel.change_bus'):
 			qs = Fahrer.objects.order_by('team','name')
 		else:
 			qs = Fahrer.objects.order_by('team','name').filter(team__in=get_bus_list(self.request))
@@ -41,7 +41,7 @@ class FahrerView(MyListView):
 		context = super().get_context_data(**kwargs)
 		context['sidebar_liste'] = get_sidebar(self.request.user)
 		context['title'] = "Fahrer"
-		if has_perm(self.request.user, 'Team.add_fahrer'):
+		if self.request.user.has_perm('Team.add_fahrer'):
 			context['add'] = "Fahrer"
 		context['filter'] = FahrerFilter(self.request.GET, queryset=self.get_fg_queryset())
 		context['url_args'] = url_args(self.request)
@@ -98,7 +98,7 @@ class FahrerChangeView(MyDetailView):
 		context = {}
 		context['sidebar_liste'] = get_sidebar(request.user)
 		context['title'] = "Fahrer ändern"
-		if has_perm(self.request.user, 'Team.delete_fahrer'):
+		if self.request.user.has_perm('Team.delete_fahrer'):
 			context['delete_button'] = "Löschen"
 		context['submit_button'] = "Sichern"
 		context['back_button'] = "Abbrechen"
@@ -154,7 +154,7 @@ class KoordinatorView(MyListView):
 	permission_required = 'Team.view_koordinator'
 
 	def get_fg_queryset(self):
-		if has_perm(self.request.user, 'Einsatzmittel.change_buero'):
+		if self.request.user.has_perm('Einsatzmittel.change_buero'):
 			qs = Koordinator.objects.order_by('team','benutzer')
 		else:
 			qs = Koordinator.objects.order_by('team','benutzer').filter(team__in=get_buero_list(self.request))
@@ -174,7 +174,7 @@ class KoordinatorView(MyListView):
 		context = super().get_context_data(**kwargs)
 		context['sidebar_liste'] = get_sidebar(self.request.user)
 		context['title'] = "Koordinator"
-		if has_perm(self.request.user, 'Team.add_koordinator'):
+		if self.request.user.has_perm('Team.add_koordinator'):
 			context['add'] = "Koordinator"
 		context['filter'] = KoordinatorFilter(self.request.GET, queryset=self.get_fg_queryset())
 		context['url_args'] = url_args(self.request)
@@ -233,7 +233,7 @@ class KoordinatorChangeView(MyDetailView):
 		context = {}
 		context['sidebar_liste'] = get_sidebar(request.user)
 		context['title'] = "Koordinator ändern"
-		if has_perm(self.request.user, 'Team.delete_koordinator'):
+		if self.request.user.has_perm('Team.delete_koordinator'):
 			context['delete_button'] = "Löschen"
 		context['submit_button'] = "Sichern"
 		context['back_button'] = "Abbrechen"

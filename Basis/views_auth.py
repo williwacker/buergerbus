@@ -4,7 +4,7 @@ from django.contrib.auth.models import User, Group
 from django.contrib import messages
 from django.contrib.auth.views import PasswordChangeView
 from django.views.generic import TemplateView
-from .utils import has_perm, get_sidebar, url_args
+from .utils import get_sidebar, url_args
 from .tables import UserTable, GroupTable
 from .views import MyListView, MyDetailView, MyUpdateView, MyView
 from .forms import MyUserChangeForm, MyGroupChangeForm
@@ -23,7 +23,7 @@ class UserView(MyListView):
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
 		context['sidebar_liste'] = get_sidebar(self.request.user)
-		if has_perm(self.request.user, 'auth.change_user'):
+		if self.request.user.has_perm('auth.change_user'):
 			context['add'] = "Benutzer"
 		context['title'] = "Benutzer"
 		context['url_args'] = url_args(self.request)
@@ -73,7 +73,7 @@ class UserChangeView(MyUpdateView):
 		context = super().get_context_data(**kwargs)
 		context['sidebar_liste'] = get_sidebar(self.request.user)
 		context['title'] = "Benutzer ändern"
-		if has_perm(self.request.user, 'auth.delete_user'):
+		if self.request.user.has_perm('auth.delete_user'):
 			context['delete_button'] = "Löschen"
 		context['submit_button'] = "Sichern"
 		context['back_button'] = "Abbrechen"
@@ -111,7 +111,7 @@ class GroupView(MyListView):
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
 		context['sidebar_liste'] = get_sidebar(self.request.user)
-		if has_perm(self.request.user, 'auth.change_group'):
+		if self.request.user.has_perm('auth.change_group'):
 			context['add'] = "Gruppe"
 		context['title'] = "Gruppen"
 		context['url_args'] = url_args(self.request)
@@ -160,7 +160,7 @@ class GroupChangeView(MyUpdateView):
 		context = super().get_context_data(**kwargs)
 		context['sidebar_liste'] = get_sidebar(self.request.user)
 		context['title'] = "Benutzer ändern"
-		if has_perm(self.request.user, 'auth.delete_group'):
+		if self.request.user.has_perm('auth.delete_group'):
 			context['delete_button'] = "Löschen"
 		context['submit_button'] = "Sichern"
 		context['back_button'] = "Abbrechen"

@@ -20,7 +20,7 @@ from Tour.models import Tour
 from Team.models import Fahrer, Koordinator
 from Einsatzmittel.models import Bus
 from Einsatzmittel.utils import get_bus_list, get_buero_list
-from Basis.utils import get_sidebar, has_perm, url_args
+from Basis.utils import get_sidebar, url_args
 from Basis.views import MyListView, MyDetailView, MyView
 
 class FahrplanView(MyListView):
@@ -75,7 +75,6 @@ class FahrplanEmailView(MyDetailView):
 	context = {}
 
 	def get_context_data(self):
-#		context = {}
 		self.context['sidebar_liste'] = get_sidebar(self.request.user)
 		ft = Fahrtag.objects.get(pk=self.kwargs['id'])
 		self.context['fahrtag_liste'] = ft
@@ -87,7 +86,6 @@ class FahrplanEmailView(MyDetailView):
 		# Fahrplan Dateiname
 		self.context['filename'] = 'Buergerbus_Fahrplan_{}_{}.pdf'.format(str(self.context['fahrtag_liste'].team).replace(' ','_'), self.context['fahrtag_liste'].datum)
 		self.context['filepath'] = [settings.TOUR_PATH+self.context['filename']]
-#		return context
 
 	def get_dsgvo_klienten(self, context):
 		klienten_liste = {}

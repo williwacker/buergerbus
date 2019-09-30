@@ -81,11 +81,12 @@ class Bus(models.Model):
 
 	def _permission_codename(self):
 		# gibt den codenamen der entsprechenden Berechtigung zurück
-		return  "Bus_{}_editieren".format(self.bus)
+		print("Bus_{}_editieren".format(self.id))
+		return  "Bus_{}_editieren".format(self.id)
 
 	def _permission_name(self):
 		# gibt den beschreibenden Namen der entsprechenden Berechtigung zurück
-		return "Bus {} verwalten".format(self.bus)
+		return "{} verwalten".format(self.bus)
 
 	def save(self, *args, **kwargs):
 		# eigene save Methode, welche die Permission erzeugt für diesen Bus

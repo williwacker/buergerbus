@@ -20,15 +20,6 @@ def get_user_permissions(user):
 		return Permission.objects.all()
 	return user.user_permissions.all().values_list('codename', flat=True) | Permission.objects.filter(group__user=user).values_list('codename', flat=True)
 
-def has_perm(user, codename):
-	if user.is_superuser:
-		return True
-	if user.has_perm(codename):
-		return True
-	if Permission.objects.filter(group__user=user, codename=codename):
-		return True
-	return False
-
 def get_sidebar(user):
 	sidebar = []
 

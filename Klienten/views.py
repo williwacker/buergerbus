@@ -12,7 +12,7 @@ from .tables import OrteTable, StrassenTable, DienstleisterTable, FahrgaesteTabl
 from .filters import StrassenFilter, OrteFilter, FahrgaesteFilter, DienstleisterFilter
 from Einsatzmittel.models import Bus
 from Einsatzmittel.utils import get_bus_list
-from Basis.utils import get_sidebar, render_to_pdf, has_perm, url_args
+from Basis.utils import get_sidebar, render_to_pdf, url_args
 from Basis.views import MyListView, MyDetailView, MyView
 
 register = template.Library()
@@ -45,7 +45,7 @@ class FahrgastView(MyListView):
 		context = super().get_context_data(**kwargs)
 		context['sidebar_liste'] = get_sidebar(self.request.user)
 		context['title'] = "Fahrgäste"
-		if has_perm(self.request.user, 'Klienten.add_klienten'):
+		if self.request.user.has_perm('Klienten.add_klienten'):
 			context['add'] = "Fahrgast"
 		context['url_args'] = url_args(self.request)
 		context['filter'] = FahrgaesteFilter(self.request.GET, queryset=self.get_fg_queryset())
@@ -114,7 +114,7 @@ class FahrgastChangeView(MyDetailView):
 		context = {}
 		context['sidebar_liste'] = get_sidebar(request.user)
 		context['title'] = "Fahrgast ändern"
-		if has_perm(self.request.user, 'Klienten.delete_klienten'):
+		if self.request.user.has_perm('Klienten.delete_klienten'):
 			context['delete_button'] = "Löschen"
 		context['submit_button'] = "Sichern"
 		context['back_button'] = "Abbrechen"
@@ -231,7 +231,7 @@ class DienstleisterView(MyListView):
 		context = super().get_context_data(**kwargs)
 		context['sidebar_liste'] = get_sidebar(self.request.user)
 		context['title'] = "Dienstleister"
-		if has_perm(self.request.user, 'Klienten.add_klienten'):
+		if self.request.user.has_perm('Klienten.add_klienten'):
 			context['add'] = "Dienstleister"
 		context['filter'] = DienstleisterFilter(self.request.GET, queryset=Klienten.objects.order_by('name','ort').filter(typ='D'))
 		context['url_args'] = url_args(self.request)
@@ -294,7 +294,7 @@ class DienstleisterChangeView(MyDetailView):
 		context = {}
 		context['sidebar_liste'] = get_sidebar(request.user)
 		context['title'] = "Fahrgast ändern"
-		if has_perm(self.request.user, 'Klienten.delete_klienten'):
+		if self.request.user.has_perm('Klienten.delete_klienten'):
 			context['delete_button'] = "Löschen"
 		context['submit_button'] = "Sichern"
 		context['back_button'] = "Abbrechen"
@@ -360,7 +360,7 @@ class OrtView(MyListView):
 		context = super().get_context_data(**kwargs)
 		context['sidebar_liste'] = get_sidebar(self.request.user)
 		context['title'] = "Orte"
-		if has_perm(self.request.user, 'Klienten.add_orte'):
+		if self.request.user.has_perm('Klienten.add_orte'):
 			context['add'] = "Ort"
 		context['filter'] = OrteFilter(self.request.GET, queryset=Orte.objects.all())
 		context['url_args'] = url_args(self.request)
@@ -416,7 +416,7 @@ class OrtChangeView(MyDetailView):
 		context = {}
 		context['sidebar_liste'] = get_sidebar(request.user)
 		context['title'] = "Ort ändern"
-		if has_perm(self.request.user, 'Klienten.delete_orte'):
+		if self.request.user.has_perm('Klienten.delete_orte'):
 			context['delete_button'] = "Löschen"
 		context['submit_button'] = "Sichern"
 		context['back_button'] = "Abbrechen"
@@ -477,7 +477,7 @@ class StrassenView(MyListView):
 		context = super().get_context_data(**kwargs)
 		context['sidebar_liste'] = get_sidebar(self.request.user)
 		context['title'] = "Strassen"
-		if has_perm(self.request.user, 'Klienten.add_strassen'):
+		if self.request.user.has_perm('Klienten.add_strassen'):
 			context['add'] = "Strasse"
 		context['filter'] = StrassenFilter(self.request.GET, queryset=Strassen.objects.all())
 		context['url_args'] = url_args(self.request)
@@ -532,7 +532,7 @@ class StrassenChangeView(MyDetailView):
 		context = {}
 		context['sidebar_liste'] = get_sidebar(request.user)
 		context['title'] = "Strasse ändern"
-		if has_perm(self.request.user, 'Klienten.delete_strassen'):
+		if self.request.user.has_perm('Klienten.delete_strassen'):
 			context['delete_button'] = "Löschen"
 		context['submit_button'] = "Sichern"
 		context['back_button'] = "Abbrechen"

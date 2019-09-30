@@ -5,7 +5,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMix
 from django.contrib.messages.views import SuccessMessageMixin
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
-from .utils import has_perm, get_sidebar
+from .utils import get_sidebar
 
 def my_custom_bad_request_view(request, exception):  #400
     return render(request,'Basis/400.html')

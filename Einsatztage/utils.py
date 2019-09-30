@@ -6,7 +6,6 @@ from django.contrib.auth.models import Permission
 from django.conf import settings
 from .models import Fahrtag
 from Einsatzmittel.models import Bus, Buero
-from Basis.utils import has_perm
 
 ### Fahrtage und Bürotage schreiben
 from Basis.berechnung_feiertage import Holidays
@@ -26,8 +25,7 @@ def get_holidays():
 class FahrtageSchreiben():
 
 	def __init__(self, user):
-		os_user = (lambda: environ["USERNAME"] if "D:" in getcwd() else environ["USER"])()
-		if os_user in ('Werner','root') or has_perm(user, 'Einsatztage.change_fahrtage'):
+		if user.has_perm('Einsatztage.change_fahrtag'):
 			self.write_new_fahrtage()
 			self.archive_past_fahrtage()
 
@@ -67,15 +65,14 @@ class FahrtageSchreiben():
 class BuerotageSchreiben():
 
 	def __init__(self,user):
-		os_user = (lambda: environ["USERNAME"] if "D:" in getcwd() else environ["USER"])()
-		if os_user in ('Werner','root') or has_perm(user, 'Einsatztage.change_buerotage'):
+		if user.has_perm('Einsatztage.change_buerotag'):
 			self.write_new_buerotage()
 			self.archive_past_buerotage()
 
 	def write_new_buerotage(self,changedate=None):
 		# die nächsten Feiertage ausrechnen
 		holiday_list = get_holidays()
-
+		
 		rows = Buero.objects.order_by('buero').values_list('id','buerotage')
 		array = [row for row in rows]
 		for item in array:

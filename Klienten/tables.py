@@ -4,7 +4,13 @@ from .models import Orte, Strassen, Klienten
 
 class FahrgaesteTable(tables.Table):
     name = tables.TemplateColumn(
-        template_code='''<a href="{{ record.id }}/{{ url_args }}">{{ record.name |safe }}</a>'''
+        template_code='''
+            {% if perms.Klienten.change_klienten %}
+                <a href="{{ record.id }}/{{ url_args }}">{{ record.name |safe }}</a>
+            {% else %}
+                {{ record.name |safe }}
+            {% endif %}            
+        '''
     )
     adresse = tables.TemplateColumn(
         template_code='''{{ record.ort }}<br/>{{ record.strasse }} {{ record.hausnr }}''',
@@ -41,7 +47,13 @@ class FahrgaesteTable(tables.Table):
 
 class DienstleisterTable(tables.Table):
     name = tables.TemplateColumn(
-        template_code='''<a href="{{ record.id }}/{{ url_args }}">{{ record.name |safe }}</a>'''
+        template_code='''
+            {% if perms.Klienten.change_klienten %}
+                <a href="{{ record.id }}/{{ url_args }}">{{ record.name |safe }}</a>
+            {% else %}
+                {{ record.name |safe }}
+            {% endif %}                  
+        '''
     )
     adresse = tables.TemplateColumn(
        template_code='''{{ record.ort }}<br/>{{ record.strasse }} {{ record.hausnr }}''',
@@ -57,7 +69,13 @@ class DienstleisterTable(tables.Table):
         
 class OrteTable(tables.Table):
     ort = tables.TemplateColumn(
-        template_code='''<a href="{{ record.id }}/{{ url_args }}">{{ record.ort |safe }}</a>'''
+        template_code='''
+            {% if perms.Klienten.change_orte %}
+                <a href="{{ record.id }}/{{ url_args }}">{{ record.ort |safe }}</a>
+            {% else %}
+                {{ record.ort |safe }}
+            {% endif %}     
+        '''
     )
     class Meta:
         model = Orte
@@ -65,7 +83,13 @@ class OrteTable(tables.Table):
 
 class StrassenTable(tables.Table):
     ort = tables.TemplateColumn(
-        template_code='''<a href="{{ record.id }}/{{ url_args }}">{{ record.ort |safe }}</a>'''
+        template_code='''
+            {% if perms.Klienten.change_strassen %}
+                <a href="{{ record.id }}/{{ url_args }}">{{ record.ort |safe }}</a>
+            {% else %}
+                {{ record.ort |safe }}
+            {% endif %} 
+        '''
     )
     class Meta:
         model = Strassen

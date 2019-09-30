@@ -9,7 +9,7 @@ from django.contrib.auth.models import User
 from .models import Bus, Buero
 from .forms import BusChgForm, BueroChgForm
 from .tables import BusTable, BueroTable
-from Basis.utils import get_sidebar, has_perm, url_args
+from Basis.utils import get_sidebar, url_args
 from Basis.views import MyListView, MyDetailView, MyView, MyUpdateView
 
 register = template.Library()
@@ -24,7 +24,7 @@ class BusView(MyListView):
 		context = super().get_context_data(**kwargs)
 		context['sidebar_liste'] = get_sidebar(self.request.user)
 		context['title'] = "Busse"
-		if has_perm(self.request.user, 'Einsatzmittel.add_bus'):
+		if self.request.user.has_perm('Einsatzmittel.add_bus'):
 			context['add'] = "Bus"
 		return context
 
@@ -71,7 +71,7 @@ class BusChangeView(MyUpdateView):
 		context = super().get_context_data(**kwargs)
 		context['sidebar_liste'] = get_sidebar(self.request.user)
 		context['title'] = "Bus ändern"
-		if has_perm(self.request.user, 'Einsatzmittel.delete_bus'):
+		if self.request.user.has_perm('Einsatzmittel.delete_bus'):
 			context['delete_button'] = "Löschen"
 		context['submit_button'] = "Sichern"
 		context['back_button'] = "Abbrechen"
@@ -108,7 +108,7 @@ class BueroView(MyListView):
 		context = super().get_context_data(**kwargs)
 		context['sidebar_liste'] = get_sidebar(self.request.user)
 		context['title'] = "Büros"
-		if has_perm(self.request.user, 'Einsatzmittel.add_buero'):
+		if self.request.user.has_perm('Einsatzmittel.add_buero'):
 			context['add'] = "Büro"
 		return context
 
@@ -155,7 +155,7 @@ class BueroChangeView(MyUpdateView):
 		context = super().get_context_data(**kwargs)
 		context['sidebar_liste'] = get_sidebar(self.request.user)
 		context['title'] = "Büro ändern"
-		if has_perm(self.request.user, 'Einsatzmittel.delete_buero'):
+		if self.request.user.has_perm('Einsatzmittel.delete_buero'):
 			context['delete_button'] = "Löschen"
 		context['submit_button'] = "Sichern"
 		context['back_button'] = "Abbrechen"

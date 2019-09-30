@@ -17,7 +17,6 @@ from Einsatzmittel.utils import get_bus_list
 from Basis.utils import get_sidebar, render_to_pdf, url_args
 from datetime import datetime, timedelta, time
 from Basis.views import MyListView, MyDetailView, MyView
-from Basis.utils import has_perm
 
 class TourView(MyListView):
 	permission_required = 'Tour.view_tour'
@@ -34,7 +33,7 @@ class TourView(MyListView):
 		context = super().get_context_data(**kwargs)
 		context['sidebar_liste'] = get_sidebar(self.request.user)
 		context['title'] = "Touren"
-		if has_perm(self.request.user, 'Tour.add_tour'):
+		if self.request.user.has_perm('Tour.add_tour'):
 			context['add'] = "Tour"
 		context['nav_bar'] = tour_navbar(Fahrtag.objects.order_by('datum').filter(archiv=False, team__in=get_bus_list(self.request)),self.request.GET.get('datum'))
 		context['url_args'] = url_args(self.request)
@@ -147,7 +146,7 @@ class TourChangeView(MyDetailView):
 		context = {}
 		context['sidebar_liste'] = get_sidebar(self.request.user)
 		context['title'] = "Tour ändern"
-		if has_perm(self.request.user, 'Tour.delete_tour'):
+		if self.request.user.has_perm('Tour.delete_tour'):
 			context['delete_button'] = "Löschen"
 		context['submit_button'] = "Sichern"
 		context['back_button'] = "Abbrechen"
