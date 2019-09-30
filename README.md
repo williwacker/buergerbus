@@ -11,6 +11,8 @@ python manage.py makemigrations
 
 python manage.py migrate
 
+python manage.py collectstatic
+
 python manage.py loaddata Einsatzmittel/fixtures/wochentage.json
 
 python manage.py createsuperuser
