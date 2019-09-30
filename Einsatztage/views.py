@@ -120,7 +120,7 @@ class FahrplanEmailView(MyDetailView):
 		if pdf:
 			response = HttpResponse(pdf, content_type='application/pdf')
 			content = "inline; filename='%s'" %(self.context['filename'])
-			path = settings.TOUR_PATH + self.context['filename'][0]
+			path = settings.TOUR_PATH + self.context['filename']
 			with open(path, 'wb') as f:
 				f.write(response.content)
 		form = self.form_class(initial=self.initial)
