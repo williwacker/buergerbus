@@ -22,13 +22,15 @@ class Tour(models.Model):
 		sort=True)
 	uhrzeit = models.TimeField()
 	abholklient  = models.ForeignKey('Klienten.Klienten', null=True, related_name='abholort', on_delete=models.CASCADE)
-	zielklient  = models.ForeignKey('Klienten.Klienten', null=True, related_name='zielort', on_delete=models.CASCADE)
-	entfernung = models.CharField(max_length=100, blank=True, null=True)
-	ankunft = models.TimeField(blank=True, null=True)
-	bemerkung = models.TextField(max_length=200, blank=True, null=True)
-	archiv     = models.BooleanField(default=False)
-	updated_on = models.DateTimeField(auto_now=True, blank=True, null=True)
-	updated_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL)
+	zielklient   = models.ForeignKey('Klienten.Klienten', null=True, related_name='zielort', on_delete=models.CASCADE)
+	entfernung   = models.CharField(max_length=100, blank=True, null=True)
+	ankunft      = models.TimeField(blank=True, null=True)
+	bemerkung    = models.TextField(max_length=200, blank=True, null=True)
+	personenzahl = models.IntegerField(default=1, verbose_name="Personen")
+	zustieg      = models.BooleanField(default=False)
+	archiv       = models.BooleanField(default=False)
+	updated_on   = models.DateTimeField(auto_now=True, blank=True, null=True)
+	updated_by   = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL)
 
 	@property
 	def abholort(self):

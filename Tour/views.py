@@ -117,12 +117,15 @@ class TourAddView2(MyDetailView):
 			tour = Tour(	
 				klient=klient,
 				datum=fahrtag,
-				uhrzeit=post['uhrzeit'],            
+				uhrzeit=post['uhrzeit'],
+				personenzahl=post['personenzahl'],      
 				abholklient=Klienten.objects.get(pk=int(post['abholklient'])),
 				zielklient=Klienten.objects.get(pk=int(post['zielklient'])),
 				bus=klient.bus,
 				updated_by=request.user
 			)
+			if 'zustieg' in post:
+				tour.zustieg=True 
 			if googleList:
 				tour.entfernung=googleList[0]
 				tour.ankunft=googleList[2]
@@ -181,6 +184,9 @@ class TourChangeView(MyDetailView):
 			tour = Tour.objects.get(pk=kwargs['pk'])
 			tour.datum=fahrtag
 			tour.uhrzeit=post['uhrzeit']
+			if 'zustieg' in post:
+				tour.zustieg= True
+			tour.personenzahl=post['personenzahl']
 			tour.bemerkung=post['bemerkung']
 			tour.abholklient=Klienten.objects.get(pk=int(post['abholklient']))
 			tour.zielklient=Klienten.objects.get(pk=int(post['zielklient']))

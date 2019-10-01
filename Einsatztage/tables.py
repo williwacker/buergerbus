@@ -80,7 +80,7 @@ class TourTable(tables.Table):
     )
     class Meta:
         model = Tour
-        fields = ('fahrgast','telefon','uhrzeit','abholort','zielort','entfernung','ankunft','bemerkungen')
+        fields = ('fahrgast','telefon','uhrzeit','zustieg','personenzahl','abholort','zielort','entfernung','ankunft','bemerkungen')
 
 class FahrerTable(tables.Table):
     class Meta:

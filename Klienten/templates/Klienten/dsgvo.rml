@@ -14,20 +14,26 @@
                 alignment="CENTER"
                 spaceBefore = "0.1cm"
                 spaceAfter = "0.3cm"
+                leftIndent = "1cm"
+                rightIndent = "1cm"
             />
             <paraStyle name="p2"
                 fontName="Helvetica"
-                fontSize="8"
+                fontSize="12"
                 alignment="JUSTIFY"
                 spaceBefore = "0.1cm"
                 spaceAfter = "0.1cm"
+                leftIndent = "1cm"
+                rightIndent = "1cm"
             />            
             <paraStyle name="p3"
                 fontName="Helvetica"
-                fontSize="12"
+                fontSize="14"
                 alignment="CENTER"
                 spaceBefore = "0.2cm"
                 spaceAfter = "0.5cm"
+                leftIndent = "1cm"
+                rightIndent = "1cm"
             />                
         </stylesheet>
         <story>
@@ -43,7 +49,7 @@
                     Ab Zugang der Widerrufserklärung dürfen meine Daten nicht weiterverarbeitet werden. Sie sind unverzüglich zu löschen. 
                     Durch den Widerruf meiner Einwilligung wird die Rechtmäßigkeit der bis dahin erfolgten Verarbeitung nicht berührt.<br />
                     <b>Ein weiterer Transport mit dem Bürgerbus ist damit aber ausgeschlossen.</b><br />
-                    Meine Widerrufserklärung kann ich schriftlich an die Verantwortliche des Bürgerbusses (Frau Kerstin Rupp, VG Alzey-Land) richten.<br /><br />
+                    Meine Widerrufserklärung kann ich schriftlich an die Verantwortliche des Bürgerbusses<br />(Frau Kerstin Rupp, VG Alzey-Land) richten.<br /><br />
                     <b>{{ klient.vorname }} {{ klient.nachname }}</b><br />
                     <b>{{ klient.ort }}, den ____________________________</b><br />
                     <br /><br />

@@ -31,15 +31,17 @@ class TourAddForm2(forms.Form):
 	bus = forms.CharField(required=False, widget=forms.TextInput(attrs={'readonly':'readonly'}))
 	datum = forms.ModelChoiceField(queryset=Fahrtag.objects.order_by('datum').filter(archiv=False, datum__gt=datetime.now()), empty_label=None)
 	uhrzeit = forms.TimeField(widget=forms.TimeInput(attrs={'class':'vTimeField'}))
-	fahrt_verbinden = forms.BooleanField(required=False)
+	zustieg = forms.BooleanField(required=False)
+	personenzahl = forms.IntegerField(initial=1, min_value=1, max_value=8, label='Anzahl Personen')
 	abholklient = forms.ModelChoiceField(queryset=Klienten.objects.order_by('name'))
 	zielklient = forms.ModelChoiceField(queryset=Klienten.objects.order_by('name'))
 	bemerkung = forms.CharField(max_length=200, required=False, widget=forms.Textarea)
 
 	def clean(self):
-		frueheste_abfahrt = DepartureTime().time(self.cleaned_data)
-		if frueheste_abfahrt != time(0,0,0) and frueheste_abfahrt > self.cleaned_data['uhrzeit']:
-			raise forms.ValidationError("Abfahrtszeit kann nicht eingehalten werden. Frühest mögliche Abfahrt um {}".format(str(frueheste_abfahrt)))
+		if not self.cleaned_data['zustieg']:
+			frueheste_abfahrt = DepartureTime().time(self.cleaned_data)
+			if frueheste_abfahrt != time(0,0,0) and frueheste_abfahrt > self.cleaned_data['uhrzeit']:
+				raise forms.ValidationError("Abfahrtszeit kann nicht eingehalten werden. Frühest mögliche Abfahrt um {}".format(str(frueheste_abfahrt)))
 		
 class TourChgForm(TourenForm):
 	fahrgast = forms.CharField(required=False, widget=forms.TextInput(attrs={'readonly':'readonly'}), label='Fahrgast')
@@ -47,11 +49,12 @@ class TourChgForm(TourenForm):
 
 	class Meta:
 		model = Tour
-		fields = ['fahrgast','bus_2','klient','bus','datum','uhrzeit','abholklient','zielklient','entfernung','ankunft','bemerkung']
+		fields = ['fahrgast','bus_2','klient','bus','datum','uhrzeit','zustieg','personenzahl','abholklient','zielklient','entfernung','ankunft','bemerkung']
 		widgets = {'klient': forms.HiddenInput(), 'bus': forms.HiddenInput(), 'entfernung': forms.HiddenInput(), 'ankunft': forms.HiddenInput(),
 				   'uhrzeit': forms.TimeInput(attrs={'class':'vTimeField'})}
 
 	def clean(self):
-		frueheste_abfahrt = DepartureTime().time(self.cleaned_data)
-		if frueheste_abfahrt != time(0,0,0) and frueheste_abfahrt > self.cleaned_data['uhrzeit']:
-			raise forms.ValidationError("Abfahrtszeit kann nicht eingehalten werden. Frühest mögliche Abfahrt um {}".format(str(frueheste_abfahrt)))
+		if not self.cleaned_data['zustieg']:
+			frueheste_abfahrt = DepartureTime().time(self.cleaned_data)
+			if frueheste_abfahrt != time(0,0,0) and frueheste_abfahrt > self.cleaned_data['uhrzeit']:
+				raise forms.ValidationError("Abfahrtszeit kann nicht eingehalten werden. Frühest mögliche Abfahrt um {}".format(str(frueheste_abfahrt)))

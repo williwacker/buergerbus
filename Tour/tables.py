@@ -23,4 +23,4 @@ class TourTable(tables.Table):
     )
     class Meta:
         model = Tour
-        fields = ('fahrgast','bus','datum','uhrzeit','abholort','zielort','entfernung','ankunft','bemerkung')
+        fields = ('fahrgast','bus','datum','uhrzeit','zustieg','personenzahl','abholort','zielort','entfernung','ankunft','bemerkung')

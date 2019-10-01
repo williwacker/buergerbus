@@ -65,24 +65,32 @@
                 </blockTable>
                 <para style="p2">Tourliste</para>
                 <blockTable 
-                            colWidths="2cm,2cm,1.2cm,3.5cm,3.5cm,1.7cm,1.3cm,4cm"
+                            colWidths="2cm,2cm,1.25cm,0.5cm,0.5cm,3.5cm,3.5cm,1.75cm,1.32cm,3cm"
                             style="myBlockTableStyle2"
                             frame="second">
                     <tr>
-                        <td>Klient</td>
-                        <td>Telefon</td>
-                        <td>Uhrzeit</td>
-                        <td>Abholort</td>
-                        <td>Zielort</td>
-                        <td>Entfernung</td>
-                        <td>Ankunft</td>
-                        <td>Bemerkungen</td>
+                        <td><para style="p1">Fahrgast</para></td>
+                        <td><para style="p1">Telefon</para></td>
+                        <td><para style="p1">Uhrzeit</para></td>
+                        <td><para style="p1">Zustieg</para></td>
+                        <td><para style="p1">Anzahl</para></td>
+                        <td><para style="p1">Abholort</para></td>
+                        <td><para style="p1">Zielort</para></td>
+                        <td><para style="p1">Entfernung</para></td>
+                        <td><para style="p1">Ankunft</para></td>
+                        <td><para style="p1">Bemerkungen</para></td>
                     </tr>
                 {% for tour in tour_liste %}
                     <tr>
                         <td><para style="p1">{{ tour.klient }}</para></td>
                         <td><para style="p1">{{ tour.klient.telefon }}<br/>{{ tour.klient.mobil }}</para></td>
                         <td><para style="p1">{{ tour.uhrzeit }}</para></td>
+                        {% if tour.zustieg %}
+                            <td><para style="p1">✔</para></td>
+                        {% else %} 
+                            <td><para style="p1">✘</para></td>
+                        {% endif %}
+                        <td><para style="p1">{{ tour.personenzahl }}</para></td>
                         <td><para style="p1">{% if tour.klient != tour.abholklient %}
                                 {{ tour.abholklient.name }}
                             {% endif %}
