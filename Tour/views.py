@@ -35,7 +35,7 @@ class TourView(MyListView):
 		context['title'] = "Touren"
 		if self.request.user.has_perm('Tour.add_tour'):
 			context['add'] = "Tour"
-		context['nav_bar'] = tour_navbar(Fahrtag.objects.order_by('datum').filter(archiv=False, team__in=get_bus_list(self.request)),self.request.GET.get('datum'))
+		context['nav_bar'] = tour_navbar(Fahrtag.objects.order_by('datum').filter(archiv=False, team__in=get_bus_list(self.request),datum__lte=datetime.now()+timedelta(settings.COUNT_TOUR_DAYS)),self.request.GET.get('datum'))
 		context['url_args'] = url_args(self.request)
 		return context	
 
