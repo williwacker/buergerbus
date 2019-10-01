@@ -291,7 +291,9 @@ class BuerotageChangeView(MyDetailView):
 			post = request.POST.dict()
 			buero = Buerotag.objects.get(pk=kwargs['pk'])
 			if post['koordinator'] != "":
-				buero.mitarbeiter=Koordinator.objects.get(pk=int(post['koordinator']))
+				buero.koordinator=Koordinator.objects.get(pk=int(post['koordinator']))
+			else:
+				buero.koordinator=None 
 			buero.updated_by = request.user
 			buero.save()
 			storage = messages.get_messages(request)

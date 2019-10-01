@@ -170,3 +170,15 @@ ul.pagination li {
 .flow .sidebar-title {
     margin-top: 10px;
 }
+.help, p.help, form p.help {
+    color: #618ab3;
+}
+input[type="text"], input[type="email"], input[type="password"], input[type="url"], input[type="number"], textarea, select, .vTextField, .select2-container--jet .select2-selection {
+    border: 0.07143rem solid #476d86;
+}
+.changeform-navigation-button-label {
+    opacity: 1.0;
+}
+div.breadcrumbs {
+    color: #38547e;
+}

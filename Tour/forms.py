@@ -32,7 +32,7 @@ class TourAddForm2(forms.Form):
 	datum = forms.ModelChoiceField(queryset=Fahrtag.objects.order_by('datum').filter(archiv=False, datum__gt=datetime.now()), empty_label=None)
 	uhrzeit = forms.TimeField(widget=forms.TimeInput(attrs={'class':'vTimeField'}))
 	zustieg = forms.BooleanField(required=False)
-	personenzahl = forms.IntegerField(initial=1, min_value=1, max_value=8, label='Anzahl Personen')
+	personenzahl = forms.IntegerField(initial=1, min_value=1, label='Anzahl Personen')
 	abholklient = forms.ModelChoiceField(queryset=Klienten.objects.order_by('name'))
 	zielklient = forms.ModelChoiceField(queryset=Klienten.objects.order_by('name'))
 	bemerkung = forms.CharField(max_length=200, required=False, widget=forms.Textarea)
