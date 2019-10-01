@@ -3,7 +3,7 @@ Application for the management of driving services
 
 Installation
 
-source 
+source activate
 
 python manage.py migrate
 
