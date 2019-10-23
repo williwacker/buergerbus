@@ -37,6 +37,7 @@ class DistanceMatrix():
 
 		return [dist,dura, arrivaltime]
 
+# calculate earliest departure time from last arrival time
 class DepartureTime():
 
 	def time(self, cleaned_data):
@@ -55,6 +56,41 @@ class DepartureTime():
 					instance.ankunft)
 			return googleList[2]
 		return time(0,0,0)
+
+# calculate earliest departure time when guest joins in from last start time
+class JoinTime():
+
+	def time(self, cleaned_data):
+		uhrzeit = cleaned_data['uhrzeit']
+		datum   = cleaned_data['datum']
+		bus     = cleaned_data['bus']
+		bus_id  = Bus.objects.get(bus=bus)
+		abholklient = cleaned_data['abholklient']
+		abholklient_id = Klienten.objects.get(name=abholklient)
+		instance = Tour.objects.order_by('uhrzeit').filter(bus=bus_id, datum=datum, uhrzeit__lt=uhrzeit).last()
+		if instance and instance.ankunft:
+			googleList = DistanceMatrix().getMatrix(
+					instance.abholklient, 
+					Klienten.objects.get(name=abholklient), 
+					instance.datum.datum, 
+					instance.uhrzeit)
+			return googleList[2]
+		return time(0,0,0)		
+
+class GuestCount():
+
+	def get(self, cleaned_data):
+		guest_count = int(cleaned_data['personenzahl'])
+		uhrzeit = cleaned_data['uhrzeit']
+		datum   = cleaned_data['datum']
+		bus     = Bus.objects.get(bus=cleaned_data['bus'])
+		zustieg = cleaned_data['zustieg']
+		while zustieg:
+			instance = Tour.objects.order_by('uhrzeit').filter(bus=bus, datum=datum, uhrzeit__lt=uhrzeit).last()
+			guest_count += int(instance.personenzahl)
+			zustieg = instance.zustieg
+			uhrzeit = str(instance.uhrzeit)
+		return guest_count
 
 class TourArchive():
 

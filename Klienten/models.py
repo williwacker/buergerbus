@@ -58,8 +58,9 @@ class Klienten(models.Model):
 	name.short_description = "Name des Klienten"
 	telefon = models.CharField(max_length=30, null=True, blank=True, help_text="01234-1111")
 	mobil   = models.CharField(max_length=30, null=True, blank=True, help_text="0150-1111")
-	ort     = models.ForeignKey(Orte, null=True, on_delete=models.CASCADE)
-	bus     = models.ForeignKey('Einsatzmittel.Bus', null=True, blank=True, on_delete=models.CASCADE)
+	ort     = models.ForeignKey(Orte, null=True, on_delete=models.CASCADE, verbose_name="Wohnort")
+	bus     = models.ForeignKey('Einsatzmittel.Bus', null=True, blank=True, on_delete=models.CASCADE, 
+				help_text="Bus lässt sich nur ändern falls dem Wohnort kein Bus zugeordnet ist")
 	strasse = ChainedForeignKey(
         Strassen, # the model where you're populating your streets from
         chained_field="ort", # the field on your own model that this field links to 
@@ -69,7 +70,7 @@ class Klienten(models.Model):
         sort=True
 	)
 	hausnr  = models.CharField(max_length=10)
-	dsgvo   = models.CharField(choices=DSGVO_AUSWAHL, max_length=2, blank=True, default='01', verbose_name='DSGVO')
+	dsgvo   = models.CharField(choices=DSGVO_AUSWAHL, max_length=2, blank=True, default='01', verbose_name='DSGVO Status')
 	typ     = models.CharField(choices=TYP_AUSWAHL, max_length=1, default='F') # F=Fahrgast, D=Dienstleister
 	bemerkung = models.TextField(max_length=200, blank=True, null=True)
 	kategorie = models.CharField(choices=DIENSTLEISTER_AUSWAHL,max_length=100, blank=True, null=True)

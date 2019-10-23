@@ -34,7 +34,6 @@ class FahrgastChgForm(KlientenForm):
 	class Meta:
 		model = Klienten
 		fields = ['name','telefon','mobil','ort','strasse','hausnr','bemerkung','dsgvo','bus']
-#		widgets = {'dsgvo': forms.Select(choices=DSGVO_AUSWAHL), 'typ': forms.HiddenInput()}	
 
 class DienstleisterAddForm(ModelForm):
 	class Meta:

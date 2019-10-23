@@ -174,8 +174,6 @@ class GroupChangeView(MyUpdateView):
 		messages.success(self.request, 'Gruppe "<a href="'+self.success_url+str(instance.id)+'">'+instance.name+'</a>" wurde erfolgreich geändert.')
 		return super(GroupChangeView, self).form_valid(form) 
 
-
-
 class GroupDeleteView(MyView):
 	permission_required = 'auth.delete_group'
 	success_url = '/Basis/gruppen/'

@@ -9,7 +9,10 @@ from smart_selects.db_fields import ChainedForeignKey, GroupedForeignKey
 
 class Fahrtag(models.Model):
 	datum      = models.DateField(blank=True)
-	team       = models.ForeignKey('Einsatzmittel.Bus', on_delete=models.CASCADE)
+	team       = models.ForeignKey(
+		'Einsatzmittel.Bus',
+		on_delete=models.CASCADE
+	)
 	fahrer_vormittag     = ChainedForeignKey(
 		Fahrer, # the model where you're populating your fahrer from
 		chained_field="team", # the field on your own model that this field links to 
@@ -19,7 +22,8 @@ class Fahrtag(models.Model):
 		null=True,
 		blank=True,
 		related_name='vormittag',
-		sort=True)
+		sort=True
+	)
 	fahrer_nachmittag     = ChainedForeignKey(
 		Fahrer, # the model where you're populating your fahrer from
 		chained_field="team", # the field on your own model that this field links to 

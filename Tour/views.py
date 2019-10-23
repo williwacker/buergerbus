@@ -5,7 +5,7 @@ from jet.filters import RelatedFieldAjaxListFilter
 from django.contrib import messages
 
 from .forms import TourAddForm1, TourAddForm2, TourChgForm
-from .utils import DistanceMatrix, TourArchive
+from .utils import DistanceMatrix, TourArchive, GuestCount
 from .models import Tour
 from .tables import TourTable
 from .filters import TourFilter
@@ -121,11 +121,12 @@ class TourAddView2(MyDetailView):
 				personenzahl=post['personenzahl'],      
 				abholklient=Klienten.objects.get(pk=int(post['abholklient'])),
 				zielklient=Klienten.objects.get(pk=int(post['zielklient'])),
+				bemerkung=post['bemerkung'],
 				bus=klient.bus,
 				updated_by=request.user
 			)
-			if 'zustieg' in post:
-				tour.zustieg=True 
+			if form.cleaned_data['zustieg']:
+				tour.zustieg=form.cleaned_data['zustieg']
 			if googleList:
 				tour.entfernung=googleList[0]
 				tour.ankunft=googleList[2]
@@ -184,8 +185,7 @@ class TourChangeView(MyDetailView):
 			tour = Tour.objects.get(pk=kwargs['pk'])
 			tour.datum=fahrtag
 			tour.uhrzeit=post['uhrzeit']
-			if 'zustieg' in post:
-				tour.zustieg= True
+			tour.zustieg=form.cleaned_data['zustieg']
 			tour.personenzahl=post['personenzahl']
 			tour.bemerkung=post['bemerkung']
 			tour.abholklient=Klienten.objects.get(pk=int(post['abholklient']))
