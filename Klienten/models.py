@@ -39,6 +39,7 @@ class Orte(models.Model):
 		verbose_name_plural = "Orte"
 		verbose_name = "Ort"
 		ordering = ["ort"]
+		constraints = [models.UniqueConstraint(fields=['ort'], name='unique_ort')]
 
 class Strassen(models.Model):
 	ort     = models.ForeignKey(Orte, null=True, on_delete=models.CASCADE)
@@ -52,6 +53,7 @@ class Strassen(models.Model):
 	class Meta():
 		verbose_name_plural = "Strassen"
 		verbose_name = "Strasse"
+		constraints = [models.UniqueConstraint(fields=['ort','strasse'], name='unique_strasse')]
 
 class Klienten(models.Model):
 	name    = models.CharField(max_length=200, help_text="Name, Vorname")
@@ -103,3 +105,4 @@ class Klienten(models.Model):
 	class Meta():
 		verbose_name_plural = "Klienten"
 		verbose_name = "Klient"
+		constraints = [models.UniqueConstraint(fields=['name','ort','strasse','hausnr'], name='unique_klient')]

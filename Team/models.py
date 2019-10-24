@@ -20,6 +20,7 @@ class Fahrer(models.Model):
 	class Meta():
 		verbose_name_plural = "Fahrer"
 		verbose_name = "Fahrer"
+		constraints = [models.UniqueConstraint(fields=['name','team'], name='unique_fahrer')]
 
 class Koordinator(models.Model):
 	benutzer = models.OneToOneField(User, related_name='benutzer2', on_delete=models.CASCADE)
@@ -36,3 +37,4 @@ class Koordinator(models.Model):
 	class Meta():
 		verbose_name_plural = "Koordinatoren"
 		verbose_name = "Koordinator"
+		constraints = [models.UniqueConstraint(fields=['benutzer','team'], name='unique_koordinator')]

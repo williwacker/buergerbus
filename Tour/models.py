@@ -72,4 +72,5 @@ class Tour(models.Model):
 	class Meta():
 		verbose_name_plural = "Touren"
 		verbose_name = "Tour"
+#		constraints = [models.UniqueConstraint(fields=['klient','bus','datum','uhrzeit'], name='unique_tour')]
 

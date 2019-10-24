@@ -35,7 +35,7 @@ class TourAddForm2(forms.Form):
 	personenzahl = forms.IntegerField(initial=1, min_value=1, label='Anzahl Personen')
 	abholklient = forms.ModelChoiceField(queryset=Klienten.objects.order_by('name'), help_text="Bei wem soll der Fahrgast abgeholt werden?")
 	zielklient = forms.ModelChoiceField(queryset=Klienten.objects.order_by('name'), help_text="Zu wem soll der Fahrgast gebracht werden?")
-	bemerkung = forms.CharField(max_length=200, required=False, widget=forms.Textarea)
+	bemerkung = forms.CharField(max_length=200, required=False, widget=forms.Textarea(attrs={'rows':'5'}))
 
 	def clean(self):
 		if self.cleaned_data['zustieg']:
@@ -49,7 +49,7 @@ class TourAddForm2(forms.Form):
 
 		bus = Bus.objects.get(bus=self.cleaned_data['bus'])
 		if GuestCount().get(self.cleaned_data) > bus.sitzplaetze:
-			if self.cleaned_data['zustieg']:  # fahrgäste wollen zusteigen
+			if self.cleaned_data['zustieg']:
 				raise forms.ValidationError("Maximale Anzahl Fahrgäste überschritten. Kein Zustieg möglich. Bitte Extrafahrt planen")
 			else:
 				raise forms.ValidationError("Maximale Anzahl Fahrgäste überschritten. Bitte Extrafahrt planen")
@@ -62,7 +62,7 @@ class TourChgForm(TourenForm):
 		model = Tour
 		fields = ['fahrgast','bus_2','klient','bus','datum','uhrzeit','zustieg','personenzahl','abholklient','zielklient','entfernung','ankunft','bemerkung']
 		widgets = {'klient': forms.HiddenInput(), 'bus': forms.HiddenInput(), 'entfernung': forms.HiddenInput(), 'ankunft': forms.HiddenInput(),
-				   'uhrzeit': forms.TimeInput(attrs={'class':'vTimeField'})}
+				   'uhrzeit': forms.TimeInput(attrs={'class':'vTimeField'}), 'bemerkung': forms.Textarea(attrs={'rows':'5'})}
 
 	def clean(self):
 		if self.cleaned_data['zustieg']:
@@ -76,7 +76,7 @@ class TourChgForm(TourenForm):
 
 		bus = Bus.objects.get(bus=self.cleaned_data['bus'])
 		if GuestCount().get(self.cleaned_data) > bus.sitzplaetze:
-			if self.cleaned_data['zustieg']:  # fahrgäste wollen zusteigen
+			if self.cleaned_data['zustieg']:
 				raise forms.ValidationError("Maximale Anzahl Fahrgäste überschritten. Kein Zustieg möglich. Bitte Extrafahrt planen")
 			else:
 				raise forms.ValidationError("Maximale Anzahl Fahrgäste überschritten. Bitte Extrafahrt planen")

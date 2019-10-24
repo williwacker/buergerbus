@@ -66,7 +66,8 @@ class Buero(models.Model):
 	class Meta():
 		verbose_name_plural = "Büros"
 		verbose_name = "Büro"
-		ordering = ["buero"]		
+		ordering = ["buero"]
+		constraints = [models.UniqueConstraint(fields=['buero'], name='unique_buero')]
 
 class Bus(models.Model):
 	bus         = models.CharField(max_length=25, verbose_name="Bus")
@@ -120,3 +121,4 @@ class Bus(models.Model):
 		verbose_name_plural = "Busse"
 		verbose_name = "Bus"
 		ordering = ["bus"]
+		constraints = [models.UniqueConstraint(fields=['bus'], name='unique_bus')]

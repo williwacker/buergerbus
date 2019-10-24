@@ -28,22 +28,25 @@ class FahrgastAddForm(KlientenForm):
 	class Meta:
 		model = Klienten
 		fields = ['name','telefon','mobil','ort','strasse','hausnr','bemerkung','dsgvo','bus','typ']
-		widgets = {'dsgvo': forms.HiddenInput(), 'bus': forms.HiddenInput(), 'typ': forms.HiddenInput()}
+		widgets = {'dsgvo': forms.HiddenInput(), 'bus': forms.HiddenInput(), 'typ': forms.HiddenInput(), 'bemerkung': forms.Textarea(attrs={'rows':'5'})}
 
 class FahrgastChgForm(KlientenForm):
 	class Meta:
 		model = Klienten
 		fields = ['name','telefon','mobil','ort','strasse','hausnr','bemerkung','dsgvo','bus']
+		widgets = {'bemerkung': forms.Textarea(attrs={'rows':'5'})}
 
 class DienstleisterAddForm(ModelForm):
 	class Meta:
 		model = Klienten
 		fields = ['name','telefon','mobil','ort','strasse','hausnr','bemerkung']
+		widgets = {'bemerkung': forms.Textarea(attrs={'rows':'5'})}
 
 class DienstleisterChgForm(ModelForm):	
 	class Meta:
 		model = Klienten
 		fields = ['name','telefon','mobil','ort','strasse','hausnr','bemerkung']
+		widgets = {'bemerkung': forms.Textarea(attrs={'rows':'5'})}
 
 class OrtAddForm(ModelForm):
 	class Meta:
@@ -55,7 +58,7 @@ class OrtChgForm(ModelForm):
 		super(OrtChgForm, self).__init__(*args, **kwargs)
 		self.fields['ort'].disabled = True
 		self.fields['ort'].required = False	
-	
+
 	class Meta:
 		model = Orte
 		fields = ['ort','bus']		
