@@ -20,13 +20,14 @@ from Tour.models import Tour
 from Team.models import Fahrer, Koordinator
 from Einsatzmittel.models import Bus
 from Einsatzmittel.utils import get_bus_list, get_buero_list
-from Basis.utils import get_sidebar, url_args
+from Basis.utils import get_sidebar, url_args, del_message
 from Basis.views import MyListView, MyDetailView, MyView
 
 class FahrplanView(MyListView):
 	permission_required = 'Tour.view_tour'
 
 	def get_queryset(self):
+		del_message(self.request)
 		return TourTable(Tour.objects.order_by('uhrzeit').filter(datum=self.kwargs['id']))
 
 	def get_context_data(self, **kwargs):
@@ -49,7 +50,6 @@ class FahrplanAsPDF(MyView):
 			cd.append('attachment')
 		cd.append('filename=%s' % filename)
 		template = loader.get_template(template_src)
-#		context_dict['filename'] = filename
 		rml = template.render(context_dict)
 		return trml2pdf.parseString(rml)
 		
@@ -174,6 +174,7 @@ class FahrtageListView(MyListView):
 	permission_required = 'Einsatztage.view_fahrtag'
 
 	def get_queryset(self):
+		del_message(self.request)
 		FahrtageSchreiben(self.request.user)
 		team = self.request.GET.get('team')
 		sort = self.request.GET.get('sort')
@@ -243,6 +244,7 @@ class BuerotageListView(MyListView):
 	permission_required = 'Einsatztage.view_buerotag'
 	
 	def get_queryset(self):
+		del_message(self.request)
 		BuerotageSchreiben(self.request.user)
 		team = self.request.GET.get('team')
 		sort = self.request.GET.get('sort')

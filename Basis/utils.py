@@ -3,6 +3,7 @@ from Einsatzmittel.models import Bus, Buero
 from django.template import loader, Context
 from django.http import HttpResponse
 from django.utils.http import is_safe_url
+from django.contrib import messages
 from xhtml2pdf import pisa
 from io import BytesIO
 
@@ -76,3 +77,9 @@ def url_args(request):
 	if is_safe_url(args,request.get_host()):
 		return args
 	return ""
+
+def del_message(request):
+	storage = messages.get_messages(request)
+	storage.used = True
+	if storage._loaded_messages:
+		del storage._loaded_messages[0]

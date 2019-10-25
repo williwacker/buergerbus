@@ -11,7 +11,7 @@ from Einsatzmittel.models import Bus, Buero
 from .forms import FahrerAddForm, FahrerChgForm, KoordinatorAddForm, KoordinatorChgForm
 from .tables import FahrerTable, KoordinatorTable
 from .filters import FahrerFilter, KoordinatorFilter
-from Basis.utils import get_sidebar, url_args
+from Basis.utils import get_sidebar, url_args, del_message
 from Einsatzmittel.utils import get_bus_list, get_buero_list
 from Basis.views import MyListView, MyDetailView, MyView
 
@@ -28,6 +28,7 @@ class FahrerView(MyListView):
 		return qs
 
 	def get_queryset(self):
+		del_message(self.request)
 		team = self.request.GET.get('team')
 		sort = self.request.GET.get('sort')
 		qs = self.get_fg_queryset()
@@ -161,6 +162,7 @@ class KoordinatorView(MyListView):
 		return qs
 
 	def get_queryset(self):
+		del_message(self.request)
 		team = self.request.GET.get('team')
 		sort = self.request.GET.get('sort')
 		qs = self.get_fg_queryset()

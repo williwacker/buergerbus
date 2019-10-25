@@ -8,6 +8,9 @@ html {
 body {
     background-color: #ecf2f6;
 }
+#container {
+    min-width: unset;
+}
 .headline {
     text-align: left;
     margin-bottom: 2em;
@@ -184,4 +187,7 @@ div.breadcrumbs {
 }
 .datetimeshortcuts {
     display: none;
+}
+.change-list .filtered .results, .change-list .filtered .paginator, .filtered #toolbar, .filtered div.xfull {
+    margin-right: 0px;
 }

@@ -12,7 +12,7 @@ from .tables import OrteTable, StrassenTable, DienstleisterTable, FahrgaesteTabl
 from .filters import StrassenFilter, OrteFilter, FahrgaesteFilter, DienstleisterFilter
 from Einsatzmittel.models import Bus
 from Einsatzmittel.utils import get_bus_list
-from Basis.utils import get_sidebar, render_to_pdf, url_args
+from Basis.utils import get_sidebar, render_to_pdf, url_args, del_message
 from Basis.views import MyListView, MyDetailView, MyView
 
 register = template.Library()
@@ -28,6 +28,7 @@ class FahrgastView(MyListView):
 			return Klienten.objects.order_by('name','ort').filter(typ='F', bus__in=get_bus_list(self.request))
 
 	def get_queryset(self):
+		del_message(self.request)
 		ort = self.request.GET.get('ort')
 		bus = self.request.GET.get('bus')
 		sort = self.request.GET.get('sort')
@@ -212,6 +213,7 @@ class DienstleisterView(MyListView):
 	permission_required = 'Klienten.view_klienten'
 
 	def get_queryset(self):
+		del_message(self.request)
 		name = self.request.GET.get('name')
 		ort = self.request.GET.get('ort')
 		kategorie = self.request.GET.get('kategorie')
@@ -347,6 +349,7 @@ class OrtView(MyListView):
 	permission_required = 'Klienten.view_orte'
 	
 	def get_queryset(self):
+		del_message(self.request)
 		ort = self.request.GET.get('ort')
 		bus = self.request.GET.get('bus')
 		qs = Orte.objects.order_by('bus','ort')
@@ -462,6 +465,7 @@ class StrassenView(MyListView):
 	permission_required = 'Klienten.view_strassen'
 	
 	def get_queryset(self):
+		del_message(self.request)
 		ort = self.request.GET.get('ort')
 		strasse = self.request.GET.get('strasse')
 		qs = Strassen.objects.order_by('ort','strasse')

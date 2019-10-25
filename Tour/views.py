@@ -14,7 +14,7 @@ from Klienten.models import Klienten
 from Einsatztage.models import Fahrtag
 
 from Einsatzmittel.utils import get_bus_list
-from Basis.utils import get_sidebar, render_to_pdf, url_args
+from Basis.utils import get_sidebar, render_to_pdf, url_args, del_message
 from datetime import datetime, timedelta, time
 from Basis.views import MyListView, MyDetailView, MyView
 
@@ -22,6 +22,7 @@ class TourView(MyListView):
 	permission_required = 'Tour.view_tour'
 	
 	def get_queryset(self):
+		del_message(self.request)
 		TourArchive()
 		datum = self.request.GET.get('datum')
 		qs = Tour.objects.order_by('bus','datum','uhrzeit').filter(archiv=False,bus__in=get_bus_list(self.request))
@@ -35,7 +36,7 @@ class TourView(MyListView):
 		context['title'] = "Touren"
 		if self.request.user.has_perm('Tour.add_tour'):
 			context['add'] = "Tour"
-		context['nav_bar'] = tour_navbar(Fahrtag.objects.order_by('datum').filter(archiv=False, team__in=get_bus_list(self.request),datum__lte=datetime.now()+timedelta(settings.COUNT_TOUR_DAYS)),self.request.GET.get('datum'))
+		context['nav_bar'] = tour_navbar(Fahrtag.objects.order_by('datum').filter(archiv=False, team__in=get_bus_list(self.request),datum__gte=datetime.now(),datum__lte=datetime.now()+timedelta(settings.COUNT_TOUR_DAYS)),self.request.GET.get('datum'))
 		context['url_args'] = url_args(self.request)
 		return context	
 
