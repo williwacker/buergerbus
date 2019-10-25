@@ -56,7 +56,7 @@ class Strassen(models.Model):
 		constraints = [models.UniqueConstraint(fields=['ort','strasse'], name='unique_strasse')]
 
 class Klienten(models.Model):
-	name    = models.CharField(max_length=200, help_text="Name, Vorname")
+	name    = models.CharField(max_length=50, help_text="Name, Vorname")
 	name.short_description = "Name des Klienten"
 	telefon = models.CharField(max_length=30, null=True, blank=True, help_text="01234-1111")
 	mobil   = models.CharField(max_length=30, null=True, blank=True, help_text="0150-1111")

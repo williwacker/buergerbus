@@ -6,7 +6,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 
 class Fahrer(models.Model):
-	name  = models.CharField(max_length=200)
+	name  = models.CharField(max_length=50)
 	email = models.EmailField(max_length=254)
 	telefon = models.CharField(max_length=30, null=True, blank=True)
 	mobil = models.CharField(max_length=30, null=True, blank=True)
