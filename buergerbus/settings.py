@@ -176,16 +176,18 @@ ALLOW_OUTSIDE_CLIENTS = True
 # Anzahl planbarer Fahrtage (Fahrer) /Bürotage (Koordinatoren)
 COUNT_DRIVING_DAYS = 30
 COUNT_OFFICE_DAYS  = 30
+
 # Anzahl planbarer Tage für Touren
-COUNT_TOUR_DAYS = 6
-# Anzahl Navigations-Buttons für die Tour Ansicht. Wert zwischen 2 und 6 gibt Anzahl der Buttons an. Ansonsten werden vorheriger und nächster Tag angeboten.
-TOUR_BAR = 6
+COUNT_TOUR_DAYS = 13
+
 # Pfad für die Tourlisten zu speichern
 TOUR_PATH = ''
+
 # Fahrzeit und Ankunftszeit mittels Google Maps errechnen
 USE_GOOGLE = True
 # Ein/Aussteigezeit in Minuten (nur relevant mit USE_GOOGLE)
 TRANSFER_TIME = 3
+
 # DSGVO mit dem Fahrplan versenden
 SEND_DSGVO = True
 
