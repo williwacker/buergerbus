@@ -11,7 +11,7 @@ class Fahrer(models.Model):
 	telefon = models.CharField(max_length=30, null=True, blank=True)
 	mobil = models.CharField(max_length=30, null=True, blank=True)
 	team  = models.ForeignKey('Einsatzmittel.Bus', null=True, on_delete=models.SET_NULL)
-	aktiv = models.BooleanField(max_length=1, default=True,verbose_name="Kann als Fahrer(in) eingeteilt werden")
+	aktiv = models.BooleanField(max_length=1, default=True,help_text="Kann als Fahrer(in) eingeteilt werden")
 	updated_on = models.DateTimeField(auto_now=True, blank=True, null=True)
 	updated_by = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='update_fahrer', null=True, blank=True, on_delete=models.SET_NULL)
 	def __str__(self):
@@ -27,7 +27,7 @@ class Koordinator(models.Model):
 	telefon = models.CharField(max_length=30, null=True, blank=True)
 	mobil = models.CharField(max_length=30, null=True, blank=True)
 	team  = models.ForeignKey('Einsatzmittel.Buero', null=True, on_delete=models.SET_NULL)
-	aktiv = models.BooleanField(max_length=1, default=True,verbose_name="Kann als Koordinator(in) eingeteilt werden")
+	aktiv = models.BooleanField(max_length=1, default=True,help_text="Kann als Koordinator(in) eingeteilt werden")
 	updated_on = models.DateTimeField(auto_now=True, blank=True, null=True)
 	updated_by = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='update_buero2', null=True, blank=True, on_delete=models.SET_NULL)
 

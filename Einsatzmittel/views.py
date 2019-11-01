@@ -79,7 +79,8 @@ class BusChangeView(MyUpdateView):
 		return context
 
 	def form_valid(self, form):
-		instance = form.save()
+		instance = form.save(commit=False)
+		instance.save(force_update=True)
 		storage = messages.get_messages(self.request)
 		storage.used = True			
 		messages.success(self.request, 'Bus "<a href="'+self.success_url+str(instance.id)+'">'+instance.bus+'</a>" wurde erfolgreich geändert.')
@@ -164,7 +165,8 @@ class BueroChangeView(MyUpdateView):
 		return context
 
 	def form_valid(self, form):
-		instance = form.save()
+		instance = form.save(commit=False)
+		instance.save(force_update=True)
 		storage = messages.get_messages(self.request)
 		storage.used = True			
 		messages.success(self.request, 'Büro "<a href="'+self.success_url+str(instance.id)+'">'+instance.buero+'</a>" wurde erfolgreich geändert.')

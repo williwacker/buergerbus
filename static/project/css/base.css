@@ -138,6 +138,16 @@ h1 {
 .submit-row a.deletelink {
     height: auto;
 }
+.submit-row a.addlink {
+    display: inline-block;
+    background: #47bac1;
+    border-radius: 4px;
+    padding: 10px 15px;
+    height: auto;
+    line-height: 15px;
+    margin: 0 0 0 5px;
+    color: #fff;
+}
 #changelist table thead th {
     padding: 10px 10px;
 }
@@ -190,4 +200,7 @@ div.breadcrumbs {
 }
 .change-list .filtered .results, .change-list .filtered .paginator, .filtered #toolbar, .filtered div.xfull {
     margin-right: 0px;
+}
+body.popup #header, body.popup div.breadcrumbs {
+        display: none;
 }

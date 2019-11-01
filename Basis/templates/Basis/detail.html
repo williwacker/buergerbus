@@ -27,11 +27,25 @@
             </fieldset>
         </div>
         <div class="submit-row">
-            {% if back_button %}<a href="javascript:history.go(-1)" class="closelink">{{ back_button|upper }}</a>{% endif %}
+            {% if back_button %}
+                {% if popup %}
+                    <a href="javascript:window.close()" class="closelink">{{ back_button|upper }}</a>
+                {% else %}
+                    <a href="javascript:history.go(-1)" class="closelink">{{ back_button|upper }}</a>
+                {% endif %}
+            {% endif %}
             <input type="submit" value="{{ submit_button|default:'Sichern' }}" class="default" name="_save">
-            {% if delete_button %}<p class="deletelink-box"><a href="delete/{{ url_args }}" class="deletelink">{{ delete_button }}</a></p>{% endif %}
+            {% if delete_button %}
+            <p class="deletelink-box">
+                <a href="delete/{{ url_args }}" class="deletelink">{{ delete_button|default:'Löschen' }}</a>
+            </p>
+            {% endif %}
+            {% if popup_button %}
+            <p class="deletelink-box">
+                <a class="addlink related-widget-wrapper-link add-related" id="popup_button.id" href="{{ popup_button.href }}?_to_field=id&amp;_popup=1" title="{{ popup_button.title }}">{{ popup_button.name|upper }}</a>
+            </p>
+            {% endif %}
         </div>
-        
     </form>
 </div>
 {% endblock %}

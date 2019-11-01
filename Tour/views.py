@@ -86,7 +86,8 @@ class TourAddView2(MyDetailView):
 		context['sidebar_liste'] = get_sidebar(self.request.user)
 		context['title'] = "Tour hinzufügen"
 		context['submit_button'] = "Sichern"
-		context['back_button'] = "Zurück"		
+		context['back_button'] = "Zurück"
+		context['popup_button'] = {"id":"add_id_dienstleister","href":"/Klienten/dienstleister/add/","title":"Dienstleister hinzufügen","name":"Dienstleister"}
 		return context
 
 	def get(self, request, *args, **kwargs):
@@ -155,7 +156,7 @@ class TourChangeView(MyDetailView):
 			context['delete_button'] = "Löschen"
 		context['submit_button'] = "Sichern"
 		context['back_button'] = "Abbrechen"
-		context['url_args'] = url_args(self.request)	
+		context['url_args'] = url_args(self.request)
 		return context
 	
 	def get(self, request, *args, **kwargs):

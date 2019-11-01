@@ -21,7 +21,7 @@ class FahrerTable(tables.Table):
     )        
     class Meta:
         model = Fahrer
-        fields = ('name','team','email','telefon')
+        fields = ('name','team','email','telefon','aktiv')
 
 class KoordinatorTable(tables.Table):
     name = tables.TemplateColumn(
@@ -42,4 +42,4 @@ class KoordinatorTable(tables.Table):
     )    
     class Meta:
         model = Koordinator
-        fields = ('name','team','email','telefon')
+        fields = ('name','team','email','telefon','aktiv')

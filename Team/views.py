@@ -13,7 +13,7 @@ from .tables import FahrerTable, KoordinatorTable
 from .filters import FahrerFilter, KoordinatorFilter
 from Basis.utils import get_sidebar, url_args, del_message
 from Einsatzmittel.utils import get_bus_list, get_buero_list
-from Basis.views import MyListView, MyDetailView, MyView
+from Basis.views import MyListView, MyDetailView, MyView, MyUpdateView
 
 register = template.Library()
 
@@ -28,7 +28,6 @@ class FahrerView(MyListView):
 		return qs
 
 	def get_queryset(self):
-		del_message(self.request)
 		team = self.request.GET.get('team')
 		sort = self.request.GET.get('sort')
 		qs = self.get_fg_queryset()
@@ -84,16 +83,17 @@ class FahrerAddView(MyDetailView):
 			fahrer.save()
 			storage = messages.get_messages(request)
 			storage.used = True			
-			messages.success(request, 'Fahrer "<a href="'+self.success_url+str(fahrer.id)+url_args(request)+'/">'+fahrer.name+' '+str(fahrer.team)+'</a>" wurde erfolgreich hinzugefügt.')
+			messages.success(request, 'Fahrer(in) "<a href="'+self.success_url+str(fahrer.id)+url_args(request)+'/">'+fahrer.name+' '+str(fahrer.team)+'</a>" wurde erfolgreich hinzugefügt.')
 			return HttpResponseRedirect(self.success_url+url_args(request))
 		else:
 			messages.error(request, form.errors)			
 		return render(request, self.template_name, context)
 
-class FahrerChangeView(MyDetailView):
+class FahrerChangeView(MyUpdateView):
 	form_class = FahrerChgForm
 	permission_required = 'Team.change_fahrer'
 	success_url = '/Team/fahrer/'
+	model = Fahrer
 
 	def get_context_data(self, request):
 		context = {}
@@ -112,32 +112,14 @@ class FahrerChangeView(MyDetailView):
 		context['form'] = form
 		return render(request, self.template_name, context)
 
-	def post(self, request, *args, **kwargs):
-		context = self.get_context_data(request)
-		form = self.form_class(request.POST)
-		context['form'] = form
-		if form.is_valid():
-			post = request.POST.dict()
-			t = Bus.objects.get(pk=int(post['team']))
-			fahrer = Fahrer.objects.get(pk=kwargs['pk'])
-			fahrer.name=post['name']
-			fahrer.email=post['email']
-			fahrer.telefon=post['telefon']
-			fahrer.mobil=post['mobil']
-			fahrer.team=t
-			if 'aktiv' in post:
-				fahrer.aktiv = True
-			else:
-				fahrer.aktiv = False
-			fahrer.updated_by = request.user
-			fahrer.save()
-			storage = messages.get_messages(request)
-			storage.used = True			
-			messages.success(request, 'Fahrer "<a href="'+request.path+url_args(request)+'">'+fahrer.name+' '+str(fahrer.team)+'</a>" wurde erfolgreich geändert.')
-			return HttpResponseRedirect(self.success_url+url_args(request))
-		else:
-			messages.error(request, form.errors)
-		return render(request, self.template_name, context)		
+	def form_valid(self, form):
+		instance = form.save(commit=False)
+		instance.updated_by = self.request.user
+		instance.save(force_update=True)
+		storage = messages.get_messages(self.request)
+		storage.used = True
+		self.success_message = 'Fahrer(in) "<a href="'+self.success_url+str(instance.id)+'">'+instance.name+' '+str(instance.team)+'</a>" wurde erfolgreich geändert.'
+		return super(FahrerChangeView, self).form_valid(form) 
 
 class FahrerDeleteView(MyView):
 	permission_required = 'Team.delete_fahrer'
@@ -146,7 +128,7 @@ class FahrerDeleteView(MyView):
 	def get(self, request, *args, **kwargs):
 		k = Fahrer.objects.get(pk=kwargs['pk'])
 		k.delete()
-		messages.success(request, 'Fahrer '+k.name+' wurde gelöscht.')
+		messages.success(request, 'Fahrer(in) '+k.name+' wurde gelöscht.')
 		return HttpResponseRedirect(self.success_url+url_args(request))
 
 # Koordinatoren 
@@ -162,7 +144,6 @@ class KoordinatorView(MyListView):
 		return qs
 
 	def get_queryset(self):
-		del_message(self.request)
 		team = self.request.GET.get('team')
 		sort = self.request.GET.get('sort')
 		qs = self.get_fg_queryset()
@@ -220,16 +201,17 @@ class KoordinatorAddView(MyDetailView):
 			koordinator.save()
 			storage = messages.get_messages(request)
 			storage.used = True			
-			messages.success(request, 'Koordinator "<a href="'+self.success_url+str(koordinator.id)+'/'+url_args(request)+'">'+str(koordinator.benutzer)+' '+str(koordinator.team)+'</a>" wurde erfolgreich hinzugefügt.')
+			messages.success(request, 'Koordinator(in) "<a href="'+self.success_url+str(koordinator.id)+'/'+url_args(request)+'">'+str(koordinator.benutzer)+' '+str(koordinator.team)+'</a>" wurde erfolgreich hinzugefügt.')
 			return HttpResponseRedirect(self.success_url+url_args(request))
 		else:
 			messages.error(request, form.errors)
 		return render(request, self.template_name, context)
 
-class KoordinatorChangeView(MyDetailView):
+class KoordinatorChangeView(MyUpdateView):
 	form_class = KoordinatorChgForm
 	permission_required = 'Team.change_koordinator'
 	success_url = '/Team/koordinator/'
+	model = Koordinator
 
 	def get_context_data(self, request):
 		context = {}
@@ -250,30 +232,14 @@ class KoordinatorChangeView(MyDetailView):
 		context['form'] = form
 		return render(request, self.template_name, context)
 
-	def post(self, request, *args, **kwargs):
-		context = self.get_context_data(request)
-		form = self.form_class(request.POST)
-		context['form'] = form
-		if form.is_valid():
-			post = request.POST.dict()
-			t = Buero.objects.get(pk=int(post['team']))
-			koordinator = Koordinator.objects.get(pk=kwargs['pk'])
-			koordinator.telefon=post['telefon']
-			koordinator.mobil=post['mobil']
-			koordinator.team=t
-			if 'aktiv' in post:
-				koordinator.aktiv = True
-			else:
-				koordinator.aktiv = False
-			koordinator.updated_by = request.user
-			koordinator.save()
-			storage = messages.get_messages(request)
-			storage.used = True
-			messages.success(request, 'Koordinator "<a href="'+request.path+url_args(request)+'">'+str(", ".join([koordinator.benutzer.last_name,koordinator.benutzer.first_name]))+' im Team '+str(koordinator.team)+'</a>" wurde erfolgreich geändert.')
-			return HttpResponseRedirect(self.success_url+url_args(request))
-		else:
-			messages.error(request, form.errors)
-		return render(request, self.template_name, context)		
+	def form_valid(self, form):
+		instance = form.save(commit=False)
+		instance.updated_by = self.request.user
+		instance.save(force_update=True)
+		storage = messages.get_messages(self.request)
+		storage.used = True
+		self.success_message = 'Koordinator(in) "<a href="'+self.success_url+str(instance.id)+'">'+str(", ".join([instance.benutzer.last_name,instance.benutzer.first_name]))+'</a>" wurde erfolgreich geändert.'
+		return super(KoordinatorChangeView, self).form_valid(form) 
 
 class KoordinatorDeleteView(MyView):
 	permission_required = 'Team.delete_koordinator'
@@ -282,5 +248,5 @@ class KoordinatorDeleteView(MyView):
 	def get(self, request, *args, **kwargs):
 		k = Koordinator.objects.get(pk=kwargs['pk'])
 		k.delete()
-		messages.success(request, 'Koordinator '+k.name+' wurde gelöscht.')
+		messages.success(request, 'Koordinator(in) '+k.name+' wurde gelöscht.')
 		return HttpResponseRedirect(self.success_url+url_args(request))		
