@@ -22,7 +22,6 @@ class TourView(MyListView):
 	permission_required = 'Tour.view_tour'
 	
 	def get_queryset(self):
-		del_message(self.request)
 		TourArchive()
 		datum = self.request.GET.get('datum')
 		qs = Tour.objects.order_by('bus','datum','uhrzeit').filter(archiv=False,bus__in=get_bus_list(self.request))

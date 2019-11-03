@@ -134,6 +134,12 @@ h1 {
 }
 .object-tools a.addlink {
     background-image: none;
+    padding: 0 0.71429rem;
+    font-size: 11px;
+}
+.changeform-navigation-button.selected {
+    background-color: #59677e;
+    color: #fff;
 }
 .submit-row a.deletelink {
     height: auto;
@@ -147,6 +153,7 @@ h1 {
     line-height: 15px;
     margin: 0 0 0 5px;
     color: #fff;
+    font-size: 0.85714rem;
 }
 #changelist table thead th {
     padding: 10px 10px;
@@ -203,4 +210,10 @@ div.breadcrumbs {
 }
 body.popup #header, body.popup div.breadcrumbs {
         display: none;
+}
+.submit-row a.closelink {
+    font-size: 0.85714rem;
+}
+.addlink::before {
+    content: "";
 }
