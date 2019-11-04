@@ -141,9 +141,6 @@ h1 {
     background-color: #59677e;
     color: #fff;
 }
-.submit-row a.deletelink {
-    height: auto;
-}
 .submit-row a.addlink {
     display: inline-block;
     background: #47bac1;
@@ -214,6 +211,20 @@ body.popup #header, body.popup div.breadcrumbs {
 .submit-row a.closelink {
     font-size: 0.85714rem;
 }
+.submit-row a.closelink:focus, .submit-row a.closelink:hover, .submit-row a.closelink:active {
+    background: #4f4d4d;
+}
 .addlink::before {
     content: "";
+}
+input[type="submit"]:hover {
+    height: 35px;
+}
+.submit-row a.deletelink {
+    background: #cc7878;
+}
+.submit-row a.deletelink, .submit-row a.deletelink:hover {
+    height: 35px;
+    line-height: 15px;
+    padding: 10px 15px;
 }
