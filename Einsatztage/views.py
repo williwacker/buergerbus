@@ -176,7 +176,6 @@ class FahrtageListView(MyListView):
 	permission_required = 'Einsatztage.view_fahrtag'
 
 	def get_queryset(self):
-		del_message(self.request)
 		FahrtageSchreiben(self.request.user)
 		team = self.request.GET.get('team')
 		sort = self.request.GET.get('sort')
@@ -246,7 +245,6 @@ class BuerotageListView(MyListView):
 	permission_required = 'Einsatztage.view_buerotag'
 	
 	def get_queryset(self):
-		del_message(self.request)
 		BuerotageSchreiben(self.request.user)
 		team = self.request.GET.get('team')
 		sort = self.request.GET.get('sort')

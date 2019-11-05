@@ -199,7 +199,9 @@ class TourChangeView(MyDetailView):
 			storage = messages.get_messages(request)
 			storage.used = True
 			messages.success(request, 'Tour "<a href="'+request.path+url_args(request)+'">'+tour.klient.name+' am '+str(tour.datum)+' um '+str(tour.uhrzeit) +'</a>" wurde erfolgreich geändert.')
-			return HttpResponseRedirect(self.success_url+url_args(request))
+#			if url_args(request):
+#				return HttpResponseRedirect(self.success_url+url_args(request)+'&datum='+post['datum'])
+			return HttpResponseRedirect(self.success_url+'?datum='+post['datum'])
 		else:
 			messages.error(request, form.errors)		
 		return render(request, self.template_name, context)		
