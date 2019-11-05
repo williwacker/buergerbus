@@ -121,6 +121,13 @@ class FahrerChangeView(MyUpdateView):
 		self.success_message = 'Fahrer(in) "<a href="'+self.success_url+str(instance.id)+'">'+instance.name+' '+str(instance.team)+'</a>" wurde erfolgreich geändert.'
 		return super(FahrerChangeView, self).form_valid(form) 
 
+	def form_invalid(self, form):
+		context = self.get_context_data(self.request)
+		form = self.form_class(self.request.POST)
+		context['form'] = form
+		messages.error(self.request, form.errors)			
+		return render(self.request, self.template_name, context)
+
 class FahrerDeleteView(MyView):
 	permission_required = 'Team.delete_fahrer'
 	success_url = '/Team/fahrer/'
@@ -239,7 +246,14 @@ class KoordinatorChangeView(MyUpdateView):
 		storage = messages.get_messages(self.request)
 		storage.used = True
 		self.success_message = 'Koordinator(in) "<a href="'+self.success_url+str(instance.id)+'">'+str(", ".join([instance.benutzer.last_name,instance.benutzer.first_name]))+'</a>" wurde erfolgreich geändert.'
-		return super(KoordinatorChangeView, self).form_valid(form) 
+		return super(KoordinatorChangeView, self).form_valid(form)
+
+	def form_invalid(self, form):
+		context = self.get_context_data(self.request)
+		form = self.form_class(self.request.POST)
+		context['form'] = form
+		messages.error(self.request, form.errors)			
+		return render(self.request, self.template_name, context)		
 
 class KoordinatorDeleteView(MyView):
 	permission_required = 'Team.delete_koordinator'

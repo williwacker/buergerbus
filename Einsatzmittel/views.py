@@ -18,7 +18,6 @@ class BusView(MyListView):
 	permission_required = 'Einsatzmittel.view_bus'
 
 	def get_queryset(self):
-		del_message(self.request)
 		return(BusTable(Bus.objects.order_by('bus')))
 
 	def get_context_data(self, **kwargs):
@@ -57,7 +56,7 @@ class BusAddView(MyDetailView):
 			storage = messages.get_messages(request)
 			storage.used = True
 			messages.success(request, 'Bus "<a href="'+self.success_url+str(instance.id)+'">'+instance.bus+'</a>" wurde erfolgreich hinzugefügt.')	
-			return HttpResponseRedirect('/Einsatzmittel/busse/')
+			return HttpResponseRedirect(self.success_url+url_args(request))
 		else:
 			messages.error(request, form.errors)			
 		return render(request, self.template_name, context)
@@ -82,7 +81,8 @@ class BusChangeView(MyUpdateView):
 		instance = form.save(commit=False)
 		instance.save(force_update=True)
 		storage = messages.get_messages(self.request)
-		storage.used = True			
+		storage.used = True
+		self.success_url += url_args(self.request)		
 		messages.success(self.request, 'Bus "<a href="'+self.success_url+str(instance.id)+'">'+instance.bus+'</a>" wurde erfolgreich geändert.')
 		return super(BusChangeView, self).form_valid(form) 
 
@@ -96,7 +96,7 @@ class BusDeleteView(MyView):
 		bus = str(b)
 		b.delete()
 		messages.success(request, bus+' wurde gelöscht.')
-		return HttpResponseRedirect('/Einsatzmittel/busse/')
+		return HttpResponseRedirect(self.success_url+url_args(request))
 
 # Bueros 
 
@@ -104,7 +104,6 @@ class BueroView(MyListView):
 	permission_required = 'Einsatzmittel.view_buero'
 
 	def get_queryset(self):
-		del_message(self.request)
 		return(BueroTable(Buero.objects.order_by('buero')))
 
 	def get_context_data(self, **kwargs):
@@ -168,17 +167,19 @@ class BueroChangeView(MyUpdateView):
 		instance = form.save(commit=False)
 		instance.save(force_update=True)
 		storage = messages.get_messages(self.request)
-		storage.used = True			
+		storage.used = True
+		self.success_url += url_args(self.request)
 		messages.success(self.request, 'Büro "<a href="'+self.success_url+str(instance.id)+'">'+instance.buero+'</a>" wurde erfolgreich geändert.')
 		return super(BueroChangeView, self).form_valid(form) 
 
 
 class BueroDeleteView(MyView):
 	permission_required = 'Einsatzmittel.delete_buero'
+	success_url = '/Einsatzmittel/bueros/'
 
 	def get(self, request, *args, **kwargs):
 		b = Buero.objects.get(pk=kwargs['pk'])
 		buero = str(b)
 		b.delete()
 		messages.success(request, 'Büro '+buero+' wurde gelöscht.')
-		return HttpResponseRedirect('/Einsatzmittel/bueros/')		
+		return HttpResponseRedirect(self.success_url+url_args(request))		

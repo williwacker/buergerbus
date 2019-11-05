@@ -1,4 +1,5 @@
-from django.template import loader, Context
+import subprocess
+from django.template.loader import get_template
 from django.http import Http404, HttpResponse, HttpResponseRedirect, HttpResponseForbidden
 from django.shortcuts import get_object_or_404, render
 from django.http import HttpResponse
@@ -40,16 +41,11 @@ class FahrplanView(MyListView):
 
 class FahrplanAsPDF(MyView):
 	permission_required = 'Tour.view_tour'
+	success_url = '/Einsatztage/fahrer/'
 
-	def pdf_render_to_response(self,template_src, context_dict={}, filename=None, prompt=False):
-		response = HttpResponse(content_type='application/pdf')
-		if not filename:
-			filename = template+'.pdf'
-		cd = []
-		if prompt:
-			cd.append('attachment')
-		cd.append('filename=%s' % filename)
-		template = loader.get_template(template_src)
+	def pdf_render_to_response(self, template_src, context_dict={}, filename=None, prompt=False):
+		context_dict['filename'] = filename
+		template = get_template(template_src)
 		rml = template.render(context_dict)
 		return trml2pdf.parseString(rml)
 		
@@ -62,10 +58,16 @@ class FahrplanAsPDF(MyView):
 		if pdf:
 			response = HttpResponse(pdf, content_type='application/pdf')
 			content = "inline; filename='%s'" %(filename)
-			path = settings.TOUR_PATH + filename
-			with open(path, 'wb') as f:
-				f.write(response.content)
-			return response
+			filepath = settings.TOUR_PATH + filename
+			try:
+				with open(filepath, 'wb') as f:
+					f.write(response.content)
+				f.close()
+				subprocess.Popen([filepath],shell=True)
+				messages.success(request, 'Dokument <b>'+filepath+'</b> wurde erstellt.')
+			except:
+				messages.error(request, 'Dokument <b>'+filepath+'</b> ist noch geöffnet.')
+			return HttpResponseRedirect(self.success_url+url_args(request))
 		return HttpResponse("Kein Dokument vorhanden")
 
 class FahrplanEmailView(MyDetailView):
@@ -304,5 +306,4 @@ class BuerotageChangeView(MyDetailView):
 			return HttpResponseRedirect(self.success_url+url_args(request))
 		else:
 			messages.error(request, form.errors)
-
 		return render(request, self.template_name, context)		

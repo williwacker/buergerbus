@@ -217,6 +217,9 @@ body.popup #header, body.popup div.breadcrumbs {
 .addlink::before {
     content: "";
 }
+.submit-row a.addlink:hover {
+    background: #205067;
+}
 input[type="submit"]:hover {
     height: 35px;
 }

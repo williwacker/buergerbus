@@ -1,3 +1,4 @@
+import subprocess
 from django import template
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
@@ -14,6 +15,7 @@ from Einsatzmittel.models import Bus
 from Einsatzmittel.utils import get_bus_list
 from Basis.utils import get_sidebar, render_to_pdf, url_args, del_message
 from Basis.views import MyListView, MyDetailView, MyView, MyUpdateView
+from Einsatztage.views import FahrplanAsPDF
 
 register = template.Library()
 
@@ -98,7 +100,7 @@ class FahrgastAddView(MyDetailView):
 							)
 			klient.save()
 			storage = messages.get_messages(request)
-			storage.used = True			
+			storage.used = True	
 			messages.success(request, 'Fahrgast "<a href="'+self.success_url+str(klient.id)+'/'+url_args(request)+'">'+klient.name+'</a>" wurde erfolgreich hinzugefügt.')
 			return HttpResponseRedirect(self.success_url+url_args(request))
 		else:
@@ -111,19 +113,19 @@ class FahrgastChangeView(MyUpdateView):
 	success_url = '/Klienten/fahrgaeste/'
 	model = Klienten
 
-	def get_context_data(self, **kwargs):
+	def get_context_data(self, request):
 		context = {}
-		context['sidebar_liste'] = get_sidebar(self.request.user)
+		context['sidebar_liste'] = get_sidebar(request.user)
 		context['title'] = "Fahrgast ändern"
-		if self.request.user.has_perm('Klienten.delete_klienten'):
+		if request.user.has_perm('Klienten.delete_klienten'):
 			context['delete_button'] = "Löschen"
 		context['submit_button'] = "Sichern"
 		context['back_button'] = "Abbrechen"
-		context['url_args'] = url_args(self.request)
+		context['url_args'] = url_args(request)
 		return context
 	
 	def get(self, request, *args, **kwargs):
-		context = self.get_context_data(**kwargs)
+		context = self.get_context_data(request)
 		form = self.form_class(instance=Klienten.objects.get(pk=kwargs['pk']))
 		# nur managed orte anzeigen
 		allow = settings.ALLOW_OUTSIDE_CLIENTS
@@ -142,8 +144,16 @@ class FahrgastChangeView(MyUpdateView):
 		instance.save(force_update=True)
 		storage = messages.get_messages(self.request)
 		storage.used = True
+		self.success_url += url_args(self.request)
 		self.success_message = 'Fahrgast "<a href="'+self.success_url+str(instance.id)+'">'+instance.name+'</a>" wurde erfolgreich geändert.'
-		return super(FahrgastChangeView, self).form_valid(form) 
+		return super(FahrgastChangeView, self).form_valid(form)
+
+	def form_invalid(self, form):
+		context = self.get_context_data(self.request)
+		form = self.form_class(self.request.POST)
+		context['form'] = form
+		messages.error(self.request, form.errors)			
+		return render(self.request, self.template_name, context)		
 
 class FahrgastDeleteView(MyView):
 	permission_required = 'Klienten.delete_klienten'
@@ -169,12 +179,11 @@ class DSGVOView(MyDetailView):
 		context['sidebar_liste'] = get_sidebar(self.request.user)
 		context['title'] = "DSGVO anzeigen"
 		context['back_button'] = "Zurück"
-		return context
-
-from Einsatztage.views import FahrplanAsPDF
+		return context 
 
 class DSGVOasPDFView(MyView):
 	permission_required = 'Klienten.view_klienten'
+	success_url = '/Klienten/fahrgaeste/'
 
 	def get(self, request, id):
 		klient = Klienten.objects.get(pk=id)
@@ -185,9 +194,15 @@ class DSGVOasPDFView(MyView):
 			response = HttpResponse(pdf, content_type='application/pdf')
 			content = "inline; filename='%s'" %(filename)
 			filepath = settings.DSGVO_PATH + filename
-			with open(filepath, 'wb') as f:
-				f.write(response.content)
-			return response
+			try:
+				with open(filepath, 'wb') as f:
+					f.write(response.content)
+				f.close()
+				subprocess.Popen([filepath],shell=True)
+				messages.success(request, 'Dokument <b>'+filepath+'</b> wurde erstellt.')
+			except:
+				messages.error(request, 'Dokument <b>'+filepath+'</b> ist noch geöffnet.')
+			return HttpResponseRedirect(self.success_url+url_args(request))
 		return HttpResponse("Kein Dokument vorhanden")		
 
 class DienstleisterView(MyListView):
@@ -300,8 +315,16 @@ class DienstleisterChangeView(MyUpdateView):
 		instance.save(force_update=True)
 		storage = messages.get_messages(self.request)
 		storage.used = True
+		self.success_url += url_args(self.request)
 		self.success_message = 'Dienstleister "<a href="'+self.success_url+str(instance.id)+'">'+instance.name+'</a>" wurde erfolgreich geändert.'
-		return super(DienstleisterChangeView, self).form_valid(form) 
+		return super(DienstleisterChangeView, self).form_valid(form)
+
+	def form_invalid(self, form):
+		context = self.get_context_data(self.request)
+		form = self.form_class(self.request.POST)
+		context['form'] = form
+		messages.error(self.request, form.errors)			
+		return render(self.request, self.template_name, context)		
 
 class DienstleisterDeleteView(MyView):
 	permission_required = 'Klienten.delete_klienten'
@@ -407,8 +430,16 @@ class OrtChangeView(MyUpdateView):
 		instance.save(force_update=True)
 		storage = messages.get_messages(self.request)
 		storage.used = True
+		self.success_url += url_args(self.request)
 		self.success_message = 'Ort "<a href="'+self.success_url+str(instance.id)+'">'+instance.ort+'</a>" wurde erfolgreich geändert.'
-		return super(OrtChangeView, self).form_valid(form) 		
+		return super(OrtChangeView, self).form_valid(form)
+
+	def form_invalid(self, form):
+		context = self.get_context_data(self.request)
+		form = self.form_class(self.request.POST)
+		context['form'] = form
+		messages.error(self.request, form.errors)			
+		return render(self.request, self.template_name, context)		
 
 class OrtDeleteView(MyView):
 	permission_required = 'Klienten.delete_orte'
@@ -514,8 +545,16 @@ class StrassenChangeView(MyUpdateView):
 		instance.save(force_update=True)
 		storage = messages.get_messages(self.request)
 		storage.used = True
+		self.success_url += url_args(self.request)
 		self.success_message = 'Strasse "<a href="'+self.success_url+str(instance.id)+'">'+instance.strasse+'</a>" wurde erfolgreich geändert.'
-		return super(StrassenChangeView, self).form_valid(form) 		
+		return super(StrassenChangeView, self).form_valid(form)
+
+	def form_invalid(self, form):
+		context = self.get_context_data(self.request)
+		form = self.form_class(self.request.POST)
+		context['form'] = form
+		messages.error(self.request, form.errors)			
+		return render(self.request, self.template_name, context)				
 
 class StrassenDeleteView(MyView):
 	permission_required = 'Klienten.delete_strassen'

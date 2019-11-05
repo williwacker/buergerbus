@@ -36,7 +36,9 @@ class FahrgaesteTable(tables.Table):
     )
     tour = tables.TemplateColumn('''
         {% load static %}
-        <a href="/Tour/tour/add/{{ record.id }}/"><img src="{% static "project/img/fahrplan.png" %}" alt="Tour hinzuf&uuml;gen" title="Tour hinzuf&uuml;gen"></a>
+        {% if record.bus %}
+            <a href="/Tour/tour/add/{{ record.id }}/"><img src="{% static "project/img/fahrplan.png" %}" alt="Tour hinzuf&uuml;gen" title="Tour hinzuf&uuml;gen"></a>
+        {% endif %}
         ''',
         orderable=False
     )

@@ -2,8 +2,9 @@ from django.forms import ModelForm
 from django.shortcuts import render
 from django import forms
 from .models import Fahrer, Koordinator
+from Klienten.forms import KlientenForm
 
-class FahrerAddForm(ModelForm):
+class FahrerAddForm(KlientenForm):
 	def __init__(self, *args, **kwargs):
 		super(FahrerAddForm, self).__init__(*args, **kwargs)
 
@@ -11,7 +12,7 @@ class FahrerAddForm(ModelForm):
 		model = Fahrer
 		fields = ['name', 'team', 'email', 'telefon', 'mobil']
 
-class FahrerChgForm(ModelForm):
+class FahrerChgForm(KlientenForm):
 	def __init__(self, *args, **kwargs):
 		super(FahrerChgForm, self).__init__(*args, **kwargs)
 
@@ -19,7 +20,7 @@ class FahrerChgForm(ModelForm):
 		model = Fahrer
 		fields = ['name', 'team', 'email', 'telefon', 'mobil', 'aktiv']
 
-class KoordinatorAddForm(ModelForm):
+class KoordinatorAddForm(KlientenForm):
 	def __init__(self, *args, **kwargs):
 		super(KoordinatorAddForm, self).__init__(*args, **kwargs)
 
@@ -27,7 +28,7 @@ class KoordinatorAddForm(ModelForm):
 		model = Koordinator
 		fields = ['benutzer', 'team', 'telefon', 'mobil']
 
-class KoordinatorChgForm(ModelForm):
+class KoordinatorChgForm(KlientenForm):
 	name = forms.CharField(required=False, widget=forms.TextInput(attrs={'readonly':'readonly'}), label='Name')
 	def __init__(self, *args, **kwargs):
 		super(KoordinatorChgForm, self).__init__(*args, **kwargs)

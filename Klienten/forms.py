@@ -24,6 +24,32 @@ class KlientenForm(ModelForm):
 		# this method didn't change it.
 		return data
 
+	def clean_telefon(self):
+		data = self.cleaned_data['telefon']
+		if data:
+			data = data.replace('/','-')
+		return data
+
+	def clean_mobil(self):
+		data = self.cleaned_data['mobil']
+		if data:
+			data = data.replace('/','-')
+		return data
+
+class DienstleisterForm(ModelForm):
+
+	def clean_telefon(self):
+		data = self.cleaned_data['telefon']
+		if data:
+			data = data.replace('/','-')
+		return data
+
+	def clean_mobil(self):
+		data = self.cleaned_data['mobil']
+		if data:
+			data = data.replace('/','-')
+		return data				
+
 class FahrgastAddForm(KlientenForm):
 	class Meta:
 		model = Klienten
@@ -36,13 +62,13 @@ class FahrgastChgForm(KlientenForm):
 		fields = ['name','telefon','mobil','ort','strasse','hausnr','bemerkung','dsgvo','bus']
 		widgets = {'bemerkung': forms.Textarea(attrs={'rows':'5'})}
 
-class DienstleisterAddForm(ModelForm):
+class DienstleisterAddForm(DienstleisterForm):
 	class Meta:
 		model = Klienten
 		fields = ['name','telefon','mobil','ort','strasse','hausnr','kategorie','bemerkung']
 		widgets = {'bemerkung': forms.Textarea(attrs={'rows':'5'})}
 
-class DienstleisterChgForm(ModelForm):	
+class DienstleisterChgForm(DienstleisterForm):	
 	class Meta:
 		model = Klienten
 		fields = ['name','telefon','mobil','ort','strasse','hausnr','kategorie','bemerkung']
