@@ -6,6 +6,8 @@ from django.utils.http import is_safe_url
 from django.contrib import messages
 from xhtml2pdf import pisa
 from io import BytesIO
+from django.db.models.deletion import Collector
+from collections import OrderedDict
 
 def render_to_pdf(template_src, context_dict={}):
 	template = loader.get_template(template_src)
@@ -83,3 +85,12 @@ def del_message(request):
 	storage.used = True
 	if storage._loaded_messages:
 		del storage._loaded_messages[0]
+
+def get_relation_dict(modelclass, kwargs):
+		objects = OrderedDict()
+		obj = modelclass.objects.get(pk=kwargs['object'].pk)
+		collector = Collector(using='default')
+		collector.collect([obj])
+		for item in collector.data.items():
+			objects[item[0].__name__] = item[1]
+		return objects

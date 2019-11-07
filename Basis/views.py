@@ -1,11 +1,12 @@
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
-from django.views.generic import ListView, DetailView, View, CreateView, UpdateView
+from django.views.generic import ListView, DetailView, View, CreateView, UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.conf import settings
+from django.contrib import messages
 from django.core.exceptions import PermissionDenied
-from .utils import get_sidebar
+from .utils import get_sidebar, get_relation_dict
 
 def my_custom_bad_request_view(request, exception):  #400
     return render(request,'Basis/400.html')
@@ -35,8 +36,27 @@ class MyView(LoginRequiredMixin, PermissionRequiredMixin, View):
 
 class MyUpdateView(SuccessMessageMixin, LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
 	login_url = settings.LOGIN_URL
-	auth_name = 'auth.change_user'
 	template_name = 'Basis/detail.html'
+
+	def form_invalid(self, form):
+		context = self.get_context_data(self.request)
+		form = self.form_class(self.request.POST)
+		context['form'] = form
+		messages.error(self.request, form.errors)			
+		return render(self.request, self.template_name, context)
+
+class MyDeleteView(SuccessMessageMixin, LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
+	login_url = settings.LOGIN_URL
+	template_name = 'Basis/confirm_delete.html'
+
+	def get_context_data(self, **kwargs):
+		context = super().get_context_data(**kwargs)
+		context['related_objects'] = get_relation_dict(self.model, kwargs)
+		context['sidebar_liste'] = get_sidebar(self.request.user)
+		context['title'] = self.model._meta.verbose_name_raw+" löschen"
+		context['submit_button'] = "Ja, ich bin sicher"
+		context['back_button'] = "Nein, bitte abbrechen"
+		return context		
 
 class BasisView(LoginRequiredMixin, ListView):
 	login_url = settings.LOGIN_URL
@@ -48,4 +68,6 @@ class BasisView(LoginRequiredMixin, ListView):
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
 		context['sidebar_liste'] = get_sidebar(self.request.user)
-		return context		
+		return context
+
+		

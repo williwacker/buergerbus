@@ -35,6 +35,20 @@ class KlientenForm(ModelForm):
 		if data:
 			data = data.replace('/','-')
 		return data
+TYP_AUSWAHL = [
+	('F', 'Fahrgast'),
+	('D', 'Dienstleister')
+]
+
+class KlientenSearchForm(forms.Form):
+	name = forms.CharField(required=False, help_text='Name oder Telefonnummer')
+	ort  = forms.ModelChoiceField(queryset=Orte.objects.order_by('ort'))
+	typ  = forms.MultipleChoiceField(choices=TYP_AUSWAHL, required=False)
+
+class KlientenSearchResultForm(forms.Form):
+	suchergebnis = forms.CharField()
+	details      = forms.CharField(required=False)
+	widgets = {'details': forms.HiddenInput(),}
 
 class DienstleisterForm(ModelForm):
 

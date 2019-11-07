@@ -9,8 +9,8 @@ from django.contrib.auth.models import User
 from .models import Bus, Buero
 from .forms import BusChgForm, BueroChgForm
 from .tables import BusTable, BueroTable
-from Basis.utils import get_sidebar, url_args, del_message
-from Basis.views import MyListView, MyDetailView, MyView, MyUpdateView
+from Basis.utils import get_sidebar, url_args, del_message, get_relation_dict
+from Basis.views import MyListView, MyDetailView, MyView, MyUpdateView,MyDeleteView
 
 register = template.Library()
 
@@ -83,20 +83,14 @@ class BusChangeView(MyUpdateView):
 		storage = messages.get_messages(self.request)
 		storage.used = True
 		self.success_url += url_args(self.request)		
-		messages.success(self.request, 'Bus "<a href="'+self.success_url+str(instance.id)+'">'+instance.bus+'</a>" wurde erfolgreich geändert.')
+		messages.success(self.request, self.model._meta.verbose_name_raw+' "<a href="'+self.success_url+str(instance.id)+'">'+str(instance)+'</a>" wurde erfolgreich geändert.')
 		return super(BusChangeView, self).form_valid(form) 
 
-
-class BusDeleteView(MyView):
+class BusDeleteView(MyDeleteView):
 	permission_required = 'Einsatzmittel.delete_bus'
+	model=Bus
 	success_url = '/Einsatzmittel/busse/'
-
-	def get(self, request, *args, **kwargs):
-		b = Bus.objects.get(pk=kwargs['pk'])
-		bus = str(b)
-		b.delete()
-		messages.success(request, bus+' wurde gelöscht.')
-		return HttpResponseRedirect(self.success_url+url_args(request))
+	pass
 
 # Bueros 
 
@@ -173,13 +167,8 @@ class BueroChangeView(MyUpdateView):
 		return super(BueroChangeView, self).form_valid(form) 
 
 
-class BueroDeleteView(MyView):
+class BueroDeleteView(MyDeleteView):
 	permission_required = 'Einsatzmittel.delete_buero'
 	success_url = '/Einsatzmittel/bueros/'
-
-	def get(self, request, *args, **kwargs):
-		b = Buero.objects.get(pk=kwargs['pk'])
-		buero = str(b)
-		b.delete()
-		messages.success(request, 'Büro '+buero+' wurde gelöscht.')
-		return HttpResponseRedirect(self.success_url+url_args(request))		
+	model = Buero
+	pass

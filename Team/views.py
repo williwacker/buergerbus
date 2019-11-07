@@ -13,7 +13,7 @@ from .tables import FahrerTable, KoordinatorTable
 from .filters import FahrerFilter, KoordinatorFilter
 from Basis.utils import get_sidebar, url_args, del_message
 from Einsatzmittel.utils import get_bus_list, get_buero_list
-from Basis.views import MyListView, MyDetailView, MyView, MyUpdateView
+from Basis.views import MyListView, MyDetailView, MyView, MyUpdateView, MyDeleteView
 
 register = template.Library()
 
@@ -121,22 +121,11 @@ class FahrerChangeView(MyUpdateView):
 		self.success_message = 'Fahrer(in) "<a href="'+self.success_url+str(instance.id)+'">'+instance.name+' '+str(instance.team)+'</a>" wurde erfolgreich geändert.'
 		return super(FahrerChangeView, self).form_valid(form) 
 
-	def form_invalid(self, form):
-		context = self.get_context_data(self.request)
-		form = self.form_class(self.request.POST)
-		context['form'] = form
-		messages.error(self.request, form.errors)			
-		return render(self.request, self.template_name, context)
-
-class FahrerDeleteView(MyView):
+class FahrerDeleteView(MyDeleteView):
 	permission_required = 'Team.delete_fahrer'
 	success_url = '/Team/fahrer/'
-
-	def get(self, request, *args, **kwargs):
-		k = Fahrer.objects.get(pk=kwargs['pk'])
-		k.delete()
-		messages.success(request, 'Fahrer(in) '+k.name+' wurde gelöscht.')
-		return HttpResponseRedirect(self.success_url+url_args(request))
+	model = Fahrer
+	pass
 
 # Koordinatoren 
 
@@ -246,21 +235,10 @@ class KoordinatorChangeView(MyUpdateView):
 		storage = messages.get_messages(self.request)
 		storage.used = True
 		self.success_message = 'Koordinator(in) "<a href="'+self.success_url+str(instance.id)+'">'+str(", ".join([instance.benutzer.last_name,instance.benutzer.first_name]))+'</a>" wurde erfolgreich geändert.'
-		return super(KoordinatorChangeView, self).form_valid(form)
+		return super(KoordinatorChangeView, self).form_valid(form)	
 
-	def form_invalid(self, form):
-		context = self.get_context_data(self.request)
-		form = self.form_class(self.request.POST)
-		context['form'] = form
-		messages.error(self.request, form.errors)			
-		return render(self.request, self.template_name, context)		
-
-class KoordinatorDeleteView(MyView):
+class KoordinatorDeleteView(MyDeleteView):
 	permission_required = 'Team.delete_koordinator'
 	success_url = '/Team/koordinator/'
-
-	def get(self, request, *args, **kwargs):
-		k = Koordinator.objects.get(pk=kwargs['pk'])
-		k.delete()
-		messages.success(request, 'Koordinator(in) '+k.name+' wurde gelöscht.')
-		return HttpResponseRedirect(self.success_url+url_args(request))		
+	model = Koordinator
+	pass

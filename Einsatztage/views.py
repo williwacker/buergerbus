@@ -28,7 +28,6 @@ class FahrplanView(MyListView):
 	permission_required = 'Tour.view_tour'
 
 	def get_queryset(self):
-		del_message(self.request)
 		return TourTable(Tour.objects.order_by('uhrzeit').filter(datum=self.kwargs['id']))
 
 	def get_context_data(self, **kwargs):
