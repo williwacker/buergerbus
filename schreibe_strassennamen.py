@@ -32,15 +32,20 @@ class ReadNames():
 		for ortsname in cfg:
 			if (ortsname != 'DEFAULT'):
 				strassenname = {}
-				[ort,bus] = ortsname.split("=")
-				print(ort, bus)
+				[ort,plz_bus] = ortsname.split("=")
+				[plz,bus] = plz_bus.split(",")
+				print(ort, plz, bus)
 
 				# if ort already exists then update, else create
 				try:
 					o = Orte.objects.get(ort=ort.strip())
 				except:
 					o = Orte(ort=ort.strip())
-				if (bus != " "):
+				if (plz.strip() != ""):
+					o.plz = plz.strip()
+				else:
+					o.plz = None				
+				if (bus.strip() != ""):
 					o.bus = Bus.objects.get(bus=bus.strip())
 				else:
 					o.bus = None

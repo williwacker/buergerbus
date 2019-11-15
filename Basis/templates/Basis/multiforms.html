@@ -1,0 +1,53 @@
+{% extends 'Basis/header.html' %}
+{% load static %}
+{% block content %}
+<div id="content-main">
+    <ul class="object-tools">
+    </ul>
+    {% for form_name, form in forms.items %} 
+        <form class="{{ form_name }}" action="" method="post">
+            {% csrf_token %}
+            {{ form.non_field_errors }}
+
+            {% for hidden_field in form.hidden_fields %}
+                {{ hidden_field.errors }}
+                {{ hidden_field }}
+            {% endfor %}
+            <div>  
+                <fieldset class="module aligned">
+                    {% for field in form.visible_fields %}
+                    <div class="form-row">
+                        <div>
+                            <label {% if field.field.required %}  class=required{% endif %}>{{ field.label }}</label>
+                            {{ field.errors }}
+                            {{ field }}
+                            <p class="help">{{ field.help_text }}</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </fieldset>
+            </div>
+            <div class="submit-row">
+                {% if back_button %}
+                    {% if popup %}
+                        <a href="javascript:window.close()" class="closelink">{{ back_button.0|upper }}</a>
+                    {% else %}
+                        <a href="{{ back_button.1 }}" class="closelink">{{ back_button.0|upper }}</a>
+                    {% endif %}
+                {% endif %}
+                <input type="submit" value="{{ form_name|default:'Sichern' }}" class="default" name="action">
+                {% if delete_button %}
+                <p class="deletelink-box">
+                    <a href="delete/{{ url_args }}" class="deletelink">{{ delete_button|default:'Löschen' }}</a>
+                </p>
+                {% endif %}
+                {% if popup_button %}
+                <p class="deletelink-box">
+                    <a class="addlink related-widget-wrapper-link add-related" id="popup_button.id" href="{{ popup_button.href }}?_to_field=id&amp;_popup=1">{{ popup_button.name|upper }}</a>
+                </p>
+                {% endif %}
+            </div>
+        </form>
+    {% endfor %}
+</div>
+{% endblock %}

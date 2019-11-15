@@ -28,6 +28,7 @@ DIENSTLEISTER_AUSWAHL = [
 
 class Orte(models.Model):
 	ort    = models.CharField(max_length=50)
+	plz    = models.CharField(max_length=5, blank=True, null=True)
 	bus    = models.ForeignKey('Einsatzmittel.Bus', null=True, blank=True, on_delete=models.CASCADE)
 	updated_on = models.DateTimeField(auto_now=True, blank=True, null=True)
 	updated_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL)

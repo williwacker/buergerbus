@@ -32,29 +32,27 @@ class Telefonbuch():
 		line = lurl.data.decode("utf-8","ignore")
 		result = []
 		for m in re.finditer('data-entry-data=\"(.*?)\"', line):
-			data_dict = {}
-			data = urllib.parse.unquote(m.group(1))
-			entry_dict = {}
-			for entry in data.split('&'):
-				entry_dict.update([tuple(entry.split('='))])
-			if entry_dict:
-				data_dict['na'] = ''
-				if 'na' in entry_dict:
-					data_dict['na'] = entry_dict['na'].replace('+',', ',1).replace('+',' ')
-				data_dict['st'] = ''
-				if 'st' in entry_dict:
-					data_dict['st'] = entry_dict['st'].replace('+',' ')
-				data_dict['ci'] = ''
-				if 'ci' in entry_dict:
-					data_dict['ci'] = entry_dict['ci'].replace('+',' ')
-				data_dict['ph'] = ''
-				if 'ph' in entry_dict:
-					data_dict['ph'] = entry_dict['ph'].replace('+','-',1).replace('+','')
-				data_dict['mph'] = ''
-				if 'mph' in entry_dict:
-					data_dict['mph'] = entry_dict['mph'].replace('+','-',1).replace('+','')
-				data_dict['hn'] = ''
-				if 'hn' in entry_dict:
-					data_dict['hn'] = entry_dict['hn'].replace('+','')								
-				result.append(data_dict)
+			data = self._split(m.group(1))
+			if data != None:
+				result.append(data) 	
 		return result
+	
+	def _split(self, match):
+		entry_dict = {}
+		for entry in match.split('&'):
+			entry_dict.update([tuple(entry.split('=',1))])
+		if entry_dict:
+			data_dict  = {}
+			typ = entry_dict.get('at','2')
+			na = urllib.parse.unquote(entry_dict.get('na',''))
+			data_dict['na']  = na.replace('+',', ',1).replace('+',' ') if typ == '1' else na.replace('+',' ')
+			data_dict['st']  = urllib.parse.unquote(entry_dict.get('st','')).replace('+',' ')
+			data_dict['ci']  = urllib.parse.unquote(entry_dict.get('ci','')).replace('+',' ')
+			data_dict['pc']  = entry_dict.get('pc','')
+			data_dict['ph']  = entry_dict.get('ph','').replace('+','-',1).replace('+','')
+			data_dict['mph'] = entry_dict.get('mph','').replace('+','-',1).replace('+','')
+			data_dict['hn']  = entry_dict.get('hn','').replace('+','')
+			# ignore entries without street name or zip
+			if data_dict['pc'] and data_dict['st']:
+				return data_dict
+

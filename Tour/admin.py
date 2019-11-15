@@ -36,7 +36,7 @@ class DistanceMatrix():
 
 class TourAdmin(admin.ModelAdmin):
 
-	list_display = ('klient', 'bus', 'datum', 'uhrzeit', 'abholort', 'zielort', 'entfernung', 'ankunft')
+	list_display = ('klient', 'bus', 'datum', 'uhrzeit', 'abholort', 'zielort', 'entfernung', 'ankunft', 'updated_on')
 	readonly_fields = ('entfernung','ankunft')
 	list_filter = ('datum','bus')
 	list_editable = ('uhrzeit',)

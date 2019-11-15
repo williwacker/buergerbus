@@ -1,4 +1,5 @@
 import subprocess
+from fuzzywuzzy import fuzz, process
 from django import template
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
@@ -9,13 +10,13 @@ from django import forms
 from .forms import FahrgastAddForm, FahrgastChgForm, DienstleisterAddForm, DienstleisterChgForm, KlientenSearchForm, KlientenSearchResultForm
 from .forms import OrtAddForm, OrtChgForm
 from .forms import StrassenAddForm, StrassenChgForm
-from .models import Klienten, Orte, Strassen
+from .models import Klienten, Orte, Strassen, DIENSTLEISTER_AUSWAHL
 from .tables import OrteTable, StrassenTable, DienstleisterTable, FahrgaesteTable
 from .filters import StrassenFilter, OrteFilter, FahrgaesteFilter, DienstleisterFilter
 from Einsatzmittel.models import Bus
 from Einsatzmittel.utils import get_bus_list
 from Basis.utils import get_sidebar, render_to_pdf, url_args, del_message
-from Basis.views import MyListView, MyDetailView, MyView, MyUpdateView, MyDeleteView
+from Basis.views import MyListView, MyDetailView, MyView, MyUpdateView, MyDeleteView, MyMultiFormsView
 from Einsatztage.views import FahrplanAsPDF
 from Basis.telefonbuch_suche import Telefonbuch
 
@@ -316,119 +317,161 @@ class DienstleisterDeleteView(MyDeleteView):
 	model = Klienten
 	pass
 
-class DienstleisterSearchView(MyDetailView):
-	form_class = KlientenSearchForm
-	permission_required = 'Klienten.add_klienten'
-	success_url = '/Klienten/dienstleister/add/searchresult/'
-	fail_url    = '/Klienten/dienstleister/add/'
-
-	def get_context_data(self, request):
-		context = {}
-		context['sidebar_liste'] = get_sidebar(request.user)
-		context['title'] = "Dienstleister suchen und hinzufügen"
-		context['submit_button'] = "Suchen"
-		context['back_button'] = "Abbrechen"
-		return context
-
-	def get(self, request, *args, **kwargs):
-		name = self.request.GET.get('name')
-		ort  = self.request.GET.get('ort')
-		context = self.get_context_data(request)
-		if ort:
-			orte = Orte.objects.get(ort=ort)
-			form = self.form_class(initial={'name':name, 'ort':orte.pk})
-		else:
-			name = ''
-			form = self.form_class(initial=self.initial)
-		context['form'] = form
-		return render(request, self.template_name, context)
-
-	def post(self, request, *args, **kwargs):
-		context = self.get_context_data(request)
-		form = self.form_class(request.POST)
-		context['form'] = form
-		if form.is_valid():
-			post = form.cleaned_data
-			typ = ''
-			if 'typ' in post:
-				typ = ''.join(post['typ'])
-			result_list = Telefonbuch().dastelefonbuch(post['name'],post['ort'].ort,typ)
-			if result_list:
-				return HttpResponseRedirect(self.success_url+'?name='+post['name']+'&ort='+post['ort'].ort)
-			else:
-				messages.error(request, 'Keinen Namen anhand der Suchkriterien gefunden')
-				return HttpResponseRedirect(self.fail_url+'?name='+post['name']+'&ort='+post['ort'].ort)
-		else:
-			messages.error(request, form.errors)		
-		return render(request, self.template_name, context)
-
-class DienstleisterSearchResultView(MyDetailView):
-	form_class = KlientenSearchResultForm
+class DienstleisterSearchMultiformsView(MyMultiFormsView):
+	form_classes = {'suchen':KlientenSearchForm, 'anlegen':KlientenSearchResultForm }
 	permission_required = 'Klienten.add_klienten'
 	success_url = '/Klienten/dienstleister/'
-	fail_url = '/Klienten/dienstleister/add/searchresult/'
+	this_url    = '/Klienten/dienstleister/add/'
 	manual_url = '/Klienten/dienstleister/add/manual/'
 
-	def get_context_data(self, request):
-		context = {}
-		context['sidebar_liste'] = get_sidebar(request.user)
+	def get_context_data(self, **kwargs):
+		context = super(DienstleisterSearchMultiformsView, self).get_context_data(**kwargs)
+		context['sidebar_liste'] = get_sidebar(self.request.user)
 		context['title'] = "Dienstleister suchen und hinzufügen"
-		context['submit_button'] = "Sichern"
-		context['back_button'] = "Zurück"
+		context['submit_button'] = "Suchen"
+		context['back_button'] = ["Abbrechen",self.success_url]
+		if self.request.GET.get('_popup') == '1':
+			context['popup'] = '1'
 		return context
 
-	def get(self, request, *args, **kwargs):
+	def get_suchen_initial(self):
 		name = self.request.GET.get('name')
 		ort  = self.request.GET.get('ort')
-		typ  = self.request.GET.get('typ')
-		context = self.get_context_data(request)
-		result_list = Telefonbuch().dastelefonbuch(name,ort,typ)
+		return {'name':name, 'ort':ort}
+
+	def get_anlegen_initial(self):
+		name = self.request.GET.get('name')
+		ort  = self.request.GET.get('ort')
+		result_list = ['initial']
+		if name:
+			result_list = Telefonbuch().dastelefonbuch(name,ort,'D')
+		return {'suchergebnis':result_list}
+	
+	def create_anlegen_form(self, initial, prefix, data=None, files=None):
+		form = self.form_classes['anlegen'](self.request.POST)
+		form.fields['suchergebnis'] = forms.ChoiceField(required=True, widget=forms.RadioSelect(), choices = [])
+		del_message(self.request)
 		choices = []
+		result_list = initial['suchergebnis']
 		if not result_list:
-			messages.error(request, 'Keinen Namen anhand der Suchkriterien gefunden')
-		else:
-			messages.success(request, 'Die folgenden Namen wurden gefunden:')
+			messages.error(self.request, 'Keinen Namen anhand der Suchkriterien gefunden')
+		elif result_list[0] != 'initial':
+			messages.success(self.request, 'Die folgenden Namen wurden gefunden:')
 			for i in range(len(result_list)):
-				choices.append((i+1,'{} {} {} {}'.format(result_list[i]['na'],result_list[i]['ci'],result_list[i]['st'],result_list[i]['hn'])))
+				# na = Name, pc = PLZ, ci = City, st = Street, hn = house-no, ph = phone, mph = mobile phone
+				choices.append((i+1,'{} {} {} {} {}'.format(result_list[i]['na'],result_list[i]['pc'],result_list[i]['ci'],result_list[i]['st'],result_list[i]['hn'])))
 		choices.append((0,'Adresse manuell eingeben'))
-		form = self.form_class(initial=self.initial)
-		form.fields['suchergebnis'] = forms.ChoiceField(widget=forms.RadioSelect(), choices = [])
 		form.fields['suchergebnis'].choices = choices
-#		result_string = str(result_list)
-#		form.fields['details'] = result_string
-		context['form'] = form
-		return render(request, self.template_name, context)
+		self.request.session['clientsearch_results'] = result_list
+		return form
 
-	def post(self, request, *args, **kwargs):
-		context = self.get_context_data(request)
-		form = self.form_class(request.POST)
-		context['form'] = form
-		storage = messages.get_messages(self.request)
-		storage.used = True
-		if form.is_valid():
-			post = form.cleaned_data
-			if post['suchergebnis'] == '0':
-				return HttpResponseRedirect(self.manual_url)
+	def suchen_form_valid(self, form):
+		return HttpResponseRedirect(self.this_url+'?name='+form.cleaned_data['name']+'&ort='+form.cleaned_data['ort'])		
+
+	def anlegen_form_valid(self, form):
+		if form.cleaned_data['suchergebnis'] == '0':
+			del_message(self.request)
+			messages.success(self.request, 'Bitte den Dienstleister manuell eingeben')
+			return HttpResponseRedirect(self.manual_url)
+		choice  = int(form.cleaned_data['suchergebnis'])
+		self.request.session['clientsearch_choice'] = choice
+		result = self.request.session.pop('clientsearch_results',[])[choice-1]
+		self.create_dienstleister(result,force_create=form.cleaned_data['force_create'], city_create=form.cleaned_data['city_create'])
+		return HttpResponseRedirect(self.this_url+url_args(self.request))
+
+	def create_ort(self,plz,ort):
+		ort = Orte(
+			ort=ort,
+			plz=plz
+		)
+		ort.save()
+		messages.success(self.request, 'Ort "<a href="/Klienten/orte/'+str(ort.id)+'/'+'">'+str(ort)+'</a>" wurde erfolgreich hinzugefügt.')
+		return
+
+	def create_strasse(self,strasse,ort):
+		orte=Orte.objects.get(ort=ort)
+		strasse = strasse.replace('Str.','Straße')
+		strasse = strasse.replace('str.','straße')
+		strasse = Strassen(
+			strasse=strasse,
+			ort=orte
+		)
+		strasse.save()
+		messages.success(self.request, 'Strasse "<a href="/Klienten/strassen/'+str(strasse.id)+'/'+'">'+str(strasse)+'</a>" wurde erfolgreich hinzugefügt.')
+		return
+
+	def create_dienstleister(self, result, force_create=False, city_create=False):
+		# suche über die PLZ wird gemacht, um alle Orte und Vororte zu finden, da die telefonbuchsuche keinen Vorort liefert
+		cities_by_zip = list(Orte.objects.values('ort','id').filter(plz=result['pc']))
+		if not cities_by_zip:
+			if self.request.user.has_perm('Klienten.add_orte'):
+				if city_create:
+					self.create_ort(plz=result['pc'], ort=result['ci'])
+					cities_by_zip = list(Orte.objects.values('ort','id').filter(plz=result['pc']))
+				else:
+					messages.error(self.request, "Der gefundene Ort existiert noch nicht. Wenn Sie ihn anlegen wollen, bitte 'Ort und Strasse anlegen' anhaken.")
+					return HttpResponseRedirect(self.success_url)
 			else:
-				index = int(post['suchergebnis'])-1
-#				selected_name = result_list[index]
-#				o = Orte.objects.get(ort=selected_name['ci'])
-			return HttpResponseRedirect(self.success_url)
-		else:
-			messages.error(request, form.errors)		
-		return HttpResponseRedirect(self.fail_url+url_args(request))
+				messages.error(self.request, "Der gefundene Ort existiert noch nicht, aber Sie haben keine Berechtigung um Orte anzulegen!")
+				return HttpResponseRedirect(self.success_url)
+		best_match = process.extract(result['ci'], [sub['ort'] for sub in cities_by_zip], scorer=fuzz.token_set_ratio, limit=100)  # for debugging only
+		filtered_city_names = [sub[0] for sub in process.extract(result['ci'], [sub['ort'] for sub in cities_by_zip], scorer=fuzz.token_set_ratio, limit=100) if sub[1]>=85]
+		matching_cities = list(Orte.objects.values('ort','id').filter(ort__in=filtered_city_names))
 
+		streets_by_city = list(Strassen.objects.values('strasse','ort','id').filter(ort_id__in=[sub['id'] for sub in matching_cities]))
+		filtered_street_names = [sub[0] for sub in process.extract(result['st'], [sub['strasse'] for sub in streets_by_city], scorer=fuzz.token_set_ratio, limit=1) if sub[1]>=85]
+		if not filtered_street_names:
+			if self.request.user.has_perm('Klienten.add_strassen'):
+				self.create_strasse(strasse=result['st'], ort=result['ci'])
+				streets_by_city = list(Strassen.objects.values('strasse','ort','id').filter(ort_id__in=[sub['id'] for sub in matching_cities]))
+				filtered_street_names = [sub[0] for sub in process.extract(result['st'], [sub['strasse'] for sub in streets_by_city], scorer=fuzz.token_set_ratio, limit=1) if sub[1]>=85]
+			else:
+				messages.error(self.request, "Die gefundene Strasse existiert noch nicht, aber Sie haben keine Berechtigung um Strassen anzulegen!")
+				return HttpResponseRedirect(self.success_url)
+		matching_street = list(Strassen.objects.values('strasse','ort','id').filter(ort_id__in=[sub['id'] for sub in matching_cities],strasse__in=filtered_street_names))
+
+		matching_category = process.extract(result['na'], [sub[0] for sub in DIENSTLEISTER_AUSWAHL], limit=1)
+		category = matching_category[0][0] if matching_category[0][1] > 85 else ''
+
+		if filtered_street_names:
+			existing_clients = list(Klienten.objects.values('name','id').filter(ort=matching_street[0]['ort'],strasse=matching_street[0]['id']))
+			if existing_clients:
+				matching_client = process.extractOne(result['na'],[sub['name'] for sub in existing_clients], scorer=fuzz.token_set_ratio)
+				if matching_client[1] > 95 and not force_create:
+					existing_client = Klienten.objects.get(name=matching_client[0])
+					del_message(self.request)
+					messages.error(self.request, 'Ein ähnlich lautender Dienstleister existiert bereits: "<a href="'+self.success_url+str(existing_client.id)+'/">'+existing_client.name+'</a>" ')
+					return HttpResponseRedirect(self.success_url)
+
+		klient = Klienten(
+			name = result['na'],
+			ort  = Orte.objects.get(id=matching_street[0]['ort']),
+			strasse = Strassen.objects.get(id=matching_street[0]['id']),
+			hausnr = result['hn'],
+			telefon = result['ph'],
+			mobil = result['mph'],
+			typ = 'D',
+			dsgvo = '99',
+			updated_by = self.request.user,
+			kategorie = category,
+		)
+		klient.save()
+		messages.success(self.request, 'Dienstleister "<a href="'+self.success_url+str(klient.id)+'/">'+klient.name+'</a>" wurde erfolgreich hinzugefügt.')
+		return HttpResponseRedirect(self.this_url)
 
 class OrtView(MyListView):
 	permission_required = 'Klienten.view_orte'
 	
 	def get_queryset(self):
 		ort = self.request.GET.get('ort')
+		plz = self.request.GET.get('plz')
 		bus = self.request.GET.get('bus')
 		# nur managed orte anzeigen
 		qs = Orte.objects.order_by('ort').filter(bus__in=get_bus_list(self.request)) | Orte.objects.order_by('ort').filter(bus__isnull=True)
 		if ort:
 			qs = qs.filter(ort=ort)
+		if plz:
+			qs = qs.filter(plz=plz)
 		if bus:
 			qs = qs.filter(bus=bus)
 		return OrteTable(qs)

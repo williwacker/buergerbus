@@ -231,3 +231,17 @@ input[type="submit"]:hover {
     line-height: 15px;
     padding: 10px 15px;
 }
+.form-row+.form-row-left {
+    float: left;
+    width: 50%;
+}
+.form-row+.form-row-right {
+    float: right;
+    width: 40%;
+}
+.form-row+.form-row-right label {
+    color: white;
+}
+.form-row+.form-row-clear {
+    clear: both;
+}

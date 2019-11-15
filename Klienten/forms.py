@@ -35,20 +35,17 @@ class KlientenForm(ModelForm):
 		if data:
 			data = data.replace('/','-')
 		return data
-TYP_AUSWAHL = [
-	('F', 'Fahrgast'),
-	('D', 'Dienstleister')
-]
 
 class KlientenSearchForm(forms.Form):
-	name = forms.CharField(required=False, help_text='Name oder Telefonnummer')
-	ort  = forms.ModelChoiceField(queryset=Orte.objects.order_by('ort'))
-	typ  = forms.MultipleChoiceField(choices=TYP_AUSWAHL, required=False)
+	name = forms.CharField(required=False, help_text='z.B. Name, Gewerbe oder Telefonnummer')
+	ort  = forms.CharField(required=True)
 
 class KlientenSearchResultForm(forms.Form):
-	suchergebnis = forms.CharField()
-	details      = forms.CharField(required=False)
-	widgets = {'details': forms.HiddenInput(),}
+	suchergebnis = forms.CharField(required=False)
+	force_create = forms.BooleanField(required=False, label="Ähnlichkeit erlauben", 
+		help_text="Dienstleister anlegen, obwohl schon ein Eintrag mit ähnlichem Namen existiert")
+	city_create = forms.BooleanField(required=False, label="Ort und Strasse anlegen", 
+		help_text="Neuen Ort und/oder Strasse anlegen")
 
 class DienstleisterForm(ModelForm):
 
@@ -91,7 +88,7 @@ class DienstleisterChgForm(DienstleisterForm):
 class OrtAddForm(ModelForm):
 	class Meta:
 		model = Orte
-		fields = ['ort','bus']
+		fields = ['ort','plz','bus']
 
 class OrtChgForm(ModelForm):
 	def __init__(self, *args, **kwargs):
@@ -101,7 +98,7 @@ class OrtChgForm(ModelForm):
 
 	class Meta:
 		model = Orte
-		fields = ['ort','bus']		
+		fields = ['ort','plz','bus']		
 
 class StrassenForm(ModelForm):
 	class Meta:

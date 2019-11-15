@@ -1,6 +1,7 @@
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.views.generic import ListView, DetailView, View, CreateView, UpdateView, DeleteView
+from Basis.multiform import MultiFormsView
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.conf import settings
@@ -29,6 +30,11 @@ class MyDetailView(LoginRequiredMixin, PermissionRequiredMixin, DetailView):
 	login_url = settings.LOGIN_URL
 	initial = {'key': 'value'}
 	template_name = 'Basis/detail.html'
+
+class MyMultiFormsView(LoginRequiredMixin, PermissionRequiredMixin, MultiFormsView):
+	login_url = settings.LOGIN_URL
+	initial = {'key': 'value'}
+	template_name = 'Basis/multiforms.html'
 
 class MyView(LoginRequiredMixin, PermissionRequiredMixin, View):
 	login_url = settings.LOGIN_URL

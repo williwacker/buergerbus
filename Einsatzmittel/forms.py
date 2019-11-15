@@ -14,6 +14,7 @@ class BusChgForm(ModelForm):
 class BueroChgForm(ModelForm):
 	def __init__(self, *args, **kwargs):
 		super(BueroChgForm, self).__init__(*args, **kwargs)
+		
 	class Meta:
 		model = Buero
 		fields = ['buero','buerotage']

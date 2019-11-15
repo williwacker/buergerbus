@@ -96,6 +96,12 @@ class TourAddView2(MyDetailView):
 		self.initial['klient'] = klient.name
 		self.initial['bus'] = klient.bus
 		form.fields['datum'].queryset = Fahrtag.objects.order_by('datum').filter(archiv=False, team_id=klient.bus, datum__gt=datetime.now(), datum__lte=datetime.now()+timedelta(settings.COUNT_TOUR_DAYS))
+		qs = Tour.objects.filter(klient__id=klient.id).values_list('abholklient',flat=True).distinct()
+		form.fields['abholfavorit'].queryset = Klienten.objects.filter(id__in=qs).order_by('name')	| Klienten.objects.filter(id=klient.id)
+		form.fields['abholklient'].queryset  = Klienten.objects.filter(typ='D').order_by('name')   	| Klienten.objects.filter(id=klient.id)
+		qs = Tour.objects.filter(klient__id=klient.id).values_list('zielklient',flat=True).distinct()
+		form.fields['zielfavorit'].queryset  = Klienten.objects.filter(id__in=qs).order_by('name') 	| Klienten.objects.filter(id=klient.id)
+		form.fields['zielklient'].queryset   = Klienten.objects.filter(typ='D').order_by('name')   	| Klienten.objects.filter(id=klient.id)
 		context['form'] = form
 		return render(request, self.template_name, context)
 
@@ -104,30 +110,26 @@ class TourAddView2(MyDetailView):
 		form = self.form_class(request.POST)
 		context['form'] = form
 		if form.is_valid():
-			post = request.POST.dict()
-			klient = Klienten.objects.get(name=post['klient'])
-			fahrtag = Fahrtag.objects.get(pk=int(post['datum']))
-			startzeit = datetime.strptime(post['uhrzeit'], '%H:%M').time()
+			tour = Tour(	
+				klient=Klienten.objects.get(name=form.cleaned_data['klient']),
+				datum=form.cleaned_data['datum'],
+				uhrzeit=form.cleaned_data['uhrzeit'],
+				personenzahl=form.cleaned_data['personenzahl'],      
+				abholklient=form.cleaned_data['abholklient'],
+				zielklient=form.cleaned_data['zielklient'],
+				bemerkung=form.cleaned_data['bemerkung'],
+				updated_by=request.user
+			)
+			tour.bus = tour.klient.bus
+			if form.cleaned_data['zustieg']:
+				tour.zustieg=form.cleaned_data['zustieg']
 			googleList = ()
 			if settings.USE_GOOGLE:
 				googleList = DistanceMatrix().getMatrix(
-					Klienten.objects.get(pk=int(post['abholklient'])), 
-					Klienten.objects.get(pk=int(post['zielklient'])), 
-					fahrtag.datum, 
-					startzeit)
-			tour = Tour(	
-				klient=klient,
-				datum=fahrtag,
-				uhrzeit=post['uhrzeit'],
-				personenzahl=post['personenzahl'],      
-				abholklient=Klienten.objects.get(pk=int(post['abholklient'])),
-				zielklient=Klienten.objects.get(pk=int(post['zielklient'])),
-				bemerkung=post['bemerkung'],
-				bus=klient.bus,
-				updated_by=request.user
-			)
-			if form.cleaned_data['zustieg']:
-				tour.zustieg=form.cleaned_data['zustieg']
+					form.cleaned_data['abholklient'], 
+					form.cleaned_data['zielklient'], 
+					form.cleaned_data['datum'].datum, 
+					form.cleaned_data['uhrzeit'])				
 			if googleList:
 				tour.entfernung=googleList[0]
 				tour.ankunft=googleList[2]
@@ -136,8 +138,8 @@ class TourAddView2(MyDetailView):
 			storage.used = True
 			messages.success(request, 'Tour "<a href="'+self.success_url+str(tour.id)+'/">'+tour.klient.name+' am '+str(tour.datum)+' um '+str(tour.uhrzeit) +'</a>" wurde erfolgreich hinzugefügt.')
 			if url_args(request):
-				return HttpResponseRedirect(self.success_url+url_args(request)+'&datum='+post['datum'])
-			return HttpResponseRedirect(self.success_url+'?datum='+post['datum'])
+				return HttpResponseRedirect(self.success_url+url_args(request)+'&datum='+str(tour.datum_id))
+			return HttpResponseRedirect(self.success_url+'?datum='+str(tour.datum_id))
 		else:
 			messages.error(request, form.errors)
 		return render(request, self.template_name, context)
@@ -160,11 +162,16 @@ class TourChangeView(MyDetailView):
 	
 	def get(self, request, *args, **kwargs):
 		context = self.get_context_data()
-		klient = Klienten.objects.get(pk=kwargs['pk'])
 		instance=Tour.objects.get(pk=kwargs['pk'])
 		form = self.form_class(instance=instance)
 		form.fields["fahrgast"].initial = instance.klient.name
-		form.fields["bus_2"].initial = instance.bus
+		qs = Tour.objects.filter(klient__id=instance.klient.id).values_list('abholklient',flat=True).distinct()
+		form.fields['abholfavorit'].queryset = Klienten.objects.filter(id__in=qs).order_by('name') 	| Klienten.objects.filter(id=instance.klient.id)
+		form.fields['abholklient'].queryset  = Klienten.objects.filter(typ='D').order_by('name') 	| Klienten.objects.filter(id=instance.klient.id)
+		qs = Tour.objects.filter(klient__id=instance.klient.id).values_list('zielklient',flat=True).distinct()
+		form.fields['zielfavorit'].queryset  = Klienten.objects.filter(id__in=qs).order_by('name') 	| Klienten.objects.filter(id=instance.klient.id)
+		form.fields['zielklient'].queryset   = Klienten.objects.filter(typ='D').order_by('name') 	| Klienten.objects.filter(id=instance.klient.id)
+		form.fields['bus_2'].initial = instance.bus
 		context['form'] = form
 		return render(request, self.template_name, context)
 
@@ -173,35 +180,26 @@ class TourChangeView(MyDetailView):
 		form = self.form_class(request.POST)
 		context['form'] = form
 		if form.is_valid():
-			post = request.POST.dict()
-			fahrtag = Fahrtag.objects.get(pk=int(post['datum']))
-			startzeit = datetime.strptime(post['uhrzeit'][:5], '%H:%M').time()
 			googleList = ()
 			if settings.USE_GOOGLE:
 				googleList = DistanceMatrix().getMatrix(
-					Klienten.objects.get(pk=int(post['abholklient'])), 
-					Klienten.objects.get(pk=int(post['zielklient'])), 
-					fahrtag.datum, 
-					startzeit)
-			tour = Tour.objects.get(pk=kwargs['pk'])
-			tour.datum=fahrtag
-			tour.uhrzeit=post['uhrzeit']
-			tour.zustieg=form.cleaned_data['zustieg']
-			tour.personenzahl=post['personenzahl']
-			tour.bemerkung=post['bemerkung']
-			tour.abholklient=Klienten.objects.get(pk=int(post['abholklient']))
-			tour.zielklient=Klienten.objects.get(pk=int(post['zielklient']))
+					form.cleaned_data['abholklient'], 
+					form.cleaned_data['zielklient'], 
+					form.cleaned_data['datum'].datum, 
+					form.cleaned_data['uhrzeit'])
+			instance = form.save(commit=False)
 			if googleList:
-				tour.entfernung=googleList[0]
-				tour.ankunft=googleList[2]
-			tour.updated_by=request.user
-			tour.save()
+				instance.entfernung =googleList[0]
+				instance.ankunft    =googleList[2]
+			instance.updated_by = request.user
+			instance.pk = int(kwargs['pk'])
+			instance.save(force_update=True)
 			storage = messages.get_messages(request)
 			storage.used = True
-			messages.success(request, 'Tour "<a href="'+request.path+url_args(request)+'">'+tour.klient.name+' am '+str(tour.datum)+' um '+str(tour.uhrzeit) +'</a>" wurde erfolgreich geändert.')
+			messages.success(request, 'Tour "<a href="'+request.path+url_args(request)+'">'+instance.klient.name+' am '+str(instance.datum)+' um '+str(instance.uhrzeit) +'</a>" wurde erfolgreich geändert.')
 #			if url_args(request):
 #				return HttpResponseRedirect(self.success_url+url_args(request)+'&datum='+post['datum'])
-			return HttpResponseRedirect(self.success_url+'?datum='+post['datum'])
+			return HttpResponseRedirect(self.success_url+'?datum='+str(instance.datum_id))
 		else:
 			messages.error(request, form.errors)		
 		return render(request, self.template_name, context)		

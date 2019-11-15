@@ -20,9 +20,11 @@ class Tour(models.Model):
 		show_all=False,
 		auto_choose=True,
 		sort=True)
-	uhrzeit = models.TimeField()
-	abholklient  = models.ForeignKey('Klienten.Klienten', null=True, related_name='abholort', on_delete=models.CASCADE)
-	zielklient   = models.ForeignKey('Klienten.Klienten', null=True, related_name='zielort', on_delete=models.CASCADE)
+	uhrzeit = models.TimeField(verbose_name="Abholzeit")
+	abholklient  = models.ForeignKey('Klienten.Klienten', null=True, related_name='abholort', verbose_name="Wo",
+		help_text="Bei wem soll der Fahrgast abgeholt werden?", on_delete=models.CASCADE)
+	zielklient   = models.ForeignKey('Klienten.Klienten', null=True, related_name='zielort', verbose_name="Wohin",
+		help_text="Zu wem soll der Fahrgast gebracht werden?" , on_delete=models.CASCADE)
 	entfernung   = models.CharField(max_length=100, blank=True, null=True)
 	ankunft      = models.TimeField(blank=True, null=True)
 	bemerkung    = models.TextField(max_length=200, blank=True, null=True)

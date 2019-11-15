@@ -81,7 +81,7 @@ class OrteTable(tables.Table):
     )
     class Meta:
         model = Orte
-        fields = ('ort','bus')
+        fields = ('ort','plz','bus')
 
 class StrassenTable(tables.Table):
     ort = tables.TemplateColumn(

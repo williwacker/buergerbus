@@ -30,11 +30,17 @@ class TourAddForm2(forms.Form):
 	klient = forms.CharField(required=False, widget=forms.TextInput(attrs={'readonly':'readonly'}), label='Fahrgast')
 	bus = forms.CharField(required=False, widget=forms.TextInput(attrs={'readonly':'readonly'}))
 	datum = forms.ModelChoiceField(queryset=Fahrtag.objects.order_by('datum').filter(archiv=False, datum__gt=datetime.now()), empty_label=None)
-	uhrzeit = forms.TimeField(widget=forms.TimeInput(attrs={'class':'vTimeField'}))
+	uhrzeit = forms.TimeField(widget=forms.TimeInput(attrs={'class':'vTimeField'}), label='Abholzeit')
 	zustieg = forms.BooleanField(required=False, label='Zustieg zu vorherigem Fahrgast')
 	personenzahl = forms.IntegerField(initial=1, min_value=1, label='Anzahl Personen')
-	abholklient = forms.ModelChoiceField(queryset=Klienten.objects.order_by('name'), help_text="Bei wem soll der Fahrgast abgeholt werden?")
-	zielklient = forms.ModelChoiceField(queryset=Klienten.objects.order_by('name'), help_text="Zu wem soll der Fahrgast gebracht werden?")
+	abholfavorit = forms.ModelChoiceField(queryset=Klienten.objects.order_by('name'), required=False, label="Wo",
+		help_text="Bei wem soll der Fahrgast abgeholt werden? Wählen Sie links aus den vergangenen Touren aus oder rechts der gesamten Liste.")
+	abholklient = forms.ModelChoiceField(queryset=Klienten.objects.order_by('name'), label="Wo",
+		help_text="Bei wem soll der Fahrgast abgeholt werden?")
+	zielfavorit = forms.ModelChoiceField(queryset=Klienten.objects.order_by('name'), required=False, label="Wohin",
+		help_text="Zu wem soll der Fahrgast gebracht werden? Wählen Sie links aus den vergangenen Touren aus oder rechts der gesamten Liste.")
+	zielklient = forms.ModelChoiceField(queryset=Klienten.objects.order_by('name'),  label="Wohin",
+		help_text="Zu wem soll der Fahrgast gebracht werden?")
 	bemerkung = forms.CharField(max_length=200, required=False, widget=forms.Textarea(attrs={'rows':'5'}))
 
 	def clean(self):
@@ -44,7 +50,7 @@ class TourAddForm2(forms.Form):
 			frueheste_abfahrt = DepartureTime().time(self.cleaned_data)
 		if frueheste_abfahrt == time(0,0,0):
 			self.cleaned_data['zustieg'] = False
-		if self.cleaned_data['zustieg'] and frueheste_abfahrt > self.cleaned_data['uhrzeit']:
+		if frueheste_abfahrt > self.cleaned_data['uhrzeit']:
 			raise forms.ValidationError("Abfahrtszeit kann nicht eingehalten werden. Frühest mögliche Abfahrt um {}".format(str(frueheste_abfahrt)))
 
 		bus = Bus.objects.get(bus=self.cleaned_data['bus'])
@@ -57,10 +63,17 @@ class TourAddForm2(forms.Form):
 class TourChgForm(TourenForm):
 	fahrgast = forms.CharField(required=False, widget=forms.TextInput(attrs={'readonly':'readonly'}), label='Fahrgast')
 	bus_2    = forms.CharField(required=False, widget=forms.TextInput(attrs={'readonly':'readonly'}), label='Bus')
+	abholfavorit = forms.ModelChoiceField(queryset=Klienten.objects.order_by('name'), required=False, label="Wo",
+		help_text="Bei wem soll der Fahrgast abgeholt werden? Wählen Sie links aus den vergangenen Touren aus oder rechts der gesamten Liste.")
+	zielfavorit  = forms.ModelChoiceField(queryset=Klienten.objects.order_by('name'), required=False, label="Wohin",
+		help_text="Zu wem soll der Fahrgast gebracht werden? Wählen Sie links aus den vergangenen Touren aus oder rechts der gesamten Liste.")
 
+	def __init__(self, *args, **kwargs):
+		super(TourChgForm, self).__init__(*args, **kwargs)
+	
 	class Meta:
 		model = Tour
-		fields = ['fahrgast','bus_2','klient','bus','datum','uhrzeit','zustieg','personenzahl','abholklient','zielklient','entfernung','ankunft','bemerkung']
+		fields = ['fahrgast','bus_2','klient','bus','datum','uhrzeit','zustieg','personenzahl','abholfavorit','abholklient','zielfavorit','zielklient','entfernung','ankunft','bemerkung']
 		widgets = {'klient': forms.HiddenInput(), 'bus': forms.HiddenInput(), 'entfernung': forms.HiddenInput(), 'ankunft': forms.HiddenInput(),
 				   'uhrzeit': forms.TimeInput(attrs={'class':'vTimeField'}), 'bemerkung': forms.Textarea(attrs={'rows':'5'})}
 
@@ -71,7 +84,7 @@ class TourChgForm(TourenForm):
 			frueheste_abfahrt = DepartureTime().time(self.cleaned_data)
 		if frueheste_abfahrt == time(0,0,0):
 			self.cleaned_data['zustieg'] = False
-		if self.cleaned_data['zustieg'] and frueheste_abfahrt > self.cleaned_data['uhrzeit']:
+		if frueheste_abfahrt > self.cleaned_data['uhrzeit']:
 			raise forms.ValidationError("Abfahrtszeit kann nicht eingehalten werden. Frühest mögliche Abfahrt um {}".format(str(frueheste_abfahrt)))
 
 		bus = Bus.objects.get(bus=self.cleaned_data['bus'])
