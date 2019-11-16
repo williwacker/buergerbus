@@ -26,7 +26,7 @@ class BuerotagChgForm(ModelForm):
 		fields = ['datum', 'team', 'koordinator']
 
 class FahrplanEmailForm(forms.Form):
-	von = forms.EmailField(required=False, widget=forms.TextInput(attrs={'readonly':'readonly','style':'width:800px;'}))
+	von = forms.EmailField(required=False, widget=forms.HiddenInput(attrs={'readonly':'readonly','style':'width:800px;'}))
 	an = forms.CharField(required=False, widget=forms.TextInput(attrs={'readonly':'readonly','style':'width:800px;'}))
 	cc = forms.EmailField(required=False, help_text='Email Adressen mit ; trennen', widget=forms.TextInput(attrs={'style':'width:800px;'}))
 	betreff = forms.CharField(max_length=50, required=False, widget=forms.TextInput(attrs={'readonly':'readonly','style':'width:800px;'}))

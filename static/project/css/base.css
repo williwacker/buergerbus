@@ -205,8 +205,8 @@ div.breadcrumbs {
 .change-list .filtered .results, .change-list .filtered .paginator, .filtered #toolbar, .filtered div.xfull {
     margin-right: 0px;
 }
-body.popup #header, body.popup div.breadcrumbs {
-        display: none;
+body.popup #header, body.popup div.breadcrumbs, body.popup div.sidebar {
+    display: none;
 }
 .submit-row a.closelink {
     font-size: 0.85714rem;

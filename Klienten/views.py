@@ -272,7 +272,7 @@ class DienstleisterAddView(MyDetailView):
 			messages.success(request, 'Dienstleister "<a href="'+self.success_url+str(klient.id)+'/'+url_args(request)+'">'+klient.name+'</a>" wurde erfolgreich hinzugefügt.')
 			context['messages'] = messages
 			if self.request.GET.get('_popup') == '1':
-				return HttpResponse('''<script type="text/javascript">opener.location.reload(false);opener.dismissAddAnotherPopup(window);</script>''')
+				return HttpResponse('''<script type="text/javascript">opener.location.reload(false);window.close();</script>''')
 			return HttpResponseRedirect(self.success_url+url_args(request))
 		else:
 			messages.error(request, form.errors)		
@@ -322,7 +322,7 @@ class DienstleisterSearchMultiformsView(MyMultiFormsView):
 	permission_required = 'Klienten.add_klienten'
 	success_url = '/Klienten/dienstleister/'
 	this_url    = '/Klienten/dienstleister/add/'
-	manual_url = '/Klienten/dienstleister/add/manual/'
+	manual_url  = '/Klienten/dienstleister/add/manual/'
 
 	def get_context_data(self, **kwargs):
 		context = super(DienstleisterSearchMultiformsView, self).get_context_data(**kwargs)
@@ -337,7 +337,8 @@ class DienstleisterSearchMultiformsView(MyMultiFormsView):
 	def get_suchen_initial(self):
 		name = self.request.GET.get('name')
 		ort  = self.request.GET.get('ort')
-		return {'name':name, 'ort':ort}
+		popup = self.request.GET.get('_popup')
+		return {'name':name, 'ort':ort, '_popup':popup}
 
 	def get_anlegen_initial(self):
 		name = self.request.GET.get('name')
@@ -366,13 +367,14 @@ class DienstleisterSearchMultiformsView(MyMultiFormsView):
 		return form
 
 	def suchen_form_valid(self, form):
-		return HttpResponseRedirect(self.this_url+'?name='+form.cleaned_data['name']+'&ort='+form.cleaned_data['ort'])		
+		popup = '&_popup='+self.request.GET.get('_popup') if self.request.GET.get('_popup') else ''
+		return HttpResponseRedirect(self.this_url+'?name='+form.cleaned_data['name']+'&ort='+form.cleaned_data['ort']+popup)	
 
 	def anlegen_form_valid(self, form):
 		if form.cleaned_data['suchergebnis'] == '0':
 			del_message(self.request)
 			messages.success(self.request, 'Bitte den Dienstleister manuell eingeben')
-			return HttpResponseRedirect(self.manual_url)
+			return HttpResponseRedirect(self.manual_url+url_args(self.request))
 		choice  = int(form.cleaned_data['suchergebnis'])
 		self.request.session['clientsearch_choice'] = choice
 		result = self.request.session.pop('clientsearch_results',[])[choice-1]

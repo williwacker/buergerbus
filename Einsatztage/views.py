@@ -17,6 +17,7 @@ from .filters import FahrtagFilter, BuerotagFilter
 from .utils import FahrtageSchreiben, BuerotageSchreiben
 from .forms import FahrtagChgForm, BuerotagChgForm, FahrplanEmailForm
 from .models import Fahrtag, Buerotag
+from Klienten.models import Klienten
 from Tour.models import Tour
 from Team.models import Fahrer, Koordinator
 from Einsatzmittel.models import Bus
@@ -85,45 +86,53 @@ class FahrplanEmailView(MyDetailView):
 		self.context['back_button'] = "Abbrechen"
 		self.context['url_args'] = url_args(self.request)
 		# Fahrplan Dateiname
-		self.context['filename'] = 'Buergerbus_Fahrplan_{}_{}.pdf'.format(str(self.context['fahrtag_liste'].team).replace(' ','_'), self.context['fahrtag_liste'].datum)
-		self.context['filepath'] = [settings.TOUR_PATH+self.context['filename']]
+#		self.context['filename'] = 'Buergerbus_Fahrplan_{}_{}.pdf'.format(str(self.context['fahrtag_liste'].team).replace(' ','_'), self.context['fahrtag_liste'].datum)
+		self.context['filepath'] = []
 
-	def get_dsgvo_klienten(self, context):
+	def get_dsgvo_klienten(self):
 		klienten_liste = {}
-		for tour in context['tour_liste']:
+		for tour in self.context['tour_liste']:
 			if tour.klient.dsgvo == '01':
 				klienten_liste[tour.klient.name] = tour.klient
 		return klienten_liste
 
-	def writeDSGVO(self, klienten_liste):
+	def writeDSGVO(self):
 		filepath_liste = []
-		for key in klienten_liste:
-			self.context['klient'] = klienten_liste[key]
-			filename = "DSGVO_{}_{}.pdf".format(klienten_liste[key].nachname, klienten_liste[key].vorname)
-			pdf = FahrplanAsPDF().pdf_render_to_response('Klienten/dsgvo.rml', self.context, filename)
-			if pdf:
-				response = HttpResponse(pdf, content_type='application/pdf')
-				content = "inline; filename='%s'" %(filename)
-				filepath = settings.DSGVO_PATH + filename
-				filepath_liste.append(filepath)
-				with open(filepath, 'wb') as f:
-					f.write(response.content)
-		return filepath_liste
-	
-	def get(self, request, *args, **kwargs):
-		self.get_context_data()
 		if settings.SEND_DSGVO:
-			klienten_liste = self.get_dsgvo_klienten(self.context)
-			# DSGVO Dateinamen
-			filepath_liste = self.writeDSGVO(klienten_liste)
-			self.context['filepath']+=filepath_liste
-		pdf = FahrplanAsPDF().pdf_render_to_response('Einsatztage/tour_as_pdf.rml', self.context, self.context['filename'])
+			klienten_liste = self.get_dsgvo_klienten()
+			klienten_keys = []
+			for key in klienten_liste:
+				klienten_keys.append(klienten_liste[key].id)
+				self.context['klient'] = klienten_liste[key]
+				filename = "DSGVO_{}_{}.pdf".format(klienten_liste[key].nachname, klienten_liste[key].vorname)
+				pdf = FahrplanAsPDF().pdf_render_to_response('Klienten/dsgvo.rml', self.context, filename)
+				if pdf:
+					response = HttpResponse(pdf, content_type='application/pdf')
+					content = "inline; filename='%s'" %(filename)
+					filepath = settings.DSGVO_PATH + filename
+					filepath_liste.append(filepath)
+					with open(filepath, 'wb') as f:
+						f.write(response.content)
+					f.close()
+			self.request.session['klienten_keys'] = klienten_keys
+		return filepath_liste
+
+	def writeFahrplan(self):
+		filename = 'Buergerbus_Fahrplan_{}_{}.pdf'.format(str(self.context['fahrtag_liste'].team).replace(' ','_'), self.context['fahrtag_liste'].datum)
+		pdf = FahrplanAsPDF().pdf_render_to_response('Einsatztage/tour_as_pdf.rml', self.context, filename)
 		if pdf:
 			response = HttpResponse(pdf, content_type='application/pdf')
-			content = "inline; filename='%s'" %(self.context['filename'])
-			path = settings.TOUR_PATH + self.context['filename']
-			with open(path, 'wb') as f:
+			content = "inline; filename='%s'" %(filename)
+			filepath = settings.TOUR_PATH + filename
+			with open(filepath, 'wb') as f:
 				f.write(response.content)
+			f.close()
+		return [filepath]
+
+	def get(self, request, *args, **kwargs):
+		self.get_context_data()
+		self.context['filepath']+=self.writeDSGVO()
+		self.context['filepath']+=self.writeFahrplan()
 		form = self.form_class(initial=self.initial)
 		self.initial['von'] = settings.EMAIL_HOST_USER
 		ft = self.context['fahrtag_liste']
@@ -144,7 +153,7 @@ class FahrplanEmailView(MyDetailView):
 		form = self.form_class(request.POST)
 		self.context['form'] = form
 		if form.is_valid():
-			post = request.POST.dict()
+			post = form.cleaned_data
 			email = EmailMessage(
 				post['betreff'],
 				post['text'],
@@ -154,15 +163,16 @@ class FahrplanEmailView(MyDetailView):
 			)
 			if post['cc']:
 				email.cc = post['cc'].split(";")
-			for filepath in self.context['filepath']:
-				email.attach_file(filepath)
+			for filepath in post['datei'].split('\n'):
+				email.attach_file(filepath.strip('\r'))
 			email.send(fail_silently=False)
 			if settings.SEND_DSGVO:
 				# klienten dsgvo auf 'versandt' stellen
-				klienten_liste = self.get_dsgvo_klienten(self.context)
-				for key in klienten_liste:
-					klienten_liste[key].dsgvo = '02'
-					klienten_liste[key].save()
+				klienten_keys = self.request.session.pop('klienten_keys',[])
+				for id in klienten_keys:
+					klient = Klienten.objects.get(id=id)
+					klient.dsgvo = '02'
+					klient.save(force_update=True)
 			storage = messages.get_messages(request)
 			storage.used = True			
 			messages.success(request, post['betreff']+' wurde erfolgreich versandt.')
