@@ -249,3 +249,6 @@ input[type="submit"]:hover {
 .form-row+.form-row-clear {
     clear: both;
 }
+ul.messagelist li.success, ul.messagelist li.info, ul.messagelist li.error {
+    color: #5c5c5c;
+}

@@ -82,8 +82,9 @@ def url_args(request):
 
 def del_message(request):
 	storage = messages.get_messages(request)
-	storage.used = True
-	if storage._loaded_messages:
+	for _ in storage:
+		pass
+	if len(storage._loaded_messages)  == 1:
 		del storage._loaded_messages[0]
 
 def get_relation_dict(modelclass, kwargs):

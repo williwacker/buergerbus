@@ -418,18 +418,20 @@ class DienstleisterSearchMultiformsView(MyMultiFormsView):
 					self.create_ort(plz=result['pc'], ort=result['ci'])
 					cities_by_zip = list(Orte.objects.values('ort','id').filter(plz=result['pc']))
 				else:
-					messages.error(self.request, "Der gefundene Ort existiert noch nicht. Wenn Sie ihn anlegen wollen, bitte 'Ort und Strasse anlegen' anhaken.")
+					messages.info(self.request, "Der gefundene Ort existiert noch nicht. Wenn Sie ihn anlegen wollen, bitte 'Ort und Strasse anlegen' anhaken.")
 					self.request.session['city_create'] = True
 					return HttpResponseRedirect(self.success_url+url_args(self.request))
 			else:
-				messages.error(self.request, "Der gefundene Ort existiert noch nicht, aber Sie haben keine Berechtigung um Orte anzulegen!")
+				messages.info(self.request, "Der gefundene Ort existiert noch nicht, aber Sie haben keine Berechtigung um Orte anzulegen!")
 				return HttpResponseRedirect(self.success_url+url_args(self.request))
 		best_match = process.extract(result['ci'], [sub['ort'] for sub in cities_by_zip], scorer=fuzz.token_set_ratio, limit=100)  # for debugging only
 		filtered_city_names = [sub[0] for sub in process.extract(result['ci'], [sub['ort'] for sub in cities_by_zip], scorer=fuzz.token_set_ratio) if sub[1]>=85]
 		matching_cities = list(Orte.objects.values('ort','id').filter(ort__in=filtered_city_names))
 
 		streets_by_city = list(Strassen.objects.values('strasse','ort','id').filter(ort_id__in=[sub['id'] for sub in matching_cities]))
-		filtered_street_names = [sub[0] for sub in process.extract(result['st'], [sub['strasse'] for sub in streets_by_city], scorer=fuzz.token_set_ratio) if sub[1]>=85]
+		filtered_street_names = []
+		if streets_by_city:
+			filtered_street_names = [sub[0] for sub in process.extract(result['st'], [sub['strasse'] for sub in streets_by_city], scorer=fuzz.token_set_ratio) if sub[1]>=85]
 		if not filtered_street_names:
 			if self.request.user.has_perm('Klienten.add_strassen'):
 				if city_create:
@@ -437,11 +439,11 @@ class DienstleisterSearchMultiformsView(MyMultiFormsView):
 					streets_by_city = list(Strassen.objects.values('strasse','ort','id').filter(ort_id__in=[sub['id'] for sub in matching_cities]))
 					filtered_street_names = [sub[0] for sub in process.extract(result['st'], [sub['strasse'] for sub in streets_by_city], scorer=fuzz.token_set_ratio, limit=1) if sub[1]>=85]
 				else:
-					messages.error(self.request, "Die gefundene Strasse existiert noch nicht. Wenn Sie sie anlegen wollen, bitte 'Ort und Strasse anlegen' anhaken.")
+					messages.info(self.request, "Die gefundene Strasse existiert noch nicht. Wenn Sie sie anlegen wollen, bitte 'Ort und Strasse anlegen' anhaken.")
 					self.request.session['city_create'] = True
 					return HttpResponseRedirect(self.success_url+url_args(self.request))
 			else:
-				messages.error(self.request, "Die gefundene Strasse existiert noch nicht, aber Sie haben keine Berechtigung um Strassen anzulegen!")
+				messages.info(self.request, "Die gefundene Strasse existiert noch nicht, aber Sie haben keine Berechtigung um Strassen anzulegen!")
 				return HttpResponseRedirect(self.success_url+url_args(self.request))
 		matching_street = list(Strassen.objects.values('strasse','ort','id').filter(ort_id__in=[sub['id'] for sub in matching_cities],strasse__in=filtered_street_names))
 
@@ -455,7 +457,7 @@ class DienstleisterSearchMultiformsView(MyMultiFormsView):
 					if process.extractOne(result['na'],client, scorer=fuzz.token_set_ratio)[1] > 95 and not force_create:
 						existing_client = Klienten.objects.get(id=client['id'])
 						del_message(self.request)
-						messages.error(self.request, 'Ein ähnlich oder gleich lautender Dienstleister existiert bereits: "<a href="'+self.success_url+str(existing_client.id)+'/">'+existing_client.name+'</a>" ')
+						messages.info(self.request, 'Ein ähnlich oder gleich lautender Dienstleister existiert bereits: "<a href="'+self.success_url+str(existing_client.id)+'/">'+existing_client.name+'</a>" ')
 						self.request.session['force_create'] = True
 						return HttpResponseRedirect(self.success_url+url_args(self.request))
 
