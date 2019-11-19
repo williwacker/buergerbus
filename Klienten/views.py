@@ -352,15 +352,15 @@ class DienstleisterSearchMultiformsView(MyMultiFormsView):
 	def create_anlegen_form(self, initial, prefix, data=None, files=None):
 		result_list  = initial['result_list']
 		choice = initial['choice']
+		choices = []
 		if not result_list:
 			messages.error(self.request, 'Keinen Namen anhand der Suchkriterien gefunden')
 		elif result_list[0] != 'initial':
 			messages.success(self.request, 'Die folgenden Namen wurden gefunden:')
-			choices = []
 			for i in range(len(result_list)):
 				# na = Name, pc = PLZ, ci = City, st = Street, hn = house-no, ph = phone, mph = mobile phone
 				choices.append((i+1,'{} {} {} {} {}'.format(result_list[i]['na'],result_list[i]['pc'],result_list[i]['ci'],result_list[i]['st'],result_list[i]['hn'])))
-			choices.append((0,'Adresse manuell eingeben'))
+		choices.append((0,'Adresse manuell eingeben'))
 
 		form = self.form_classes['anlegen'](self.request.POST)
 		form.fields['suchergebnis'] = forms.ChoiceField(required=False, initial=choice, widget=forms.RadioSelect(), choices=choices)
