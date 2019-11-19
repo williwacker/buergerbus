@@ -81,6 +81,8 @@ class Klienten(models.Model):
 	updated_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL)
 	
 	def __str__(self):
+		if self.typ=='D':
+			return " ".join([self.name, self.ort.ort, self.strasse.strasse])
 		return self.name
 
 	@property
@@ -101,7 +103,7 @@ class Klienten(models.Model):
 	
 	@property
 	def name_ort(self):
-		return "_".join([self.name, self.ort.ort])
+		return " ".join([self.name, self.ort.ort])
 
 	class Meta():
 		verbose_name_plural = "Klienten"

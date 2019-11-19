@@ -329,46 +329,53 @@ class DienstleisterSearchMultiformsView(MyMultiFormsView):
 		context['sidebar_liste'] = get_sidebar(self.request.user)
 		context['title'] = "Dienstleister suchen und hinzufügen"
 		context['submit_button'] = "Suchen"
-		context['back_button'] = ["Abbrechen",self.success_url]
+		context['back_button'] = ["Abbrechen",self.success_url+url_args(self.request)]
 		if self.request.GET.get('_popup') == '1':
 			context['popup'] = '1'
 		return context
 
 	def get_suchen_initial(self):
-		name = self.request.GET.get('name')
-		ort  = self.request.GET.get('ort')
+		suchname = self.request.session.get('suchname','')
+		suchort  = self.request.session.get('suchort','')		
 		popup = self.request.GET.get('_popup')
-		return {'name':name, 'ort':ort, '_popup':popup}
+		return {'suchname':suchname, 'suchort':suchort, '_popup':popup}
 
 	def get_anlegen_initial(self):
-		name = self.request.GET.get('name')
-		ort  = self.request.GET.get('ort')
+		suchname = self.request.session.get('suchname','')
+		suchort  = self.request.session.get('suchort','')
+		choice   = self.request.session.get('clientsearch_choice','')
 		result_list = ['initial']
-		if name:
-			result_list = Telefonbuch().dastelefonbuch(name,ort,'D')
-		return {'suchergebnis':result_list}
+		if suchname:
+			result_list = Telefonbuch().dastelefonbuch(suchname,suchort,'D')
+		return {'result_list':result_list, 'choice':choice}
 	
 	def create_anlegen_form(self, initial, prefix, data=None, files=None):
-		form = self.form_classes['anlegen'](self.request.POST)
-		form.fields['suchergebnis'] = forms.ChoiceField(required=True, widget=forms.RadioSelect(), choices = [])
-		del_message(self.request)
-		choices = []
-		result_list = initial['suchergebnis']
+		result_list  = initial['result_list']
+		choice = initial['choice']
 		if not result_list:
 			messages.error(self.request, 'Keinen Namen anhand der Suchkriterien gefunden')
 		elif result_list[0] != 'initial':
 			messages.success(self.request, 'Die folgenden Namen wurden gefunden:')
+			choices = []
 			for i in range(len(result_list)):
 				# na = Name, pc = PLZ, ci = City, st = Street, hn = house-no, ph = phone, mph = mobile phone
 				choices.append((i+1,'{} {} {} {} {}'.format(result_list[i]['na'],result_list[i]['pc'],result_list[i]['ci'],result_list[i]['st'],result_list[i]['hn'])))
-		choices.append((0,'Adresse manuell eingeben'))
-		form.fields['suchergebnis'].choices = choices
+			choices.append((0,'Adresse manuell eingeben'))
+
+		form = self.form_classes['anlegen'](self.request.POST)
+		form.fields['suchergebnis'] = forms.ChoiceField(required=False, initial=choice, widget=forms.RadioSelect(), choices=choices)
+		if not self.request.session.pop('city_create',False):
+			form.fields['city_create'].widget = forms.HiddenInput()
+		if not self.request.session.pop('force_create',False):
+			form.fields['force_create'].widget = forms.HiddenInput()
+		del_message(self.request)
 		self.request.session['clientsearch_results'] = result_list
 		return form
 
 	def suchen_form_valid(self, form):
-		popup = '&_popup='+self.request.GET.get('_popup') if self.request.GET.get('_popup') else ''
-		return HttpResponseRedirect(self.this_url+'?name='+form.cleaned_data['name']+'&ort='+form.cleaned_data['ort']+popup)	
+		self.request.session['suchname'] = form.cleaned_data['suchname']
+		self.request.session['suchort']  = form.cleaned_data['suchort']
+		return HttpResponseRedirect(self.this_url+url_args(self.request))	
 
 	def anlegen_form_valid(self, form):
 		if form.cleaned_data['suchergebnis'] == '0':
@@ -378,7 +385,7 @@ class DienstleisterSearchMultiformsView(MyMultiFormsView):
 		choice  = int(form.cleaned_data['suchergebnis'])
 		self.request.session['clientsearch_choice'] = choice
 		result = self.request.session.pop('clientsearch_results',[])[choice-1]
-		self.create_dienstleister(result,force_create=form.cleaned_data['force_create'], city_create=form.cleaned_data['city_create'])
+		self.create_dienstleister(result, force_create=form.cleaned_data.get('force_create',False), city_create=form.cleaned_data.get('city_create',False))
 		return HttpResponseRedirect(self.this_url+url_args(self.request))
 
 	def create_ort(self,plz,ort):
@@ -412,24 +419,30 @@ class DienstleisterSearchMultiformsView(MyMultiFormsView):
 					cities_by_zip = list(Orte.objects.values('ort','id').filter(plz=result['pc']))
 				else:
 					messages.error(self.request, "Der gefundene Ort existiert noch nicht. Wenn Sie ihn anlegen wollen, bitte 'Ort und Strasse anlegen' anhaken.")
-					return HttpResponseRedirect(self.success_url)
+					self.request.session['city_create'] = True
+					return HttpResponseRedirect(self.success_url+url_args(self.request))
 			else:
 				messages.error(self.request, "Der gefundene Ort existiert noch nicht, aber Sie haben keine Berechtigung um Orte anzulegen!")
-				return HttpResponseRedirect(self.success_url)
+				return HttpResponseRedirect(self.success_url+url_args(self.request))
 		best_match = process.extract(result['ci'], [sub['ort'] for sub in cities_by_zip], scorer=fuzz.token_set_ratio, limit=100)  # for debugging only
-		filtered_city_names = [sub[0] for sub in process.extract(result['ci'], [sub['ort'] for sub in cities_by_zip], scorer=fuzz.token_set_ratio, limit=100) if sub[1]>=85]
+		filtered_city_names = [sub[0] for sub in process.extract(result['ci'], [sub['ort'] for sub in cities_by_zip], scorer=fuzz.token_set_ratio) if sub[1]>=85]
 		matching_cities = list(Orte.objects.values('ort','id').filter(ort__in=filtered_city_names))
 
 		streets_by_city = list(Strassen.objects.values('strasse','ort','id').filter(ort_id__in=[sub['id'] for sub in matching_cities]))
-		filtered_street_names = [sub[0] for sub in process.extract(result['st'], [sub['strasse'] for sub in streets_by_city], scorer=fuzz.token_set_ratio, limit=1) if sub[1]>=85]
+		filtered_street_names = [sub[0] for sub in process.extract(result['st'], [sub['strasse'] for sub in streets_by_city], scorer=fuzz.token_set_ratio) if sub[1]>=85]
 		if not filtered_street_names:
 			if self.request.user.has_perm('Klienten.add_strassen'):
-				self.create_strasse(strasse=result['st'], ort=result['ci'])
-				streets_by_city = list(Strassen.objects.values('strasse','ort','id').filter(ort_id__in=[sub['id'] for sub in matching_cities]))
-				filtered_street_names = [sub[0] for sub in process.extract(result['st'], [sub['strasse'] for sub in streets_by_city], scorer=fuzz.token_set_ratio, limit=1) if sub[1]>=85]
+				if city_create:
+					self.create_strasse(strasse=result['st'], ort=result['ci'])
+					streets_by_city = list(Strassen.objects.values('strasse','ort','id').filter(ort_id__in=[sub['id'] for sub in matching_cities]))
+					filtered_street_names = [sub[0] for sub in process.extract(result['st'], [sub['strasse'] for sub in streets_by_city], scorer=fuzz.token_set_ratio, limit=1) if sub[1]>=85]
+				else:
+					messages.error(self.request, "Die gefundene Strasse existiert noch nicht. Wenn Sie sie anlegen wollen, bitte 'Ort und Strasse anlegen' anhaken.")
+					self.request.session['city_create'] = True
+					return HttpResponseRedirect(self.success_url+url_args(self.request))
 			else:
 				messages.error(self.request, "Die gefundene Strasse existiert noch nicht, aber Sie haben keine Berechtigung um Strassen anzulegen!")
-				return HttpResponseRedirect(self.success_url)
+				return HttpResponseRedirect(self.success_url+url_args(self.request))
 		matching_street = list(Strassen.objects.values('strasse','ort','id').filter(ort_id__in=[sub['id'] for sub in matching_cities],strasse__in=filtered_street_names))
 
 		matching_category = process.extract(result['na'], [sub[0] for sub in DIENSTLEISTER_AUSWAHL], limit=1)
@@ -438,12 +451,13 @@ class DienstleisterSearchMultiformsView(MyMultiFormsView):
 		if filtered_street_names:
 			existing_clients = list(Klienten.objects.values('name','id').filter(ort=matching_street[0]['ort'],strasse=matching_street[0]['id']))
 			if existing_clients:
-				matching_client = process.extractOne(result['na'],[sub['name'] for sub in existing_clients], scorer=fuzz.token_set_ratio)
-				if matching_client[1] > 95 and not force_create:
-					existing_client = Klienten.objects.get(name=matching_client[0])
-					del_message(self.request)
-					messages.error(self.request, 'Ein ähnlich lautender Dienstleister existiert bereits: "<a href="'+self.success_url+str(existing_client.id)+'/">'+existing_client.name+'</a>" ')
-					return HttpResponseRedirect(self.success_url)
+				for client in existing_clients:
+					if process.extractOne(result['na'],client, scorer=fuzz.token_set_ratio)[1] > 95 and not force_create:
+						existing_client = Klienten.objects.get(id=client['id'])
+						del_message(self.request)
+						messages.error(self.request, 'Ein ähnlich oder gleich lautender Dienstleister existiert bereits: "<a href="'+self.success_url+str(existing_client.id)+'/">'+existing_client.name+'</a>" ')
+						self.request.session['force_create'] = True
+						return HttpResponseRedirect(self.success_url+url_args(self.request))
 
 		klient = Klienten(
 			name = result['na'],
@@ -459,7 +473,10 @@ class DienstleisterSearchMultiformsView(MyMultiFormsView):
 		)
 		klient.save()
 		messages.success(self.request, 'Dienstleister "<a href="'+self.success_url+str(klient.id)+'/">'+klient.name+'</a>" wurde erfolgreich hinzugefügt.')
-		return HttpResponseRedirect(self.this_url)
+		# clear search criteria
+		self.request.session.pop('suchname')
+		self.request.session.pop('suchort')
+		return HttpResponseRedirect(self.this_url+url_args(self.request))
 
 class OrtView(MyListView):
 	permission_required = 'Klienten.view_orte'

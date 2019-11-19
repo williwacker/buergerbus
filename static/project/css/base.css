@@ -240,7 +240,11 @@ input[type="submit"]:hover {
     width: 40%;
 }
 .form-row+.form-row-right label {
-    color: white;
+    display: none;
+}
+.form-row+.form-row-right p.help {
+    margin-left: 0;
+    padding-left: 0;
 }
 .form-row+.form-row-clear {
     clear: both;

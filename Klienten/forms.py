@@ -37,15 +37,21 @@ class KlientenForm(ModelForm):
 		return data
 
 class KlientenSearchForm(forms.Form):
-	name = forms.CharField(required=False, help_text='z.B. Name, Gewerbe oder Telefonnummer')
-	ort  = forms.CharField(required=True)
+	suchname = forms.CharField(required=True, label='Suchbegriff', help_text='z.B. Name, Gewerbe oder Telefonnummer')
+	suchort  = forms.CharField(required=True, label='Ort')
 
 class KlientenSearchResultForm(forms.Form):
 	suchergebnis = forms.CharField(required=False)
+	city_create  = forms.BooleanField(required=False, label="Ort und Strasse anlegen", 
+					help_text="Neuen Ort und/oder Strasse anlegen")
 	force_create = forms.BooleanField(required=False, label="Ähnlichkeit erlauben", 
-		help_text="Dienstleister anlegen, obwohl schon ein Eintrag mit ähnlichem Namen existiert")
-	city_create = forms.BooleanField(required=False, label="Ort und Strasse anlegen", 
-		help_text="Neuen Ort und/oder Strasse anlegen")
+					help_text="Dienstleister anlegen, obwohl schon ein Eintrag mit ähnlichem Namen existiert")
+
+	def clean_suchergebnis(self):
+		data = self.cleaned_data['suchergebnis']
+		if not data:
+			raise forms.ValidationError("Bitte erst einen Eintrag aus der Liste wählen")
+		return data	
 
 class DienstleisterForm(ModelForm):
 
