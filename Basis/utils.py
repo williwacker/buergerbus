@@ -80,12 +80,14 @@ def url_args(request):
 		return args
 	return ""
 
+'''
 def del_message(request):
 	storage = messages.get_messages(request)
 	for _ in storage:
 		pass
 	if len(storage._loaded_messages)  == 1:
 		del storage._loaded_messages[0]
+'''
 
 def get_relation_dict(modelclass, kwargs):
 		objects = OrderedDict()
@@ -95,3 +97,21 @@ def get_relation_dict(modelclass, kwargs):
 		for item in collector.data.items():
 			objects[item[0].__name__] = item[1]
 		return objects
+
+from django.contrib.messages.api import get_messages
+from django.contrib.messages.constants import DEFAULT_LEVELS
+
+def messages(request):
+    """Remove duplicate messages
+    """
+    messages = []
+    unique_messages = []
+    for m in get_messages(request):
+        if m.message not in messages:
+            messages.append(m.message)
+            unique_messages.append(m)
+
+    return {
+		'messages': unique_messages,
+        'DEFAULT_MESSAGE_LEVELS': DEFAULT_LEVELS,
+	}		

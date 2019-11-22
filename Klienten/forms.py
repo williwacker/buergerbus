@@ -41,7 +41,7 @@ class KlientenSearchForm(forms.Form):
 	suchort  = forms.CharField(required=True, label='Ort')
 
 class KlientenSearchResultForm(forms.Form):
-	suchergebnis = forms.CharField(required=False)
+	suchergebnis = forms.ChoiceField(required=False, widget=forms.RadioSelect())
 	city_create  = forms.BooleanField(required=False, label="Ort und Strasse anlegen", 
 					help_text="Neuen Ort und/oder Strasse anlegen")
 	force_create = forms.BooleanField(required=False, label="Ähnlichkeit erlauben", 

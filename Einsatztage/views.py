@@ -22,7 +22,7 @@ from Tour.models import Tour
 from Team.models import Fahrer, Koordinator
 from Einsatzmittel.models import Bus
 from Einsatzmittel.utils import get_bus_list, get_buero_list
-from Basis.utils import get_sidebar, url_args, del_message
+from Basis.utils import get_sidebar, url_args
 from Basis.views import MyListView, MyDetailView, MyView
 
 class FahrplanView(MyListView):
@@ -83,7 +83,7 @@ class FahrplanEmailView(MyDetailView):
 		self.context['tour_liste'] = Tour.objects.order_by('uhrzeit').filter(datum=self.kwargs['id'])
 		self.context['title'] = 'Fahrplan {} am {} versenden'.format(ft.team,ft.datum)
 		self.context['submit_button'] = "Senden"
-		self.context['back_button'] = "Abbrechen"
+		self.context['back_button'] = ["Abbrechen",self.success_url+url_args(self.request)]
 		self.context['url_args'] = url_args(self.request)
 		# Fahrplan Dateiname
 #		self.context['filename'] = 'Buergerbus_Fahrplan_{}_{}.pdf'.format(str(self.context['fahrtag_liste'].team).replace(' ','_'), self.context['fahrtag_liste'].datum)
@@ -215,7 +215,7 @@ class FahrtageChangeView(MyDetailView):
 		context['sidebar_liste'] = get_sidebar(self.request.user)
 		context['title'] = "Fahrereinsatz ändern"
 		context['submit_button'] = "Sichern"
-		context['back_button'] = "Abbrechen"
+		context['back_button'] = ["Abbrechen",self.success_url+url_args(self.request)]
 		context['url_args'] = url_args(self.request)
 		return context
 	
@@ -284,7 +284,7 @@ class BuerotageChangeView(MyDetailView):
 		context['sidebar_liste'] = get_sidebar(request.user)
 		context['title'] = "Bürotag ändern"
 		context['submit_button'] = "Sichern"
-		context['back_button'] = "Abbrechen"
+		context['back_button'] = ["Abbrechen",self.success_url+url_args(self.request)]
 		context['url_args'] = url_args(self.request)
 		return context
 	

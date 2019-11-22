@@ -15,7 +15,7 @@ from .tables import OrteTable, StrassenTable, DienstleisterTable, FahrgaesteTabl
 from .filters import StrassenFilter, OrteFilter, FahrgaesteFilter, DienstleisterFilter
 from Einsatzmittel.models import Bus
 from Einsatzmittel.utils import get_bus_list
-from Basis.utils import get_sidebar, render_to_pdf, url_args, del_message
+from Basis.utils import get_sidebar, render_to_pdf, url_args
 from Basis.views import MyListView, MyDetailView, MyView, MyUpdateView, MyDeleteView, MyMultiFormsView
 from Einsatztage.views import FahrplanAsPDF
 from Basis.telefonbuch_suche import Telefonbuch
@@ -66,7 +66,8 @@ class FahrgastAddView(MyDetailView):
 		context['sidebar_liste'] = get_sidebar(request.user)
 		context['title'] = "Fahrgast hinzufügen"
 		context['submit_button'] = "Sichern"
-		context['back_button'] = "Abbrechen"
+		context['back_button'] = ["Abbrechen",self.success_url+url_args(self.request)]
+		context['popup'] = self.request.GET.get('_popup',None)
 		return context
 	
 	def get(self, request, *args, **kwargs):
@@ -123,7 +124,7 @@ class FahrgastChangeView(MyUpdateView):
 		if request.user.has_perm('Klienten.delete_klienten'):
 			context['delete_button'] = "Löschen"
 		context['submit_button'] = "Sichern"
-		context['back_button'] = "Abbrechen"
+		context['back_button'] = ["Abbrechen",self.success_url+url_args(self.request)]
 		context['url_args'] = url_args(request)
 		return context
 	
@@ -159,7 +160,7 @@ class FahrgastDeleteView(MyDeleteView):
 
 class DSGVOView(MyDetailView):
 	permission_required = 'Klienten.view_klienten'
-
+	success_url = '/Klienten/fahrgaeste/'
 	template_name = 'Klienten/dsgvo.html'
 	context_object_name = 'klient'
 
@@ -170,7 +171,7 @@ class DSGVOView(MyDetailView):
 		context = super().get_context_data(**kwargs)
 		context['sidebar_liste'] = get_sidebar(self.request.user)
 		context['title'] = "DSGVO anzeigen"
-		context['back_button'] = "Zurück"
+		context['back_button'] = ["Zurück",self.success_url+url_args(self.request)]
 		return context 
 
 class DSGVOasPDFView(MyView):
@@ -236,9 +237,8 @@ class DienstleisterAddView(MyDetailView):
 		context['sidebar_liste'] = get_sidebar(request.user)
 		context['title'] = "Dienstleister hinzufügen"
 		context['submit_button'] = "Sichern"
-		if self.request.GET.get('_popup') == '1':
-			context['popup'] = '1'
-		context['back_button'] = "Abbrechen"
+		context['popup'] = self.request.GET.get('_popup',None)
+		context['back_button'] = ["Abbrechen",self.success_url+url_args(self.request)]
 		return context
 	
 	def get(self, request, *args, **kwargs):
@@ -291,7 +291,7 @@ class DienstleisterChangeView(MyUpdateView):
 		if self.request.user.has_perm('Klienten.delete_klienten'):
 			context['delete_button'] = "Löschen"
 		context['submit_button'] = "Sichern"
-		context['back_button'] = "Abbrechen"
+		context['back_button'] = ["Abbrechen",self.success_url+url_args(self.request)]
 		context['url_args'] = url_args(request)
 		return context
 	
@@ -330,8 +330,7 @@ class DienstleisterSearchMultiformsView(MyMultiFormsView):
 		context['title'] = "Dienstleister suchen und hinzufügen"
 		context['submit_button'] = "Suchen"
 		context['back_button'] = ["Abbrechen",self.success_url+url_args(self.request)]
-		if self.request.GET.get('_popup') == '1':
-			context['popup'] = '1'
+		context['popup'] = self.request.GET.get('_popup',None)
 		return context
 
 	def get_suchen_initial(self):
@@ -344,42 +343,48 @@ class DienstleisterSearchMultiformsView(MyMultiFormsView):
 		suchname = self.request.session.get('suchname','')
 		suchort  = self.request.session.get('suchort','')
 		choice   = self.request.session.get('clientsearch_choice','')
-		result_list = ['initial']
+		result_list = []
 		if suchname:
-			result_list = Telefonbuch().dastelefonbuch(suchname,suchort,'D')
+			result_list =  Telefonbuch().dasoertliche(suchname,suchort,'D')
+			result_list += Telefonbuch().dastelefonbuch(suchname,suchort,'D')
+			if not result_list:
+				messages.error(self.request, 'Keinen Namen anhand der Suchkriterien gefunden')
+			else:
+				messages.success(self.request, 'Die folgenden Namen wurden gefunden:')
 		return {'result_list':result_list, 'choice':choice}
 	
 	def create_anlegen_form(self, initial, prefix, data=None, files=None):
 		result_list  = initial['result_list']
 		choice = initial['choice']
 		choices = []
-		if not result_list:
-			messages.error(self.request, 'Keinen Namen anhand der Suchkriterien gefunden')
-		elif result_list[0] != 'initial':
-			messages.success(self.request, 'Die folgenden Namen wurden gefunden:')
+		sel_choice = (0,'Adresse manuell eingeben')
+		if result_list:
 			for i in range(len(result_list)):
 				# na = Name, pc = PLZ, ci = City, st = Street, hn = house-no, ph = phone, mph = mobile phone
 				choices.append((i+1,'{} {} {} {} {}'.format(result_list[i]['na'],result_list[i]['pc'],result_list[i]['ci'],result_list[i]['st'],result_list[i]['hn'])))
+				if i+1 == initial['choice']:
+					sel_choice = choices[i]
 		choices.append((0,'Adresse manuell eingeben'))
 
-		form = self.form_classes['anlegen'](self.request.POST)
-		form.fields['suchergebnis'] = forms.ChoiceField(required=False, initial=choice, widget=forms.RadioSelect(), choices=choices)
+		form = self.form_classes['anlegen'](self.request.POST or None, initial={'suchergebnis':sel_choice})
+		form.fields['suchergebnis'].choices=choices
 		if not self.request.session.pop('city_create',False):
 			form.fields['city_create'].widget = forms.HiddenInput()
 		if not self.request.session.pop('force_create',False):
 			form.fields['force_create'].widget = forms.HiddenInput()
-		del_message(self.request)
 		self.request.session['clientsearch_results'] = result_list
 		return form
 
 	def suchen_form_valid(self, form):
+		if self.request.session.get('suchname','') != form.cleaned_data.get('suchname','A') \
+		or self.request.session.get('suchort','')  != form.cleaned_data.get('suchort','A'):
+			self.request.session.pop('clientsearch_choice','')
 		self.request.session['suchname'] = form.cleaned_data['suchname']
 		self.request.session['suchort']  = form.cleaned_data['suchort']
 		return HttpResponseRedirect(self.this_url+url_args(self.request))	
 
 	def anlegen_form_valid(self, form):
 		if form.cleaned_data['suchergebnis'] == '0':
-			del_message(self.request)
 			messages.success(self.request, 'Bitte den Dienstleister manuell eingeben')
 			return HttpResponseRedirect(self.manual_url+url_args(self.request))
 		choice  = int(form.cleaned_data['suchergebnis'])
@@ -387,7 +392,7 @@ class DienstleisterSearchMultiformsView(MyMultiFormsView):
 		result = self.request.session.pop('clientsearch_results',[])[choice-1]
 		self.create_dienstleister(result, force_create=form.cleaned_data.get('force_create',False), city_create=form.cleaned_data.get('city_create',False))
 		return HttpResponseRedirect(self.this_url+url_args(self.request))
-
+	
 	def create_ort(self,plz,ort):
 		ort = Orte(
 			ort=ort,
@@ -456,7 +461,6 @@ class DienstleisterSearchMultiformsView(MyMultiFormsView):
 				for client in existing_clients:
 					if process.extractOne(result['na'],client, scorer=fuzz.token_set_ratio)[1] > 95 and not force_create:
 						existing_client = Klienten.objects.get(id=client['id'])
-						del_message(self.request)
 						messages.info(self.request, 'Ein ähnlich oder gleich lautender Dienstleister existiert bereits: "<a href="'+self.success_url+str(existing_client.id)+'/">'+existing_client.name+'</a>" ')
 						self.request.session['force_create'] = True
 						return HttpResponseRedirect(self.success_url+url_args(self.request))
@@ -517,7 +521,8 @@ class OrtAddView(MyDetailView):
 		context['sidebar_liste'] = get_sidebar(request.user)
 		context['title'] = "Ort hinzufügen"
 		context['submit_button'] = "Sichern"
-		context['back_button'] = "Abbrechen"		
+		context['back_button'] = ["Abbrechen",self.success_url+url_args(self.request)]
+		context['popup'] = self.request.GET.get('_popup',None) 
 		return context
 	
 	def get(self, request, *args, **kwargs):
@@ -561,7 +566,7 @@ class OrtChangeView(MyUpdateView):
 		if self.request.user.has_perm('Klienten.delete_orte'):
 			context['delete_button'] = "Löschen"
 		context['submit_button'] = "Sichern"
-		context['back_button'] = "Abbrechen"
+		context['back_button'] = ["Abbrechen",self.success_url+url_args(self.request)]
 		context['url_args'] = url_args(request)
 		return context
 	
@@ -622,11 +627,14 @@ class StrassenAddView(MyDetailView):
 		context['sidebar_liste'] = get_sidebar(request.user)
 		context['title'] = "Strasse hinzufügen"
 		context['submit_button'] = "Sichern"
-		context['back_button'] = "Abbrechen"		
+		context['back_button'] = ["Abbrechen",self.success_url+url_args(self.request)]
+		context['popup'] = self.request.GET.get('_popup',None)
 		return context
 	
 	def get(self, request, *args, **kwargs):
 		context = self.get_context_data(request)
+		ort = request.GET.get('ort')
+		self.initial['ort'] = Orte.objects.get(id=str(ort)) if ort else None
 		form = self.form_class(initial=self.initial)
 		context['form'] = form
 		return render(request, self.template_name, context)
@@ -665,7 +673,7 @@ class StrassenChangeView(MyUpdateView):
 		if self.request.user.has_perm('Klienten.delete_strassen'):
 			context['delete_button'] = "Löschen"
 		context['submit_button'] = "Sichern"
-		context['back_button'] = "Abbrechen"
+		context['back_button'] = ["Abbrechen",self.success_url+url_args(self.request)]
 		context['url_args'] = url_args(request)
 		return context
 	

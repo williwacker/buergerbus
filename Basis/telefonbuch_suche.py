@@ -19,6 +19,47 @@ import re
 class Telefonbuch():
 	def __init__(self):
 		self.http = urllib3.PoolManager(cert_reqs='CERT_REQUIRED',ca_certs=certifi.where())
+		self.transTable = {'zip':'pc', 'na':'na', 'ci':'ci', 'st':'st', 'hn':'hn', 'ph':'ph', 'mph':'mph', 'recuid':'recuid'}
+
+	def dasoertliche(self,name,city,typ):
+		lurl = self.http.request('GET', 'https://www.dasoertliche.de/?kgs=07331020&choose=true&page=0&context=0&action=43&buc=22&topKw=0&form_name=search_nat&kw={}&ci={}'.format(name,city))
+		line = lurl.data.decode("utf-8","ignore").replace('\t','').replace('\n','').replace('\r','').replace('&nbsp;',' ')
+		result = []
+		try:
+			# list with phone numbers
+			itemData    = eval(re.search('itemData\s*=\s*(.*?)]];', line).group(1)+']]')
+			# list with address info
+			handlerData = eval(re.search('handlerData\s*=\s*(.*?);', line).group(1))
+			# item list matching to address list 
+			itemList    = re.search('var item = {(.*?)};', line).group(1).split(',')
+			result = []
+			for m in range(len(handlerData)):
+				data_dict = self._init_dict();
+				for singleItem in itemList:
+					item = singleItem.split(':',1)
+					if item[0].strip() in self.transTable:
+						id = self.transTable[item[0].strip()]
+						data_dict[id] = eval(item[1])
+				phone = itemData[m][10][0].replace('(','').replace(')','-').replace(' ','')
+				if phone[:3] in ('015','016','017'):
+					data_dict['mph'] = phone
+				else:
+					data_dict['ph'] = phone
+				if data_dict['st'] == '0':
+					self.dasoertliche_gewerbe(line, data_dict)
+				if data_dict['pc'] and data_dict['st']:
+					result.append(data_dict)
+		except:
+			pass
+		return result
+
+	def dasoertliche_gewerbe(self, line, data_dict):
+		handlerData = re.search('recuid='+data_dict['recuid']+'.*?<address>(.*?)\s+([0-9]+.*?),.*?([0-9]+).*?<.*?>(.*?)</span>', line).group(1,2,3,4)
+		data_dict['st'] = handlerData[0]
+		data_dict['hn'] = handlerData[1]
+		data_dict['pc'] = handlerData[2]
+		data_dict['ci'] = handlerData[3]
+		return
 
 	def dastelefonbuch(self,name,city,typ):
 		searchArg = 'Suche'
@@ -31,13 +72,22 @@ class Telefonbuch():
 		lurl = self.http.request('GET', 'https://www.dastelefonbuch.de/{}/{}/{}'.format(searchArg,name,city))
 		line = lurl.data.decode("utf-8","ignore")
 		result = []
-		for m in re.finditer('data-entry-data=\"(.*?)\"', line):
-			data = self._split(m.group(1))
-			if data != None:
-				result.append(data) 	
+		try:
+			for m in re.finditer('data-entry-data=\"(.*?)\"', line):
+				data = self._split_das_telefonbuch(m.group(1))
+				if data != None:
+					result.append(data)
+		except:
+			pass	
 		return result
+
+	def _init_dict(self):
+		data_dict = {}
+		for key in self.transTable:
+			data_dict[self.transTable[key]] = ''
+		return data_dict
 	
-	def _split(self, match):
+	def _split_das_telefonbuch(self, match):
 		entry_dict = {}
 		for entry in match.split('&'):
 			entry_dict.update([tuple(entry.split('=',1))])

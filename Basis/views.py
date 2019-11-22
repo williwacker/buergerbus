@@ -26,6 +26,12 @@ class MyListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
 	template_name = 'Basis/simple_table.html'
 	context_object_name = 'table'
 
+	def dispatch(self, request, *args, **kwargs):
+		request.session.pop('suchname','')
+		request.session.pop('suchort','')
+		request.session.pop('clientsearch_choice','')
+		return super(MyListView, self).dispatch(request, *args, **kwargs)
+
 class MyDetailView(LoginRequiredMixin, PermissionRequiredMixin, DetailView):
 	login_url = settings.LOGIN_URL
 	initial = {'key': 'value'}

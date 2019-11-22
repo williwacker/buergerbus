@@ -14,7 +14,7 @@ from Klienten.models import Klienten
 from Einsatztage.models import Fahrtag
 
 from Einsatzmittel.utils import get_bus_list
-from Basis.utils import get_sidebar, render_to_pdf, url_args, del_message
+from Basis.utils import get_sidebar, render_to_pdf, url_args
 from datetime import datetime, timedelta, time
 from Basis.views import MyListView, MyDetailView, MyView
 
@@ -51,7 +51,7 @@ class TourAddView(MyDetailView):
 		context['sidebar_liste'] = get_sidebar(self.request.user)
 		context['title'] = "Tour hinzufügen"
 		context['submit_button'] = "Weiter"
-		context['back_button'] = "Abbrechen"
+		context['back_button'] = ["Abbrechen",self.success_url+url_args(self.request)]
 		return context
 
 	def get(self, request, *args, **kwargs):
@@ -85,16 +85,19 @@ class TourAddView2(MyDetailView):
 		context['sidebar_liste'] = get_sidebar(self.request.user)
 		context['title'] = "Tour hinzufügen"
 		context['submit_button'] = "Sichern"
-		context['back_button'] = "Zurück"
-		context['popup_button'] = {"id":"add_id_dienstleister","href":"/Klienten/dienstleister/add/","title":"Dienstleister hinzufügen","name":"Dienstleister"}
+		context['back_button'] = ["Zurück","javascript:history.go(-1)"]
 		return context
 
 	def get(self, request, *args, **kwargs):
 		context = self.get_context_data()
-		form = self.form_class(initial=self.initial)
 		klient = Klienten.objects.get(pk=kwargs['pk'])
 		self.initial['klient'] = klient.name
 		self.initial['bus'] = klient.bus
+		self.initial['abholklient'] = klient
+		self.initial['zielklient'] = klient
+		fahrtag = request.GET.get('datum')
+		self.initial['datum'] = Fahrtag.objects.get(id=str(fahrtag)) if fahrtag else None
+		form = self.form_class(initial=self.initial)
 		form.fields['datum'].queryset = Fahrtag.objects.order_by('datum').filter(archiv=False, team_id=klient.bus, datum__gt=datetime.now(), datum__lte=datetime.now()+timedelta(settings.COUNT_TOUR_DAYS))
 		qs = Tour.objects.filter(klient__id=klient.id).values_list('abholklient',flat=True).distinct()
 		form.fields['abholfavorit'].queryset = Klienten.objects.filter(id__in=qs).order_by('name')	| Klienten.objects.filter(id=klient.id)
@@ -156,7 +159,7 @@ class TourChangeView(MyDetailView):
 		if self.request.user.has_perm('Tour.delete_tour'):
 			context['delete_button'] = "Löschen"
 		context['submit_button'] = "Sichern"
-		context['back_button'] = "Abbrechen"
+		context['back_button'] = ["Abbrechen",self.success_url+url_args(self.request)]
 		context['url_args'] = url_args(self.request)
 		return context
 	

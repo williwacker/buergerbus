@@ -25,9 +25,9 @@
             <a href="javascript:history.go(-1)" class="closelink">{{ back_button|upper|default:'Abbrechen' }}</a>
             <input type="submit" value="{{ submit_button|default:'Bestätigen' }}" class="default" name="_save">
             {% if delete_button %}
-            <p class="deletelink-box">
-                <a href="delete/{{ url_args }}" class="deletelink">{{ delete_button|default:'Löschen' }}</a>
-            </p>
+                <p class="deletelink-box">
+                    <a href="delete/{{ url_args }}" class="deletelink">{{ delete_button|default:'Löschen' }}</a>
+                </p>
             {% endif %}
         </div>
     </form>

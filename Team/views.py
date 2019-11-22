@@ -11,7 +11,7 @@ from Einsatzmittel.models import Bus, Buero
 from .forms import FahrerAddForm, FahrerChgForm, KoordinatorAddForm, KoordinatorChgForm
 from .tables import FahrerTable, KoordinatorTable
 from .filters import FahrerFilter, KoordinatorFilter
-from Basis.utils import get_sidebar, url_args, del_message
+from Basis.utils import get_sidebar, url_args
 from Einsatzmittel.utils import get_bus_list, get_buero_list
 from Basis.views import MyListView, MyDetailView, MyView, MyUpdateView, MyDeleteView
 
@@ -57,7 +57,7 @@ class FahrerAddView(MyDetailView):
 		context['sidebar_liste'] = get_sidebar(request.user)
 		context['title'] = "Fahrer hinzufügen"
 		context['submit_button'] = "Sichern"
-		context['back_button'] = "Abbrechen"
+		context['back_button'] = ["Abbrechen",self.success_url+url_args(self.request)]
 		return context
 	
 	def get(self, request, *args, **kwargs):
@@ -102,7 +102,7 @@ class FahrerChangeView(MyUpdateView):
 		if self.request.user.has_perm('Team.delete_fahrer'):
 			context['delete_button'] = "Löschen"
 		context['submit_button'] = "Sichern"
-		context['back_button'] = "Abbrechen"
+		context['back_button'] = ["Abbrechen",self.success_url+url_args(self.request)]
 		context['url_args'] = url_args(self.request)
 		return context
 	
@@ -169,7 +169,7 @@ class KoordinatorAddView(MyDetailView):
 		context['sidebar_liste'] = get_sidebar(request.user)
 		context['title'] = "Koordinator hinzufügen"
 		context['submit_button'] = "Sichern"
-		context['back_button'] = "Abbrechen"
+		context['back_button'] = ["Abbrechen",self.success_url+url_args(self.request)]
 		return context
 	
 	def get(self, request, *args, **kwargs):
@@ -216,7 +216,7 @@ class KoordinatorChangeView(MyUpdateView):
 		if self.request.user.has_perm('Team.delete_koordinator'):
 			context['delete_button'] = "Löschen"
 		context['submit_button'] = "Sichern"
-		context['back_button'] = "Abbrechen"
+		context['back_button'] = ["Abbrechen",self.success_url+url_args(self.request)]
 		context['url_args'] = url_args(self.request)
 		return context
 	

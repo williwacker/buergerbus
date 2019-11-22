@@ -9,7 +9,7 @@ from django.contrib.auth.models import User
 from .models import Bus, Buero
 from .forms import BusChgForm, BueroChgForm
 from .tables import BusTable, BueroTable
-from Basis.utils import get_sidebar, url_args, del_message, get_relation_dict
+from Basis.utils import get_sidebar, url_args, get_relation_dict
 from Basis.views import MyListView, MyDetailView, MyView, MyUpdateView,MyDeleteView
 
 register = template.Library()
@@ -26,6 +26,7 @@ class BusView(MyListView):
 		context['title'] = "Busse"
 		if self.request.user.has_perm('Einsatzmittel.add_bus'):
 			context['add'] = "Bus"
+		context['url_args'] = url_args(self.request)
 		return context
 
 class BusAddView(MyDetailView):
@@ -38,7 +39,7 @@ class BusAddView(MyDetailView):
 		context['sidebar_liste'] = get_sidebar(request.user)
 		context['title'] = "Bus hinzufügen"
 		context['submit_button'] = "Sichern"
-		context['back_button'] = "Abbrechen"
+		context['back_button'] = ["Abbrechen",self.success_url+url_args(self.request)]
 		return context
 	
 	def get(self, request, *args, **kwargs):
@@ -74,7 +75,8 @@ class BusChangeView(MyUpdateView):
 		if self.request.user.has_perm('Einsatzmittel.delete_bus'):
 			context['delete_button'] = "Löschen"
 		context['submit_button'] = "Sichern"
-		context['back_button'] = "Abbrechen"
+		context['back_button'] = ["Abbrechen",self.success_url+url_args(self.request)]
+		context['url_args'] = url_args(self.request)
 		return context
 
 	def form_valid(self, form):
@@ -106,6 +108,7 @@ class BueroView(MyListView):
 		context['title'] = "Büros"
 		if self.request.user.has_perm('Einsatzmittel.add_buero'):
 			context['add'] = "Büro"
+		context['url_args'] = url_args(self.request)
 		return context
 
 class BueroAddView(MyDetailView):
@@ -118,7 +121,7 @@ class BueroAddView(MyDetailView):
 		context['sidebar_liste'] = get_sidebar(request.user)
 		context['title'] = "Büro hinzufügen"
 		context['submit_button'] = "Sichern"
-		context['back_button'] = "Abbrechen"
+		context['back_button'] = ["Abbrechen",self.success_url+url_args(self.request)]
 		return context
 	
 	def get(self, request, *args, **kwargs):
@@ -154,7 +157,8 @@ class BueroChangeView(MyUpdateView):
 		if self.request.user.has_perm('Einsatzmittel.delete_buero'):
 			context['delete_button'] = "Löschen"
 		context['submit_button'] = "Sichern"
-		context['back_button'] = "Abbrechen"
+		context['back_button'] = ["Abbrechen",self.success_url+url_args(self.request)]
+		context['url_args'] = url_args(self.request)
 		return context
 
 	def form_valid(self, form):
