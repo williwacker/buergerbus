@@ -13,6 +13,7 @@ from .forms import StrassenAddForm, StrassenChgForm
 from .models import Klienten, Orte, Strassen, DIENSTLEISTER_AUSWAHL
 from .tables import OrteTable, StrassenTable, DienstleisterTable, FahrgaesteTable
 from .filters import StrassenFilter, OrteFilter, FahrgaesteFilter, DienstleisterFilter
+from .utils import del_message
 from Einsatzmittel.models import Bus
 from Einsatzmittel.utils import get_bus_list
 from Basis.utils import get_sidebar, render_to_pdf, url_args
@@ -385,6 +386,7 @@ class DienstleisterSearchMultiformsView(MyMultiFormsView):
 
 	def anlegen_form_valid(self, form):
 		if form.cleaned_data['suchergebnis'] == '0':
+			del_message(self.request)
 			messages.success(self.request, 'Bitte den Dienstleister manuell eingeben')
 			return HttpResponseRedirect(self.manual_url+url_args(self.request))
 		choice  = int(form.cleaned_data['suchergebnis'])

@@ -8,6 +8,8 @@ from xhtml2pdf import pisa
 from io import BytesIO
 from django.db.models.deletion import Collector
 from collections import OrderedDict
+from django.contrib.messages.api import get_messages
+from django.contrib.messages.constants import DEFAULT_LEVELS
 
 def render_to_pdf(template_src, context_dict={}):
 	template = loader.get_template(template_src)
@@ -80,15 +82,6 @@ def url_args(request):
 		return args
 	return ""
 
-'''
-def del_message(request):
-	storage = messages.get_messages(request)
-	for _ in storage:
-		pass
-	if len(storage._loaded_messages)  == 1:
-		del storage._loaded_messages[0]
-'''
-
 def get_relation_dict(modelclass, kwargs):
 		objects = OrderedDict()
 		obj = modelclass.objects.get(pk=kwargs['object'].pk)
@@ -97,9 +90,6 @@ def get_relation_dict(modelclass, kwargs):
 		for item in collector.data.items():
 			objects[item[0].__name__] = item[1]
 		return objects
-
-from django.contrib.messages.api import get_messages
-from django.contrib.messages.constants import DEFAULT_LEVELS
 
 def messages(request):
     """Remove duplicate messages

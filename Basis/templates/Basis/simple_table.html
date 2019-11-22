@@ -32,6 +32,15 @@
             </div>
         </form>
     </div>
+    <div class="submit-row">
+        {% if back_button %}
+        {% if popup %}
+                <a href="javascript:opener.location.reload(false);window.close();" class="closelink">{{ back_button.0|upper }}</a>
+            {% else %}
+                <a href="{{ back_button.1 }}" class="closelink">{{ back_button.0|upper }}</a>
+            {% endif %}
+        {% endif %}
+    </div>
     {% else %}
         <p>Keine {{ title }} eingetragen.</p>
     {% endif %}

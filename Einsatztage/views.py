@@ -27,6 +27,7 @@ from Basis.views import MyListView, MyDetailView, MyView
 
 class FahrplanView(MyListView):
 	permission_required = 'Tour.view_tour'
+	success_url = '/Einsatztage/fahrer/'
 
 	def get_queryset(self):
 		return TourTable(Tour.objects.order_by('uhrzeit').filter(datum=self.kwargs['id']))
@@ -37,6 +38,7 @@ class FahrplanView(MyListView):
 		ft = Fahrtag.objects.filter(pk=self.kwargs['id'])
 		context['pre_table'] = FahrerTable(ft)
 		context['title'] = 'Fahrplan {} am {}'.format(ft.first().team,ft.first())
+		context['back_button'] = ["Zurück",self.success_url+url_args(self.request)]
 		return context
 
 class FahrplanAsPDF(MyView):
