@@ -39,7 +39,7 @@ class UserAddView(MyDetailView):
 		context['sidebar_liste'] = get_sidebar(self.request.user)
 		context['title'] = "Benutzer hinzufügen"
 		context['submit_button'] = "Sichern"
-		context['back_button'] = "Abbrechen"		
+		context['back_button'] = ["Abbrechen",self.success_url+url_args(self.request)]	
 		return context
 	
 	def get(self, request, *args, **kwargs):
@@ -76,7 +76,7 @@ class UserChangeView(MyUpdateView):
 		if self.request.user.has_perm('auth.delete_user'):
 			context['delete_button'] = "Löschen"
 		context['submit_button'] = "Sichern"
-		context['back_button'] = "Abbrechen"
+		context['back_button'] = ["Abbrechen",self.success_url+url_args(self.request)]
 		context['url_args'] = url_args(self.request)
 		return context
 
@@ -127,7 +127,7 @@ class GroupAddView(MyDetailView):
 		context['sidebar_liste'] = get_sidebar(self.request.user)
 		context['title'] = "Gruppe hinzufügen"
 		context['submit_button'] = "Sichern"
-		context['back_button'] = "Abbrechen"		
+		context['back_button'] = ["Abbrechen",self.success_url+url_args(self.request)]	
 		return context
 	
 	def get(self, request, *args, **kwargs):
@@ -163,7 +163,7 @@ class GroupChangeView(MyUpdateView):
 		if self.request.user.has_perm('auth.delete_group'):
 			context['delete_button'] = "Löschen"
 		context['submit_button'] = "Sichern"
-		context['back_button'] = "Abbrechen"
+		context['back_button'] = ["Abbrechen",self.success_url+url_args(self.request)]
 		context['url_args'] = url_args(self.request)
 		return context
 	

@@ -87,8 +87,6 @@ class FahrplanEmailView(MyDetailView):
 		self.context['submit_button'] = "Senden"
 		self.context['back_button'] = ["Abbrechen",self.success_url+url_args(self.request)]
 		self.context['url_args'] = url_args(self.request)
-		# Fahrplan Dateiname
-#		self.context['filename'] = 'Buergerbus_Fahrplan_{}_{}.pdf'.format(str(self.context['fahrtag_liste'].team).replace(' ','_'), self.context['fahrtag_liste'].datum)
 		self.context['filepath'] = []
 
 	def get_dsgvo_klienten(self):

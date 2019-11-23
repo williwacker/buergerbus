@@ -74,6 +74,10 @@ def get_sidebar(user):
 	if value:
 		sidebar.append({'name':'Einsatzmittel', 'value':value})
 
+	value = []
+	value.append({'name':'Feedback','value':'/Basis/feedback/'})
+	if value:
+		sidebar.append({'name':'Kontakt', 'value':value})		
 	return sidebar
 
 def url_args(request):
