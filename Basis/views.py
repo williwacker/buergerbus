@@ -4,6 +4,7 @@ from django.views.generic import ListView, DetailView, View, CreateView, UpdateV
 from .multiform import MultiFormsView
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
+from django.contrib.auth.models import User
 from django.conf import settings
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied
@@ -101,9 +102,10 @@ class FeedbackView(MyDetailView):
 		self.context['url_args'] = url_args(self.request)
 
 	def get(self, request, *args, **kwargs):
+		admin_email = list(User.objects.filter(is_superuser=True).values_list('email', flat=True))
 		self.get_context_data()
 		self.initial['von'] = settings.EMAIL_HOST_USER
-		self.initial['an'] = settings.ADMIN_EMAIL
+		self.initial['an'] = ';'.join(admin_email)
 		self.initial['betreff'] = '[Bürgerbus] Feedback '
 		form = self.form_class(initial=self.initial)
 		self.context['form'] = form
