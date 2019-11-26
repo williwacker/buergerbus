@@ -46,12 +46,11 @@ class DepartureTime():
 		bus     = cleaned_data['bus']
 		bus_id  = Bus.objects.get(bus=bus)
 		abholklient = cleaned_data['abholklient']
-		abholklient_id = Klienten.objects.get(name=abholklient)
 		instance = Tour.objects.order_by('uhrzeit').filter(bus=bus_id, datum=datum, uhrzeit__lt=uhrzeit).last()
 		if instance and instance.ankunft:
 			googleList = DistanceMatrix().getMatrix(
 					instance.zielklient, 
-					Klienten.objects.get(name=abholklient), 
+					abholklient, 
 					instance.datum.datum, 
 					instance.ankunft)
 			return googleList[2]
@@ -66,12 +65,11 @@ class JoinTime():
 		bus     = cleaned_data['bus']
 		bus_id  = Bus.objects.get(bus=bus)
 		abholklient = cleaned_data['abholklient']
-		abholklient_id = Klienten.objects.get(name=abholklient)
 		instance = Tour.objects.order_by('uhrzeit').filter(bus=bus_id, datum=datum, uhrzeit__lt=uhrzeit).last()
 		if instance and instance.ankunft:
 			googleList = DistanceMatrix().getMatrix(
 					instance.abholklient, 
-					Klienten.objects.get(name=abholklient), 
+					abholklient, 
 					instance.datum.datum, 
 					instance.uhrzeit)
 			return googleList[2]

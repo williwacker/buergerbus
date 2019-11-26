@@ -16,7 +16,7 @@ class Tour(models.Model):
 		chained_field="bus", # the field on your own model that this field links to 
 		chained_model_field="team", # the field on the model that corresponds to chained_field
 		related_name="datum1",
-		limit_choices_to={"archiv": False, "datum__lte": datetime.now()+timedelta(settings.COUNT_TOUR_DAYS)},
+		limit_choices_to={"archiv": False},
 		show_all=False,
 		auto_choose=True,
 		sort=True)

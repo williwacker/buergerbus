@@ -16,7 +16,7 @@ from Einsatztage.models import Fahrtag
 from Einsatzmittel.utils import get_bus_list
 from Basis.utils import get_sidebar, render_to_pdf, url_args
 from datetime import datetime, timedelta, time
-from Basis.views import MyListView, MyDetailView, MyView
+from Basis.views import MyListView, MyDetailView, MyView, MyDeleteView
 
 class TourView(MyListView):
 	permission_required = 'Tour.view_tour'
@@ -207,12 +207,16 @@ class TourChangeView(MyDetailView):
 			messages.error(request, form.errors)		
 		return render(request, self.template_name, context)		
 
-class TourDeleteView(MyView):
+class TourDeleteView(MyDeleteView):
 	permission_required = 'Tour.delete_tour'
 	success_url = '/Tour/tour/'
-
+	model = Tour
+	pass
+	
+	'''
 	def get(self, request, *args, **kwargs):
 		k = Tour.objects.get(pk=kwargs['pk'])
-		k.delete()
+#		k.delete()
 		messages.success(request, 'Tour '+k.klient.name+' am '+str(k.datum)+' um '+str(k.uhrzeit)+' wurde gelöscht.')
 		return HttpResponseRedirect(self.success_url+url_args(request))
+	'''

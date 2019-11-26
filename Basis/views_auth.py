@@ -80,6 +80,15 @@ class UserChangeView(MyUpdateView):
 		context['url_args'] = url_args(self.request)
 		return context
 
+	def get_form(self, form_class=None):
+		form = super(UserChangeView, self).get_form(self.form_class)
+		user = self.request.user
+		if not user.is_superuser:
+			form.fields['groups'].queryset = form.fields['groups'].queryset.filter(id__in=[i.id for i in user.groups.all()])
+			form.fields['user_permissions'].queryset = form.fields['user_permissions'].queryset.filter(id__in=[i.id for i in user.user_permissions.all()])
+			form.fields['is_superuser'].widget.attrs['disabled'] = True
+		return form
+	
 	def form_valid(self, form):
 		instance = form.save()
 		storage = messages.get_messages(self.request)

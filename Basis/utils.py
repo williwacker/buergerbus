@@ -4,6 +4,7 @@ from django.template import loader, Context
 from django.http import HttpResponse
 from django.utils.http import is_safe_url
 from django.contrib import messages
+from django.contrib.auth.models import User
 from xhtml2pdf import pisa
 from io import BytesIO
 from django.db.models.deletion import Collector
@@ -75,7 +76,8 @@ def get_sidebar(user):
 		sidebar.append({'name':'Einsatzmittel', 'value':value})
 
 	value = []
-	value.append({'name':'Feedback','value':'/Basis/feedback/'})
+	if list(User.objects.filter(is_superuser=True).values_list('email', flat=True)):
+		value.append({'name':'Feedback','value':'/Basis/feedback/'})
 	if value:
 		sidebar.append({'name':'Kontakt', 'value':value})		
 	return sidebar

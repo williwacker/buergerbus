@@ -34,7 +34,7 @@ class Telefonbuch():
 			itemList    = re.search('var item = {(.*?)};', line).group(1).split(',')
 			result = []
 			for m in range(len(handlerData)):
-				data_dict = self._init_dict();
+				data_dict = self._init_dict()
 				for singleItem in itemList:
 					item = singleItem.split(':',1)
 					if item[0].strip() in self.transTable:
@@ -47,7 +47,7 @@ class Telefonbuch():
 					data_dict['ph'] = phone
 				if data_dict['st'] == '0':
 					self.dasoertliche_gewerbe(line, data_dict)
-				if data_dict['pc'] and data_dict['st']:
+				if data_dict['pc'] and data_dict['st'] and data_dict['hn']:
 					result.append(data_dict)
 		except:
 			pass
@@ -103,6 +103,6 @@ class Telefonbuch():
 			data_dict['mph'] = entry_dict.get('mph','').replace('+','-',1).replace('+','')
 			data_dict['hn']  = entry_dict.get('hn','').replace('+','')
 			# ignore entries without street name or zip
-			if data_dict['pc'] and data_dict['st']:
+			if data_dict['pc'] and data_dict['st'] and data_dict['hn']:
 				return data_dict
 

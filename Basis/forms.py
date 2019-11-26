@@ -11,7 +11,7 @@ class MyUserChangeForm(UserChangeForm):
 
 	class Meta:
 		model = User
-		fields = ['username', 'password', 'first_name', 'last_name', 'email', 'groups', 'user_permissions', 'is_staff', 'is_superuser', 'is_active']
+		fields = ['username', 'first_name', 'last_name', 'email', 'groups', 'user_permissions', 'is_staff', 'is_superuser', 'is_active']
 
 class MyGroupChangeForm(ModelForm):
 	def __init__(self, *args, **kwargs):
