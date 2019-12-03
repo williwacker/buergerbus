@@ -34,6 +34,7 @@ class Fahrtag(models.Model):
 		blank=True,
 		related_name='nachmittag',
 		sort=True)		
+	urlaub     = models.BooleanField(default=False)
 	archiv     = models.BooleanField(default=False)
 	updated_on = models.DateTimeField(auto_now=True, blank=True, null=True)
 	updated_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL)
@@ -82,7 +83,8 @@ class Buerotag(models.Model):
 		auto_choose=False,
 		null=True,
 		blank=True,
-		sort=True)	
+		sort=True)
+	urlaub     = models.BooleanField(default=False)
 	archiv     = models.BooleanField(default=False)
 	updated_on = models.DateTimeField(auto_now=True, blank=True, null=True)
 	updated_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL)

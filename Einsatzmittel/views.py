@@ -45,6 +45,7 @@ class BusAddView(MyDetailView):
 	def get(self, request, *args, **kwargs):
 		context = self.get_context_data(request)
 		form = self.form_class(initial=self.initial)
+		self.initial['tourtage'] = settings.COUNT_TOUR_DAYS
 		context['form'] = form
 		return render(request, self.template_name, context)
 

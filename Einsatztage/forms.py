@@ -12,7 +12,7 @@ class FahrtagChgForm(ModelForm):
 		self.fields['team'].required = False
 	class Meta:
 		model = Fahrtag
-		fields = ['datum', 'team', 'fahrer_vormittag', 'fahrer_nachmittag']
+		fields = ['datum', 'team', 'fahrer_vormittag', 'fahrer_nachmittag', 'urlaub']
 
 class BuerotagChgForm(ModelForm):
 	def __init__(self, *args, **kwargs):
@@ -23,7 +23,7 @@ class BuerotagChgForm(ModelForm):
 		self.fields['team'].required = False
 	class Meta:
 		model = Buerotag
-		fields = ['datum', 'team', 'koordinator']
+		fields = ['datum', 'team', 'koordinator', 'urlaub']
 
 class FahrplanEmailForm(forms.Form):
 	von = forms.EmailField(required=False, widget=forms.HiddenInput(attrs={'readonly':'readonly','style':'width:800px;'}))

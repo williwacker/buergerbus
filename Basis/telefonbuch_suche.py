@@ -26,6 +26,8 @@ class Telefonbuch():
 		line = lurl.data.decode("utf-8","ignore").replace('\t','').replace('\n','').replace('\r','').replace('&nbsp;',' ')
 		result = []
 		try:
+			if line.find('Die Suche wurde automatisch auf') > 0:
+				return result
 			# list with phone numbers
 			itemData    = eval(re.search('itemData\s*=\s*(.*?)]];', line).group(1)+']]')
 			# list with address info
@@ -73,6 +75,8 @@ class Telefonbuch():
 		line = lurl.data.decode("utf-8","ignore")
 		result = []
 		try:
+			if line.find("Wir konnten zu Ihrer Eingabe keine Eintr&auml;ge finden, daher wurde Ihre Suche ge&auml;ndert.") > 0:
+				return result
 			for m in re.finditer('data-entry-data=\"(.*?)\"', line):
 				data = self._split_das_telefonbuch(m.group(1))
 				if data != None:

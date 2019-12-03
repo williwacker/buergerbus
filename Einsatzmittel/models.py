@@ -74,6 +74,7 @@ class Bus(models.Model):
 	sitzplaetze = models.IntegerField(default=8, verbose_name="Anzahl Sitzplätze") 
 	fahrtage    = models.ManyToManyField(Wochentage, default='', verbose_name = "Fahrtage")
 	email 		= models.EmailField(max_length=254, blank=True, null=True)
+	plantage    = models.IntegerField(default=0, verbose_name="Anzahl planbarer Kalendertage")
 	updated_on  = models.DateTimeField(auto_now=True, blank=True, null=True)
 	updated_by  = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, related_name="bus_updated_by", on_delete=models.SET_NULL)
 

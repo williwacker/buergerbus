@@ -10,16 +10,8 @@ from Einsatztage.models import Fahrtag
 
 class Tour(models.Model):
 	klient  = models.ForeignKey('Klienten.Klienten', related_name='klient', on_delete=models.CASCADE)
-	bus    = models.ForeignKey('Einsatzmittel.Bus', related_name="bus2", on_delete=models.CASCADE)
-	datum = ChainedForeignKey(
-		Fahrtag, # the model where you're populating your items from
-		chained_field="bus", # the field on your own model that this field links to 
-		chained_model_field="team", # the field on the model that corresponds to chained_field
-		related_name="datum1",
-		limit_choices_to={"archiv": False},
-		show_all=False,
-		auto_choose=True,
-		sort=True)
+	bus    = models.ForeignKey('Einsatzmittel.Bus', related_name='bus2', on_delete=models.CASCADE)
+	datum  = models.ForeignKey('Einsatztage.Fahrtag', related_name='datum2', on_delete=models.CASCADE)
 	uhrzeit = models.TimeField(verbose_name="Abholzeit")
 	abholklient  = models.ForeignKey('Klienten.Klienten', null=True, related_name='abholort', verbose_name="Wo",
 		help_text="Bei wem soll der Fahrgast abgeholt werden?", on_delete=models.CASCADE)
@@ -30,6 +22,8 @@ class Tour(models.Model):
 	bemerkung    = models.TextField(max_length=200, blank=True, null=True)
 	personenzahl = models.IntegerField(default=1, verbose_name="Personen")
 	zustieg      = models.BooleanField(default=False)
+	konflikt     = models.TextField(max_length=200, blank=True, null=True)
+	konflikt_richtung = models.TextField(max_length=2, blank=True, null=True)
 	archiv       = models.BooleanField(default=False)
 	updated_on   = models.DateTimeField(auto_now=True, blank=True, null=True)
 	updated_by   = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL)
@@ -55,6 +49,10 @@ class Tour(models.Model):
 	@property
 	def is_today(self):
 		return date.today() == self.datum.datum
+
+	@property
+	def has_conflict(self):
+		return self.konflikt != ''
 
 	def einsatz_bus(self):
 		rows = Fahrtag.objects.filter(datum=self.datum.datum).values_list('team',flat=True)

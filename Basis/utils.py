@@ -98,8 +98,7 @@ def get_relation_dict(modelclass, kwargs):
 		return objects
 
 def messages(request):
-    """Remove duplicate messages
-    """
+    # Remove duplicate messages
     messages = []
     unique_messages = []
     for m in get_messages(request):

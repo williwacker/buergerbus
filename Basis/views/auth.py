@@ -4,10 +4,10 @@ from django.contrib.auth.models import User, Group
 from django.contrib import messages
 from django.contrib.auth.views import PasswordChangeView
 from django.views.generic import TemplateView
-from .utils import get_sidebar, url_args
-from .tables import UserTable, GroupTable
-from .views import MyListView, MyDetailView, MyUpdateView, MyView
-from .forms import MyUserChangeForm, MyGroupChangeForm
+from Basis.utils import get_sidebar, url_args
+from Basis.tables import UserTable, GroupTable
+from Basis.views import MyListView, MyDetailView, MyUpdateView, MyView, MyDeleteView
+from Basis.forms import MyUserChangeForm, MyGroupChangeForm
 from django.contrib.auth.forms import UserCreationForm
 from django.views.generic import ListView, DetailView, CreateView, UpdateView
 
@@ -96,15 +96,10 @@ class UserChangeView(MyUpdateView):
 		messages.success(self.request, 'Benutzer "<a href="'+self.success_url+str(instance.id)+'">'+instance.username+'</a>" wurde erfolgreich geändert.')
 		return super(UserChangeView, self).form_valid(form) 
 
-class UserDeleteView(MyView):
+class UserDeleteView(MyDeleteView):
 	permission_required = 'auth.delete_user'
 	success_url = '/Basis/benutzer/'
-
-	def get(self, request, *args, **kwargs):
-		instance = User.objects.get(pk=kwargs['pk'])
-		instance.delete()
-		messages.success(request, 'Benutzer '+instance.username+' wurde gelöscht.')
-		return HttpResponseRedirect(self.success_url+url_args(request))
+	model = User
 
 # Gruppen
 
@@ -183,15 +178,10 @@ class GroupChangeView(MyUpdateView):
 		messages.success(self.request, 'Gruppe "<a href="'+self.success_url+str(instance.id)+'">'+instance.name+'</a>" wurde erfolgreich geändert.')
 		return super(GroupChangeView, self).form_valid(form) 
 
-class GroupDeleteView(MyView):
+class GroupDeleteView(MyDeleteView):
 	permission_required = 'auth.delete_group'
 	success_url = '/Basis/gruppen/'
-
-	def get(self, request, *args, **kwargs):
-		g = Group.objects.get(pk=kwargs['pk'])
-		g.delete()
-		messages.success(request, 'Gruppe '+g.name+' wurde gelöscht.')
-		return HttpResponseRedirect(self.success_url+url_args(request))
+	model = Group
 
 class MyPasswordChangeView(PasswordChangeView):
 

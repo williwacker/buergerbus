@@ -1,9 +1,8 @@
 from django.urls import path
 from django.views.generic import TemplateView
 
-#from . import views
-from .views_auth import UserView, UserAddView, UserChangeView, UserDeleteView
-from .views_auth import GroupView, GroupAddView, GroupChangeView, GroupDeleteView
+from .views import UserView, UserAddView, UserChangeView, UserDeleteView
+from .views import GroupView, GroupAddView, GroupChangeView, GroupDeleteView
 from .views import FeedbackView
 
 app_name = 'Basis'

@@ -23,7 +23,7 @@ from Team.models import Fahrer, Koordinator
 from Einsatzmittel.models import Bus
 from Einsatzmittel.utils import get_bus_list, get_buero_list
 from Basis.utils import get_sidebar, url_args
-from Basis.views import MyListView, MyDetailView, MyView
+from Basis.views import MyListView, MyDetailView, MyView, MyUpdateView
 
 class FahrplanView(MyListView):
 	permission_required = 'Tour.view_tour'
@@ -124,9 +124,12 @@ class FahrplanEmailView(MyDetailView):
 			response = HttpResponse(pdf, content_type='application/pdf')
 			content = "inline; filename='%s'" %(filename)
 			filepath = settings.TOUR_PATH + filename
-			with open(filepath, 'wb') as f:
-				f.write(response.content)
-			f.close()
+			try:
+				with open(filepath, 'wb') as f:
+					f.write(response.content)
+				f.close()
+			except:
+				messages.error(self.request, 'Dokument <b>'+filepath+'</b> ist noch geöffnet und kann nicht geschrieben werden.')
 		return [filepath]
 
 	def get(self, request, *args, **kwargs):
@@ -205,10 +208,11 @@ class FahrtageListView(MyListView):
 		context['url_args'] = url_args(self.request)
 		return context
 
-class FahrtageChangeView(MyDetailView):
+class FahrtageChangeView(MyUpdateView):
 	form_class = FahrtagChgForm
 	permission_required = 'Einsatztage.change_fahrtag'
 	success_url = '/Einsatztage/fahrer/'
+	model = Fahrtag
 	
 	def get_context_data(self):
 		context = {}
@@ -225,30 +229,13 @@ class FahrtageChangeView(MyDetailView):
 		context['form'] = form
 		return render(request, self.template_name, context)
 
-	def post(self, request, *args, **kwargs):
-		context = self.get_context_data()
-		form = self.form_class(request.POST)
-		context['form'] = form
-		if form.is_valid():
-			post = request.POST.dict()
-			fahrtag = Fahrtag.objects.get(pk=kwargs['pk'])
-			if post['fahrer_vormittag'] != "":
-				fahrtag.fahrer_vormittag=Fahrer.objects.get(pk=int(post['fahrer_vormittag']))
-			else:
-				fahrtag.fahrer_vormittag=None
-			if post['fahrer_nachmittag'] != "":
-				fahrtag.fahrer_nachmittag=Fahrer.objects.get(pk=int(post['fahrer_nachmittag']))
-			else:
-				fahrtag.fahrer_nachmittag=None
-			fahrtag.updated_by = request.user
-			fahrtag.save()
-			storage = messages.get_messages(request)
-			storage.used = True			
-			messages.success(request, 'Fahrtag "<a href="'+request.path+url_args(request)+'">'+str(fahrtag.datum)+' '+str(fahrtag.team)+'</a>" wurde erfolgreich geändert.')
-			return HttpResponseRedirect(self.success_url+url_args(request))
-		else:
-			messages.error(request, form.errors)			
-		return render(request, self.template_name, context)		
+	def form_valid(self, form):
+		instance = form.save(commit=False)
+		instance.updated_by = self.request.user
+		instance.save(force_update=True)
+		self.success_url += url_args(self.request)
+		self.success_message = self.model._meta.verbose_name.title()+' "<a href="'+self.success_url+str(instance.id)+'">'+str(instance.datum)+' '+str(instance.team)+'</a>" wurde erfolgreich geändert.'
+		return super(FahrtageChangeView, self).form_valid(form)	
 
 class BuerotageListView(MyListView):
 	permission_required = 'Einsatztage.view_buerotag'
@@ -274,10 +261,11 @@ class BuerotageListView(MyListView):
 		context['url_args'] = url_args(self.request)
 		return context
 
-class BuerotageChangeView(MyDetailView):
+class BuerotageChangeView(MyUpdateView):
 	form_class = BuerotagChgForm
 	permission_required = 'Einsatztage.change_buerotag'
 	success_url = '/Einsatztage/buero/'
+	model = Buerotag
 
 	def get_context_data(self, request):
 		context = {}
@@ -294,23 +282,10 @@ class BuerotageChangeView(MyDetailView):
 		context['form'] = form
 		return render(request, self.template_name, context)
 
-	def post(self, request, *args, **kwargs):
-		context = self.get_context_data(request)
-		form = self.form_class(request.POST)
-		context['form'] = form
-		if form.is_valid():
-			post = request.POST.dict()
-			buero = Buerotag.objects.get(pk=kwargs['pk'])
-			if post['koordinator'] != "":
-				buero.koordinator=Koordinator.objects.get(pk=int(post['koordinator']))
-			else:
-				buero.koordinator=None 
-			buero.updated_by = request.user
-			buero.save()
-			storage = messages.get_messages(request)
-			storage.used = True			
-			messages.success(request, 'Bürotag "<a href="'+request.path+url_args(request)+'">'+str(buero.datum)+' '+str(buero.team)+'</a>" wurde erfolgreich geändert.')
-			return HttpResponseRedirect(self.success_url+url_args(request))
-		else:
-			messages.error(request, form.errors)
-		return render(request, self.template_name, context)		
+	def form_valid(self, form):
+		instance = form.save(commit=False)
+		instance.updated_by = self.request.user
+		instance.save(force_update=True)
+		self.success_url += url_args(self.request)
+		self.success_message = self.model._meta.verbose_name.title()+' "<a href="'+self.success_url+str(instance.id)+'">'+str(instance.datum)+' '+str(instance.team)+'</a>" wurde erfolgreich geändert.'
+		return super(BuerotageChangeView, self).form_valid(form)	

@@ -1,13 +1,24 @@
 <?xml version="1.0" encoding="iso-8859-1" standalone="no" ?>
 <!DOCTYPE document SYSTEM "rml.dtd">
+{% load static %}
 {% block content %}
         <document filename="{{ filename }}">
-            <template rotation="0" showBoundary="0" >
+            <template rotation="0" showBoundary="0" pageSize="29.7cm, 21cm">
                 <pageTemplate id="main">
-                    <frame id="first" x1="0" y1="20" width="21cm" height="820"/>
+                    <pageGraphics>
+                        <setFont size="10" name="Helvetica"/>
+                        <drawCenteredString x="14.85cm" y="1cm">Seite <pageNumber/></drawCenteredString>
+                    </pageGraphics>
+                    <frame id="first" x1="0" y1="-0.5cm" width="29.7cm" height="21cm"/>
                 </pageTemplate>
             </template>
             <stylesheet>
+                <blockTableStyle id="header">
+                    <blockAlignment value="LEFT"/>
+                    <blockFont name="Helvetica" size="10"/>
+                    <blockLeftPadding length="5"/>
+                    <blockRightPadding length="5"/>
+                 </blockTableStyle>
                 <blockTableStyle id="myBlockTableStyle1">
                     <blockAlignment value="LEFT"/>
                     <blockFont name="Helvetica" size="8"/>
@@ -16,15 +27,15 @@
                     <blockBackground colorName="yellow" start="0,0" stop="0,-1"/>
                     <blockLeftPadding length="5"/>
                     <blockRightPadding length="5"/>
-                 </blockTableStyle>
+                 </blockTableStyle>                 
                 <blockTableStyle id="myBlockTableStyle2">
                     <blockAlignment value="LEFT"/>
                     <blockFont name="Helvetica" size="8"/>
                     <lineStyle kind="GRID" colorName="black"/>
                     <lineStyle kind="OUTLINE" colorName="black" thickness="1"/>
                     <blockBackground colorName="yellow" start="0,0" stop="-1,0"/>
-                    <blockBottomPadding length="30"/>
-                    <!--blockTopPadding length="0"/-->
+                    <blockBottomPadding length="5"/>
+                    <blockTopPadding length="5"/>
                     <blockLeftPadding length="5"/>
                     <blockRightPadding length="5"/>
                     <blockValign  value="TOP"/>
@@ -33,14 +44,28 @@
                     fontName="Helvetica"
                     fontSize="8"
                 />
-                <paraStyle name="p2"
+                <paraStyle name="pl"
+                    fontName="Helvetica"
+                    fontSize="10"
+                    alignment="LEFT"
+                    spaceBefore = "0.1cm"
+                    spaceAfter = "0.1cm"
+                />
+                <paraStyle name="pc"
                     fontName="Helvetica"
                     fontSize="10"
                     alignment="CENTER"
                     spaceBefore = "0.1cm"
                     spaceAfter = "0.1cm"
-                />
-                <paraStyle name="p3"
+                />                
+                <paraStyle name="pr"
+                    fontName="Helvetica"
+                    fontSize="10"
+                    alignment="RIGHT"
+                    spaceBefore = "0.1cm"
+                    spaceAfter = "0.1cm"
+                />                
+                <paraStyle name="p4"
                     fontName="Helvetica"
                     fontSize="16"
                     alignment="CENTER"
@@ -49,11 +74,19 @@
                 />                
             </stylesheet>
             <story>
-            <para style="p2">VG Alzey-Land Bürgerbus Portal</para>
-            <para style="p3">Fahrplan {{ fahrtag_liste.team.bus }} am {{ fahrtag_liste.datum }}</para>
+                <blockTable 
+                            colWidths="20cm, 7.0cm"
+                            style="header"
+                            frame="first">
+                    <tr>
+                        <td><para style="pl">VG Alzey-Land Bürgerbus Portal</para></td>
+                        <td><para style="pr">{% now "j. F Y H:i" %}</para></td>
+                    </tr>
+                </blockTable>
+                <para style="p4">Fahrplan {{ fahrtag_liste.team.bus }} am {{ fahrtag_liste.datum }}</para>
             {%if fahrtag_liste %}
                 <blockTable 
-                            colWidths="4cm,15.2cm"
+                            colWidths="4cm,23cm"
                             style="myBlockTableStyle1"
                             frame="first">
                     <tr>
@@ -63,9 +96,9 @@
                         <td class="name">Fahrer Nachmittag:</td><td class="value">{{ fahrtag_liste.fahrer_nachmittag.name|default_if_none:"-" }}</td>
                     </tr>
                 </blockTable>
-                <para style="p2">Tourliste</para>
+                <para style="pc"></para>
                 <blockTable 
-                            colWidths="2cm,2cm,1.25cm,0.5cm,0.5cm,3.5cm,3.5cm,1.75cm,1.32cm,3cm"
+                            colWidths="4cm,2.5cm,1.4cm,1.5cm,1.5cm,4.5cm,4.5cm,1.75cm,1.4cm,4cm"
                             style="myBlockTableStyle2"
                             frame="second">
                     <tr>
@@ -83,7 +116,7 @@
                 {% for tour in tour_liste %}
                     <tr>
                         <td><para style="p1">{{ tour.klient }}</para></td>
-                        <td><para style="p1">{{ tour.klient.telefon }}<br/>{{ tour.klient.mobil }}</para></td>
+                        <td><para style="p1">{{ tour.klient.telefon|default_if_none:"-" }}<br/>{{ tour.klient.mobil|default_if_none:"" }}</para></td>
                         <td><para style="p1">{{ tour.uhrzeit }}</para></td>
                         {% if tour.zustieg %}
                             <td><para style="p1">✔</para></td>
@@ -92,11 +125,11 @@
                         {% endif %}
                         <td><para style="p1">{{ tour.personenzahl }}</para></td>
                         <td><para style="p1">{% if tour.klient != tour.abholklient %}
-                                {{ tour.abholklient.name }}
+                                {{ tour.abholklient.name }}<br/>
                             {% endif %}
                             {{ tour.abholklient.ort }}<br/>{{ tour.abholklient.strasse }} {{ tour.abholklient.hausnr }}</para></td>
                         <td><para style="p1">{% if tour.klient != tour.zielklient %}
-                                {{ tour.zielklient.name }}
+                                {{ tour.zielklient.name }}<br/>
                             {% endif %}
                             {{ tour.zielklient.ort }}<br/>{{ tour.zielklient.strasse }} {{ tour.zielklient.hausnr }}</para></td>
                         <td><para style="p1">{{ tour.entfernung|default_if_none:"-" }}</para></td>

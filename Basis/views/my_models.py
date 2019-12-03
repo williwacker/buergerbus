@@ -1,7 +1,7 @@
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.views.generic import ListView, DetailView, View, CreateView, UpdateView, DeleteView
-from .multiform import MultiFormsView
+from Basis.multiform import MultiFormsView
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.contrib.auth.models import User
@@ -9,8 +9,8 @@ from django.conf import settings
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied
 from django import forms
-from .utils import get_sidebar, get_relation_dict, url_args
-from .forms import FeedbackForm
+from Basis.utils import get_sidebar, get_relation_dict, url_args
+from Basis.forms import FeedbackForm
 from django.core.mail import EmailMessage
 
 def my_custom_bad_request_view(request, exception):  #400
@@ -36,11 +36,22 @@ class MyListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
 		request.session.pop('clientsearch_choice','')
 		return super(MyListView, self).dispatch(request, *args, **kwargs)
 
-class MyDetailView(LoginRequiredMixin, PermissionRequiredMixin, DetailView):
+class MyDetailView(SuccessMessageMixin, LoginRequiredMixin, PermissionRequiredMixin, DetailView):
 	login_url = settings.LOGIN_URL
 	initial = {'key': 'value'}
 	template_name = 'Basis/detail.html'
 
+class MyCreateView(SuccessMessageMixin, LoginRequiredMixin, PermissionRequiredMixin, CreateView):
+	login_url = settings.LOGIN_URL
+	initial = {'key': 'value'}
+	template_name = 'Basis/detail.html'	
+
+	def form_invalid(self, form):
+		context = self.get_context_data(self.request)
+		context['form'] = form
+		messages.error(self.request, form.errors)			
+		return render(self.request, self.template_name, context)
+	
 class MyMultiFormsView(LoginRequiredMixin, PermissionRequiredMixin, MultiFormsView):
 	login_url = settings.LOGIN_URL
 	initial = {'key': 'value'}
@@ -53,14 +64,13 @@ class MyView(LoginRequiredMixin, PermissionRequiredMixin, View):
 class MyUpdateView(SuccessMessageMixin, LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
 	login_url = settings.LOGIN_URL
 	template_name = 'Basis/detail.html'
-
+	
 	def form_invalid(self, form):
 		context = self.get_context_data(self.request)
-		form = self.form_class(self.request.POST)
 		context['form'] = form
 		messages.error(self.request, form.errors)			
 		return render(self.request, self.template_name, context)
-
+	
 class MyDeleteView(SuccessMessageMixin, LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
 	login_url = settings.LOGIN_URL
 	template_name = 'Basis/confirm_delete.html'
@@ -72,7 +82,12 @@ class MyDeleteView(SuccessMessageMixin, LoginRequiredMixin, PermissionRequiredMi
 		context['title'] = self.model._meta.verbose_name_raw+" löschen"
 		context['submit_button'] = "Ja, ich bin sicher"
 		context['back_button'] = "Nein, bitte abbrechen"
-		return context		
+		return context
+
+	def post(self, request, *args, **kwargs):
+		instance = self.model.objects.get(pk=kwargs['pk'])
+		messages.success(request, self.model._meta.verbose_name.title()+' "'+str(instance)+'" wurde gelöscht.')
+		return self.delete(request, *args, **kwargs)
 
 class BasisView(LoginRequiredMixin, ListView):
 	login_url = settings.LOGIN_URL

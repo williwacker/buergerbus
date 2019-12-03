@@ -77,6 +77,8 @@ class Klienten(models.Model):
 	typ     = models.CharField(choices=TYP_AUSWAHL, max_length=1, default='F') # F=Fahrgast, D=Dienstleister
 	bemerkung = models.TextField(max_length=200, blank=True, null=True)
 	kategorie = models.CharField(choices=DIENSTLEISTER_AUSWAHL,max_length=100, blank=True, null=True)
+	latitude = models.DecimalField(max_digits=7, decimal_places=4, default=0)
+	longitude = models.DecimalField(max_digits=7, decimal_places=4, default=0)
 	updated_on = models.DateTimeField(auto_now=True, blank=True, null=True)
 	updated_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL)
 	

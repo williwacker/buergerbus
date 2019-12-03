@@ -42,7 +42,7 @@ class FahrtageSchreiben():
 			existierende_tage = [row for row in rows]
 
 			# die Fahrtage für die nächsten n Tage ausrechnen
-			max_days = settings.COUNT_DRIVING_DAYS
+			max_days = max(settings.COUNT_DRIVING_DAYS, b.plantage, settings.COUNT_TOUR_DAYS)
 			for i in range(1,max_days):
 				neuer_tag = datetime.date.today() + datetime.timedelta(days=i)
 				if neuer_tag not in existierende_tage:  # Tag ist nicht bereits definiert

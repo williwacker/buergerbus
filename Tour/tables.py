@@ -17,6 +17,15 @@ class TourTable(tables.Table):
             {% endif %}
         '''
     )
+    uhrzeit = tables.TemplateColumn(
+        template_code='''
+            {% if record.has_conflict %}
+                <span class="conflict">{{ record.uhrzeit }} {{ record.konflikt_richtung }}</span>
+            {% else %}
+                {{ record.uhrzeit }}
+            {% endif %}
+        '''
+    )
     bemerkung = tables.TemplateColumn(
         template_code ='''{{ record.klient.bemerkung  |safe|default_if_none:""  }}<br/>{{ record.bemerkung|default_if_none:""  }} ''',
         orderable=False
