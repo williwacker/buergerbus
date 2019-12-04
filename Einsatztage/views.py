@@ -66,7 +66,8 @@ class FahrplanAsPDF(MyView):
 					f.write(response.content)
 				f.close()
 				subprocess.Popen([filepath],shell=True)
-				messages.success(request, 'Dokument <b>'+filename+'</b> wurde erstellt.')
+				response['Content-Disposition'] = 'attachment; filename=' + filename
+				messages.success(request, 'Dokument <b>'+filename+'</b> wurde erstellt und befindet sich im Download Ordner (Strg+J).')
 			except:
 				messages.error(request, 'Dokument <b>'+filename+'</b> ist noch geöffnet.')
 			return HttpResponseRedirect(self.success_url+url_args(request))

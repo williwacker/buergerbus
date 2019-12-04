@@ -179,7 +179,8 @@ class DSGVOasPDFView(MyView):
 					f.write(response.content)
 				f.close()
 				subprocess.Popen([filepath],shell=True)
-				messages.success(request, 'Dokument <b>'+filename+'</b> wurde erstellt.')
+				messages.success(request, 'Dokument <b>'+filename+'</b> wurde erstellt und befindet sich im Download Ordner (Strg+J).')
+				response['Content-Disposition'] = 'attachment; filename=' + filename
 			except:
 				messages.error(request, 'Dokument <b>'+filename+'</b> ist noch geöffnet.')
 			return HttpResponseRedirect(self.success_url+url_args(request))
