@@ -36,7 +36,7 @@ INSTALLED_APPS = [
     'Einsatzmittel.apps.EinsatzmittelConfig',
     'Einsatztage.apps.EinsatztageConfig',
     'Klienten.apps.KlientenConfig',
-    'Team.apps.TeamConfig',    
+    'Team.apps.TeamConfig',
     'Tour.apps.TourConfig',
     'jet.dashboard',
     'jet',
@@ -50,6 +50,11 @@ INSTALLED_APPS = [
     'multiselectfield',
     'django_tables2',
     'django_cron',
+    'qr_code',
+#    'crispy_forms',
+#    'test_app',
+#    'bootstrap_modal_forms',
+#    'bootstrap',
 ]
 
 MIDDLEWARE = [
