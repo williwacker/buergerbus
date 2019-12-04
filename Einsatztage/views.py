@@ -66,9 +66,9 @@ class FahrplanAsPDF(MyView):
 					f.write(response.content)
 				f.close()
 				subprocess.Popen([filepath],shell=True)
-				messages.success(request, 'Dokument <b>'+filepath+'</b> wurde erstellt.')
+				messages.success(request, 'Dokument <b>'+filename+'</b> wurde erstellt.')
 			except:
-				messages.error(request, 'Dokument <b>'+filepath+'</b> ist noch geöffnet.')
+				messages.error(request, 'Dokument <b>'+filename+'</b> ist noch geöffnet.')
 			return HttpResponseRedirect(self.success_url+url_args(request))
 		return HttpResponse("Kein Dokument vorhanden")
 

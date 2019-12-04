@@ -23,7 +23,7 @@ class FahrgaesteTable(tables.Table):
         {% load static %}
         {% if record.dsgvo == '01' %}
             <a href="{{ record.id }}/dsgvo/"><img src="{% static "project/img/dsgvo.png" %}" alt="DSGVO anzeigen" title="DSGVO anzeigen"></a>
-            <!--a href="{{ record.id }}/dsgvoAsPDF/"><img src="{% static "project/img/icon_pdf.png" %}" alt="PDF erzeugen" title="PDF erzeugen"></a-->
+            <a href="{{ record.id }}/dsgvoAsPDF/"><img src="{% static "project/img/icon_pdf.png" %}" alt="PDF erzeugen" title="PDF erzeugen"></a>
         {% else %}
             {% if record.dsgvo == '02' %}
                 <img src="{% static "project/img/pencil.png" %}" alt="DSGVO zur Unterschrift" title="DSGVO zur Unterschrift">

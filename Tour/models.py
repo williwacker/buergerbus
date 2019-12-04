@@ -54,6 +54,22 @@ class Tour(models.Model):
 	def has_conflict(self):
 		return self.konflikt != ''
 
+	@property
+	def hat_abhol_qr(self):
+		if self.abholklient.latitude == 0:
+			return False
+		if self.abholklient.longitude == 0:
+			return False
+		return True	
+
+	@property
+	def hat_ziel_qr(self):
+		if self.zielklient.latitude == 0:
+			return False
+		if self.zielklient.longitude == 0:
+			return False
+		return True						
+
 	def einsatz_bus(self):
 		rows = Fahrtag.objects.filter(datum=self.datum.datum).values_list('team',flat=True)
 		einsatz_bus = [row for row in rows]

@@ -13,6 +13,7 @@ from Klienten.filters import FahrgaesteFilter
 from Klienten.utils import GeoLocation
 from Einsatzmittel.models import Bus
 from Einsatzmittel.utils import get_bus_list
+from Einsatztage.views import FahrplanAsPDF
 from Basis.utils import get_sidebar, render_to_pdf, url_args
 from Basis.views import MyListView, MyDetailView, MyView, MyUpdateView, MyDeleteView, MyCreateView
 
@@ -178,8 +179,8 @@ class DSGVOasPDFView(MyView):
 					f.write(response.content)
 				f.close()
 				subprocess.Popen([filepath],shell=True)
-				messages.success(request, 'Dokument <b>'+filepath+'</b> wurde erstellt.')
+				messages.success(request, 'Dokument <b>'+filename+'</b> wurde erstellt.')
 			except:
-				messages.error(request, 'Dokument <b>'+filepath+'</b> ist noch geöffnet.')
+				messages.error(request, 'Dokument <b>'+filename+'</b> ist noch geöffnet.')
 			return HttpResponseRedirect(self.success_url+url_args(request))
 		return HttpResponse("Kein Dokument vorhanden")		

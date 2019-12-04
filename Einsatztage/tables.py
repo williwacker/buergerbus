@@ -19,7 +19,7 @@ class FahrtagTable(tables.Table):
             {% if record.gaeste_vormittag > 0 or record.gaeste_nachmittag > 0 %}
                 {% load static %}
                 <a href="/Einsatztage/fahrer/{{ record.id }}/fahrplan/{{ url_args }}"><img src="{% static "project/img/fahrplan.png" %}" alt="Fahrplan anzeigen" title="Fahrplan anzeigen"></a>
-                <!--a href="/Einsatztage/fahrer/{{ record.id }}/fahrplanAsPDF/"><img src="{% static "project/img/icon_pdf.png" %}" alt="Fahrplan als PDF erzeugen" title="Fahrplan als PDF erzeugen"></a-->
+                <a href="/Einsatztage/fahrer/{{ record.id }}/fahrplanAsPDF/"><img src="{% static "project/img/icon_pdf.png" %}" alt="Fahrplan als PDF erzeugen" title="Fahrplan als PDF erzeugen"></a>
                 {% if record.hat_fahrer %}
                     <a href="/Einsatztage/fahrer/{{ record.id }}/fahrplanAsEmail/{{ url_args }}"><img src="{% static "project/img/send.png" %}" alt="Fahrplan als Email verschicken" title="Fahrplan als Email verschicken"></a>
                 {% endif %}
@@ -91,7 +91,8 @@ class TourTable(tables.Table):
         template_code='''{{ record.klient.bemerkung |default_if_none:'' }}<br>{{ record.bemerkung |default_if_none:'' }}'''
     )
     telefon = tables.TemplateColumn(
-        template_code='''{{ record.klient.telefon |default_if_none:"-" }}<br/>{{ record.klient.mobil |default_if_none:"" }}'''
+        template_code='''{{ record.klient.telefon |default_if_none:"-" }}<br/>{{ record.klient.mobil |default_if_none:"" }}
+        '''
     )
     class Meta:
         model = Tour

@@ -30,9 +30,6 @@ class MyModelForm(ModelForm):
 				raise forms.ValidationError("Maximale Anzahl Fahrgäste überschritten. Bitte Extrafahrt planen")
 
 		# Kann der Bus zum gewünschten Zeitpunkt am Anholort sein ?
-#		if self.cleaned_data['zustieg']:
-#			frueheste_abfahrt = JoinTime().time(self.cleaned_data)
-#		else:
 		frueheste_abfahrt = DepartureTime().time(self.cleaned_data)
 		if frueheste_abfahrt == time(0,0,0):
 			self.cleaned_data['zustieg'] = False

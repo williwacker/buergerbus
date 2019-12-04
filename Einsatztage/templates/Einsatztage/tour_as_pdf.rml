@@ -7,9 +7,13 @@
                 <pageTemplate id="main">
                     <pageGraphics>
                         <setFont size="10" name="Helvetica"/>
+                        <drawString x="1.5cm" y="20cm">VG Alzey-Land Bürgerbus Portal</drawString>
+                        <drawRightString x="28.15cm" y="20cm">{% now "j. F Y H:i" %}</drawRightString>
                         <drawCenteredString x="14.85cm" y="1cm">Seite <pageNumber/></drawCenteredString>
+                        <setFont size="16" name="Helvetica"/>
+                        <drawCenteredString x="14.85cm" y="19.5cm">Fahrplan {{ fahrtag_liste.team.bus }} am {{ fahrtag_liste.datum }}</drawCenteredString>
                     </pageGraphics>
-                    <frame id="first" x1="0" y1="-0.5cm" width="29.7cm" height="21cm"/>
+                    <frame id="first" x1="0cm" y1="1.3cm" width="29.7cm" height="18cm"/>
                 </pageTemplate>
             </template>
             <stylesheet>
@@ -39,6 +43,14 @@
                     <blockLeftPadding length="5"/>
                     <blockRightPadding length="5"/>
                     <blockValign  value="TOP"/>
+                </blockTableStyle>
+                <blockTableStyle id="myInnerTableStyle">
+                    <blockAlignment value="LEFT"/>
+                    <blockValign  value="TOP"/>
+                    <blockBottomPadding length="0"/>
+                    <blockTopPadding length="0"/>
+                    <blockLeftPadding length="0"/>
+                    <blockRightPadding length="0"/>
                 </blockTableStyle>
                 <paraStyle name="p1"
                     fontName="Helvetica"
@@ -74,16 +86,6 @@
                 />                
             </stylesheet>
             <story>
-                <blockTable 
-                            colWidths="20cm, 7.0cm"
-                            style="header"
-                            frame="first">
-                    <tr>
-                        <td><para style="pl">VG Alzey-Land Bürgerbus Portal</para></td>
-                        <td><para style="pr">{% now "j. F Y H:i" %}</para></td>
-                    </tr>
-                </blockTable>
-                <para style="p4">Fahrplan {{ fahrtag_liste.team.bus }} am {{ fahrtag_liste.datum }}</para>
             {%if fahrtag_liste %}
                 <blockTable 
                             colWidths="4cm,23cm"
@@ -98,7 +100,7 @@
                 </blockTable>
                 <para style="pc"></para>
                 <blockTable 
-                            colWidths="4cm,2.5cm,1.4cm,1.5cm,1.5cm,4.5cm,4.5cm,1.75cm,1.4cm,4cm"
+                            colWidths="4cm,2.5cm,1.3cm,1.3cm,1.3cm,4.8cm,4.8cm,1.75cm,1.4cm,3.9cm"
                             style="myBlockTableStyle2"
                             frame="second">
                     <tr>
@@ -124,14 +126,55 @@
                             <td><para style="p1">✘</para></td>
                         {% endif %}
                         <td><para style="p1">{{ tour.personenzahl }}</para></td>
-                        <td><para style="p1">{% if tour.klient != tour.abholklient %}
-                                {{ tour.abholklient.name }}<br/>
+                        <td>
+                            {% if tour.hat_abhol_qr %}
+                            <blockTable style="myInnerTableStyle" colWidths="3.1cm,1.3cm">
+                            <tr>
+                                <td><para style="p1">
+                                    {% if tour.klient != tour.abholklient %}
+                                        {{ tour.abholklient.name }}<br/>
+                                    {% endif %}
+                                    {{ tour.abholklient.ort }}<br/>{{ tour.abholklient.strasse }} {{ tour.abholklient.hausnr }}
+                                </para></td>
+                                <td>
+                                    {% load qr_code %}
+                                    <image x="0" y="0" width="40" height="40" file="{% qr_for_google_maps latitude=tour.abholklient.latitude longitude=tour.abholklient.longitude image_format="png" %}"></image>
+                                </td>
+                            </tr>
+                            </blockTable>
+                            {% else %}
+                                <para style="p1">
+                                    {% if tour.klient != tour.abholklient %}
+                                        {{ tour.abholklient.name }}<br/>
+                                    {% endif %}
+                                    {{ tour.abholklient.ort }}<br/>{{ tour.abholklient.strasse }} {{ tour.abholklient.hausnr }}
+                                </para>
                             {% endif %}
-                            {{ tour.abholklient.ort }}<br/>{{ tour.abholklient.strasse }} {{ tour.abholklient.hausnr }}</para></td>
-                        <td><para style="p1">{% if tour.klient != tour.zielklient %}
-                                {{ tour.zielklient.name }}<br/>
+                        </td>
+                        <td>
+                            {% if tour.hat_ziel_qr %}
+                            <blockTable style="myInnerTableStyle" colWidths="3.1cm,1.3cm">
+                            <tr>
+                                <td><para style="p1">
+                                    {% if tour.klient != tour.zielklient %}
+                                        {{ tour.zielklient.name }}<br/>
+                                    {% endif %}
+                                    {{ tour.zielklient.ort }}<br/>{{ tour.zielklient.strasse }} {{ tour.zielklient.hausnr }}
+                                </para></td>
+                                <td>
+                                    <image x="0" y="0" width="40" height="40" file="{% qr_for_google_maps latitude=tour.zielklient.latitude longitude=tour.zielklient.longitude image_format="png" %}"></image>
+                                </td>
+                            </tr>
+                            </blockTable>
+                            {% else %}
+                                <para style="p1">
+                                    {% if tour.klient != tour.zielklient %}
+                                        {{ tour.zielklient.name }}<br/>
+                                    {% endif %}
+                                    {{ tour.zielklient.ort }}<br/>{{ tour.zielklient.strasse }} {{ tour.zielklient.hausnr }}
+                                </para>
                             {% endif %}
-                            {{ tour.zielklient.ort }}<br/>{{ tour.zielklient.strasse }} {{ tour.zielklient.hausnr }}</para></td>
+                        </td>
                         <td><para style="p1">{{ tour.entfernung|default_if_none:"-" }}</para></td>
                         <td><para style="p1">{{ tour.ankunft|default_if_none:"-" }}</para></td>
                         <td><para style="p1">{{ tour.klient.bemerkung|default_if_none:"" }}<br/>{{ tour.bemerkung|default_if_none:"" }}</para></td>  
