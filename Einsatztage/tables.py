@@ -14,22 +14,22 @@ class FahrtagTable(tables.Table):
             {% endif %}
         '''
     )
-    tour = tables.TemplateColumn(
+    fahrplan = tables.TemplateColumn(
         template_code='''
             {% if record.gaeste_vormittag > 0 or record.gaeste_nachmittag > 0 %}
                 {% load static %}
                 <a href="/Einsatztage/fahrer/{{ record.id }}/fahrplan/{{ url_args }}"><img src="{% static "project/img/fahrplan.png" %}" alt="Fahrplan anzeigen" title="Fahrplan anzeigen"></a>
-                <a href="/Einsatztage/fahrer/{{ record.id }}/fahrplanAsPDF/"><img src="{% static "project/img/icon_pdf.png" %}" alt="Fahrplan als PDF erzeugen" title="Fahrplan als PDF erzeugen"></a>
+                <a href="/Einsatztage/fahrer/{{ record.id }}/fahrplanAsPDF/"><img src="{% static "project/img/icon_pdf.png" %}" alt="Fahrplan als PDF anzeigen/herunterladen" title="Fahrplan als PDF anzeigen/herunterladen"></a>
                 {% if record.hat_fahrer %}
-                    <a href="/Einsatztage/fahrer/{{ record.id }}/fahrplanAsEmail/{{ url_args }}"><img src="{% static "project/img/send.png" %}" alt="Fahrplan als Email verschicken" title="Fahrplan als Email verschicken"></a>
+                    <a href="/Einsatztage/fahrer/{{ record.id }}/fahrplanAsEmail/{{ url_args }}"><img src="{% static "project/img/send.png" %}" alt="Fahrplan verschicken" title="Fahrplan verschicken"></a>
                 {% endif %}
             {% else %}
                 &nbsp;
             {% endif %}
         ''',orderable=False
     )
-    gaeste_vormittag = tables.Column(orderable=False)
-    gaeste_nachmittag = tables.Column(orderable=False)
+    gaeste_vormittag = tables.Column(orderable=False, verbose_name='Gäste Vormittag')
+    gaeste_nachmittag = tables.Column(orderable=False, verbose_name='Gäste Nachmittag')
     fahrer_vormittag = tables.TemplateColumn(
         template_code='''
             {% if record.gaeste_vormittag > 0 and record.fahrer_vormittag == None %}
@@ -55,7 +55,7 @@ class FahrtagTable(tables.Table):
     wochentag = tables.Column(orderable=False)
     class Meta:
         model = Fahrtag
-        fields = ('datum','wochentag','team','fahrer_vormittag','gaeste_vormittag','fahrer_nachmittag','gaeste_nachmittag','tour')
+        fields = ('datum','wochentag','team','fahrer_vormittag','gaeste_vormittag','fahrer_nachmittag','gaeste_nachmittag','fahrplan')
 
 class BuerotagTable(tables.Table):
     datum = tables.TemplateColumn(

@@ -23,7 +23,7 @@ class FahrgaesteTable(tables.Table):
         {% load static %}
         {% if record.dsgvo == '01' %}
             <a href="{{ record.id }}/dsgvo/"><img src="{% static "project/img/dsgvo.png" %}" alt="DSGVO anzeigen" title="DSGVO anzeigen"></a>
-            <a href="{{ record.id }}/dsgvoAsPDF/"><img src="{% static "project/img/icon_pdf.png" %}" alt="PDF erzeugen" title="PDF erzeugen"></a>
+            <a href="{{ record.id }}/dsgvoAsPDF/"><img src="{% static "project/img/icon_pdf.png" %}" alt="DSGVO als PDF anzeigen/herunterladen" title="DSGVO als PDF anzeigen/herunterladen"></a>
         {% else %}
             {% if record.dsgvo == '02' %}
                 <img src="{% static "project/img/pencil.png" %}" alt="DSGVO zur Unterschrift" title="DSGVO zur Unterschrift">
@@ -63,10 +63,15 @@ class DienstleisterTable(tables.Table):
     )
     telefon = tables.TemplateColumn(
         template_code='''{{ record.telefon |default_if_none:"-" }}<br/>{{ record.mobil |default_if_none:"" }}'''
-    )   
+    )
+    anzahl_touren = tables.TemplateColumn(
+        template_code='''{{ record.anzahl_touren }}''',
+        orderable=False
+    )
+
     class Meta:
         model = Klienten
-        fields = ('name','telefon','adresse','bemerkung','kategorie')
+        fields = ('name','telefon','adresse','bemerkung','kategorie','anzahl_touren')
 
         
 class OrteTable(tables.Table):

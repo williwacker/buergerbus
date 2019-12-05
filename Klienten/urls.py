@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, re_path
 from .views import FahrgastView, DienstleisterView, DSGVOView, DSGVOasPDFView, FahrgastAddView, FahrgastChangeView, FahrgastDeleteView
 from .views import DienstleisterView, DienstleisterAddView, DienstleisterChangeView, DienstleisterDeleteView
 from .views import DienstleisterSearchMultiformsView
@@ -19,7 +19,7 @@ urlpatterns = [
 	path('fahrgaeste/<int:pk>/dsgvo/', DSGVOView.as_view()),
 	path('fahrgaeste/<int:id>/dsgvoAsPDF/', DSGVOasPDFView.as_view()),
 	path('orte/', OrtView.as_view()),
-	path('orte/add/', OrtAddView.as_view()),
+	path('orte/add/', OrtAddView.as_view(), name='add_ort'),
 	path('orte/<int:pk>/', OrtChangeView.as_view()),
 	path('orte/<int:pk>/delete/', OrtDeleteView.as_view()),
 	path('strassen/', StrassenView.as_view()),

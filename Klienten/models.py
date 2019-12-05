@@ -107,6 +107,11 @@ class Klienten(models.Model):
 	def name_ort(self):
 		return " ".join([self.name, self.ort.ort])
 
+	@property
+	def anzahl_touren(self):
+		from Tour.models import Tour
+		return Tour.objects.filter(zielklient_id=self.id).count()+Tour.objects.filter(abholklient_id=self.id).count()
+
 	class Meta():
 		verbose_name_plural = "Klienten"
 		verbose_name = "Klient"
