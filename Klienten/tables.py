@@ -56,7 +56,7 @@ class FahrgaesteTable(tables.Table):
 
     class Meta:
         model = Klienten
-        fields = ('name','telefon','adresse','bus','bemerkung','tour','dsgvo')
+        fields = ('name','telefon','adresse','bus','bemerkung','tour','dsgvo','anzahl_fahrgast_touren')
 
 class DienstleisterTable(tables.Table):
     name = tables.TemplateColumn(
@@ -89,7 +89,7 @@ class DienstleisterTable(tables.Table):
 
     class Meta:
         model = Klienten
-        fields = ('name','telefon','adresse','bemerkung','kategorie','anzahl_touren')
+        fields = ('name','telefon','adresse','bemerkung','kategorie','anzahl_dienstleister_touren')
 
         
 class OrteTable(tables.Table):
