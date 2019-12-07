@@ -23,11 +23,12 @@ class GoogleMixin():
 	def get_google(self, form):
 		googleDict = {}
 		if settings.USE_GOOGLE:
-			googleDict = DistanceMatrix().getMatrix(
-				form.cleaned_data['abholklient'], 
-				form.cleaned_data['zielklient'], 
-				form.cleaned_data['datum'].datum, 
-				form.cleaned_data['uhrzeit'])
+			if form.cleaned_data['entfernung'] == '' or set(['abholklient','zielklient','datum','uhrzeit']).intersection(set(form.changed_data)):
+				googleDict = DistanceMatrix().getMatrix(
+					form.cleaned_data['abholklient'], 
+					form.cleaned_data['zielklient'], 
+					form.cleaned_data['datum'].datum, 
+					form.cleaned_data['uhrzeit'])
 		return googleDict
 
 class TourView(MyListView):

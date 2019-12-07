@@ -5,6 +5,7 @@ from django.utils import timezone
 from django.conf import settings
 from smart_selects.db_fields import ChainedForeignKey
 from Einsatzmittel.models import Bus
+from Tour.models import Tour
 
 DSGVO_AUSWAHL = [
 	(None, 'Bitte Status auswählen'),
@@ -107,10 +108,15 @@ class Klienten(models.Model):
 	def name_ort(self):
 		return " ".join([self.name, self.ort.ort])
 
+	# Wie oft wurde der Dienstleister angefahren, oder von dort abgeholt ?
 	@property
-	def anzahl_touren(self):
-		from Tour.models import Tour
+	def anzahl_dienstleister_touren(self):
 		return Tour.objects.filter(zielklient_id=self.id).count()+Tour.objects.filter(abholklient_id=self.id).count()
+
+	# Wie oft hat der Fahrgast gebucht ?
+	@property
+	def anzahl_fahrgast_touren(self):
+		return Tour.objects.filter(klient_id=self.id).count()
 
 	class Meta():
 		verbose_name_plural = "Klienten"

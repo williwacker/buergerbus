@@ -195,8 +195,11 @@ TRANSFER_TIME = 3
 # DSGVO mit dem Fahrplan versenden
 SEND_DSGVO = True
 
+PORTAL = 'Bürgerbus Portal'
+WELCOME = 'Willkommen auf dem Bürgerbus Portal'
+
 # import settings.json
 import json
 base_dir = os.path.dirname(__file__)
-overrides = json.loads(open(os.path.join(base_dir,'settings.json')).read())
+overrides = json.loads(open(os.path.join(base_dir,'settings.json'), encoding='UTF-8').read())
 globals().update(overrides)

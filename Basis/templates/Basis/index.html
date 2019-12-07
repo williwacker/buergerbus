@@ -1,5 +1,6 @@
 {% extends 'Basis/header.html' %}
 {% load static %}
+{% load my_tags %}
 {% block content %}
 <div id="content-main">
     <div id="changelist" class="module filtered">
@@ -28,7 +29,7 @@
                     </div>                
                 </div>
                 <div class="image">
-                    <p style="text-align: center; padding-left: 250px;"><bold>Willkommen auf dem Bürgerbus Portal der VG Alzey-Land</bold></p>
+                    <p style="text-align: center; padding-left: 250px;"><bold>{% settings_value "WELCOME" %}</bold></p>
                     <p style="text-align: center; padding-top: 50px; padding-left: 250px;"><img src="{% static "project/img/Buergerbus-Projektgruppen.jpg" %}"></p>
                 </div>
             </div>

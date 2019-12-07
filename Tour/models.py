@@ -5,7 +5,6 @@ from django.conf import settings
 from datetime import datetime, date, timedelta
 
 from Einsatzmittel.models import Bus
-from Klienten.models import Klienten, Orte
 from Einsatztage.models import Fahrtag
 
 class Tour(models.Model):

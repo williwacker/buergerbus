@@ -42,6 +42,17 @@ class FahrgaesteTable(tables.Table):
         ''',
         orderable=False
     )
+    anzahl_fahrgast_touren = tables.TemplateColumn(
+        template_code='''{{ record.anzahl_fahrgast_touren }}''',
+        orderable=False,
+        verbose_name='Anzahl Touren'
+    )
+
+    def before_render(self, request):
+        if request.user.is_superuser:
+            self.columns.show('anzahl_fahrgast_touren')
+        else:
+            self.columns.hide('anzahl_fahrgast_touren')
 
     class Meta:
         model = Klienten
@@ -64,10 +75,17 @@ class DienstleisterTable(tables.Table):
     telefon = tables.TemplateColumn(
         template_code='''{{ record.telefon |default_if_none:"-" }}<br/>{{ record.mobil |default_if_none:"" }}'''
     )
-    anzahl_touren = tables.TemplateColumn(
-        template_code='''{{ record.anzahl_touren }}''',
-        orderable=False
+    anzahl_dienstleister_touren = tables.TemplateColumn(
+        template_code='''{{ record.anzahl_dienstleister_touren }}''',
+        orderable=False,
+        verbose_name='Anzahl Touren'
     )
+
+    def before_render(self, request):
+        if request.user.is_superuser:
+            self.columns.show('anzahl_dienstleister_touren')
+        else:
+            self.columns.hide('anzahl_dienstleister_touren')
 
     class Meta:
         model = Klienten
