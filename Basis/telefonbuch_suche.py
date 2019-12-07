@@ -34,7 +34,6 @@ class Telefonbuch():
 			handlerData = eval(re.search('handlerData\s*=\s*(.*?);', line).group(1))
 			# item list matching to address list 
 			itemList    = re.search('var item = {(.*?)};', line).group(1).split(',')
-			result = []
 			for m in range(len(handlerData)):
 				data_dict = self._init_dict()
 				for singleItem in itemList:
@@ -56,10 +55,10 @@ class Telefonbuch():
 		return result
 
 	def dasoertliche_gewerbe(self, line, data_dict):
-		handlerData = re.search('recuid='+data_dict['recuid']+'.*?<address>(.*?)\s+([0-9]+.*?),.*?([0-9]+).*?<.*?>(.*?)</span>', line).group(1,2,3,4)
+		handlerData = re.search('recuid='+data_dict['recuid']+'.*?<address>(.*?)\s+([0-9]+.*?),.*?([\s0-9]+).*?<span.*?>(.*?)</span>', line).group(1,2,3,4)
 		data_dict['st'] = handlerData[0]
 		data_dict['hn'] = handlerData[1]
-		data_dict['pc'] = handlerData[2]
+		data_dict['pc'] = handlerData[2].strip()
 		data_dict['ci'] = handlerData[3]
 		return
 
