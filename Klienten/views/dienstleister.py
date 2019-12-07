@@ -8,7 +8,7 @@ from django.contrib import messages
 from jet.filters import RelatedFieldAjaxListFilter
 from django import forms
 from Klienten.forms import DienstleisterAddForm, DienstleisterChgForm, KlientenSearchForm, KlientenSearchResultForm
-from Klienten.models import Klienten, DIENSTLEISTER_AUSWAHL
+from Klienten.models import Klienten, Orte, Strassen, DIENSTLEISTER_AUSWAHL
 from Klienten.tables import DienstleisterTable
 from Klienten.filters import DienstleisterFilter
 from Klienten.utils import GeoLocation
@@ -78,10 +78,7 @@ class DienstleisterAddView(MyDetailView):
 		if form.is_valid():
 			instance = form.save(commit=False)
 			if instance.latitude == 0 or set(['ort','strasse','hausnr']).intersection(set(form.changed_data)):
-				location = GeoLocation().getLocation(instance)
-				if location:
-					instance.latitude  = location['lat']
-					instance.longitude = location['lng']
+				GeoLocation().getLocation(instance)
 			instance.updated_by = self.request.user
 			instance.save()	
 			messages.success(request, 'Dienstleister "<a href="'+self.success_url+str(instance.id)+'/'+url_args(request)+'">'+instance.name+'</a>" wurde erfolgreich hinzugefügt.')
@@ -120,10 +117,7 @@ class DienstleisterChangeView(MyUpdateView):
 		instance = form.save(commit=False)
 		instance.updated_by = self.request.user
 		if instance.latitude == 0 or set(['ort','strasse','hausnr']).intersection(set(form.changed_data)):
-			location = GeoLocation().getLocation(instance)
-			if location:
-				instance.latitude  = location['lat']
-				instance.longitude = location['lng']		
+			GeoLocation().getLocation(instance)
 		instance.save(force_update=True)
 		self.success_message = 'Dienstleister "<a href="'+self.success_url+str(instance.id)+'">'+instance.name+'</a>" wurde erfolgreich geändert.'
 		self.success_url += url_args(self.request)
@@ -203,7 +197,6 @@ class DienstleisterSearchMultiformsView(MyMultiFormsView):
 
 	def anlegen_form_valid(self, form):
 		if form.cleaned_data['suchergebnis'] == '0':
-			del_message(self.request)
 			messages.success(self.request, 'Bitte den Dienstleister manuell eingeben')
 			return HttpResponseRedirect(self.manual_url+url_args(self.request))
 		choice  = int(form.cleaned_data['suchergebnis'])

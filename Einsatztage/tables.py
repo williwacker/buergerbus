@@ -67,7 +67,6 @@ class BuerotagTable(tables.Table):
             {% endif %}            
         '''
     )
-
     koordinator = tables.TemplateColumn(
         template_code='''
             {% if record.urlaub %}
@@ -77,10 +76,11 @@ class BuerotagTable(tables.Table):
             {% endif %}
         '''
     )
+    wochentag = tables.Column(orderable=False)
 
     class Meta:
         model = Buerotag
-        fields = ('datum','team','koordinator')
+        fields = ('datum','wochentag','team','koordinator')
 
 
 class TourTable(tables.Table):

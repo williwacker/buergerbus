@@ -63,7 +63,7 @@ class Klienten(models.Model):
 	mobil   = models.CharField(max_length=30, null=True, blank=True, help_text="0150-1111")
 	ort     = models.ForeignKey(Orte, null=True, on_delete=models.CASCADE, verbose_name="Wohnort")
 	bus     = models.ForeignKey('Einsatzmittel.Bus', null=True, blank=True, on_delete=models.CASCADE, 
-				help_text="Bus lässt sich nur ändern falls dem Wohnort kein Bus zugeordnet ist")
+				help_text="Dem Wohnort ist kein Bus zugeordnet. Deshalb für den Fahrgast einen Bus auswählen!")
 	strasse = ChainedForeignKey(
         Strassen, # the model where you're populating your streets from
         chained_field="ort", # the field on your own model that this field links to 

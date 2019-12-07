@@ -18,6 +18,7 @@ import django
 django.setup()
 
 from Klienten.models import Klienten, Orte, Strassen
+from Klienten.utils import GeoLocation
 
 class AddKlienten():
 
@@ -54,8 +55,10 @@ class AddKlienten():
 				print('{} hat keinen bekannten Strassennamen: {}'.format(name,strasse))
 				exit()
 			print(s)
-			k = Klienten(name=name, ort=o, strasse=s, hausnr=hausnr, kategorie=values['Kategorie'], bemerkung=values['Sparte'], dsgvo='99', typ="D", telefon='-'.join([values['Vorwahl'],values['Tel.Nr.']]))
-			k.save()
-			
+
+			instance = Klienten(name=name, ort=o, strasse=s, hausnr=hausnr, kategorie=values['Kategorie'], bemerkung=values['Sparte'], dsgvo='99', typ="D", telefon='-'.join([values['Vorwahl'],values['Tel.Nr.']]))
+			GeoLocation().getLocation(instance)
+			instance.save()
+
 AddKlienten('Friseur.csv')
 AddKlienten('Apotheke.csv')

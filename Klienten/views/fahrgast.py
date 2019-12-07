@@ -85,10 +85,7 @@ class FahrgastAddView(MyCreateView):
 		if instance.ort.bus != None:
 			instance.bus=instance.ort.bus
 		if instance.latitude == 0 or set(['ort','strasse','hausnr']).intersection(set(form.changed_data)):
-			location = GeoLocation().getLocation(instance)
-			if location:
-				instance.latitude  = location['lat']
-				instance.longitude = location['lng']
+			GeoLocation().getLocation(instance)
 		instance.updated_by = self.request.user
 		instance.save()
 		self.success_message = 'Fahrgast "<a href="'+self.success_url+str(instance.id)+'/'+url_args(self.request)+'">'+instance.name+'</a>" wurde erfolgreich hinzugefügt.'
@@ -121,6 +118,8 @@ class FahrgastChangeView(MyUpdateView):
 			form.fields['ort'].queryset = Orte.objects.order_by('ort').filter(bus__in=get_bus_list(request)) | Orte.objects.order_by('ort').filter(bus__isnull=True)
 		else:
 			form.fields['ort'].queryset = Orte.objects.order_by('ort').filter(bus__in=get_bus_list(request))
+		if form.instance.ort.bus != None:
+			form.fields['bus'].widget = forms.HiddenInput()
 		context['form'] = form
 		return render(request, self.template_name, context)
 
@@ -129,10 +128,7 @@ class FahrgastChangeView(MyUpdateView):
 		if instance.ort.bus != None:
 			instance.bus=instance.ort.bus
 		if instance.latitude == 0 or set(['ort','strasse','hausnr']).intersection(set(form.changed_data)):
-			location = GeoLocation().getLocation(instance)
-			if location:
-				instance.latitude  = location['lat']
-				instance.longitude = location['lng']
+			GeoLocation().getLocation(instance)
 		instance.updated_by = self.request.user
 		instance.save(force_update=True)
 		self.success_message = 'Fahrgast "<a href="'+self.success_url+str(instance.id)+'/'+url_args(self.request)+'">'+instance.name+'</a>" wurde erfolgreich geändert.'

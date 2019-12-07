@@ -92,10 +92,10 @@
                             style="myBlockTableStyle1"
                             frame="first">
                     <tr>
-                        <td class="name">Fahrer Vormittag:</td><td class="value">{{ fahrtag_liste.fahrer_vormittag.name|default_if_none:"-" }}</td>
+                        <td class="name">Fahrer Vormittag:</td><td class="value">{% if fahrtag_liste.fahrer_vormittag %}{{ fahrtag_liste.fahrer_vormittag.name }}{% endif %}</td>
                     </tr>
                     <tr>
-                        <td class="name">Fahrer Nachmittag:</td><td class="value">{{ fahrtag_liste.fahrer_nachmittag.name|default_if_none:"-" }}</td>
+                        <td class="name">Fahrer Nachmittag:</td><td class="value">{% if fahrtag_liste.fahrer_nachmittag %}{{ fahrtag_liste.fahrer_nachmittag.name }}{% endif %}</td>
                     </tr>
                 </blockTable>
                 <para style="pc"></para>

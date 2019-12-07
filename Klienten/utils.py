@@ -24,4 +24,5 @@ class GeoLocation():
 		if settings.USE_GOOGLE:
 			address = ' '.join([instance.strasse.strasse, instance.hausnr, instance.ort.plz, instance.ort.ort])
 			location = self.client.geocode(address)
-			return location[0]['geometry']['location']
+			instance.longitude=location[0]['geometry']['location']['lng']
+			instance.latitude =location[0]['geometry']['location']['lat']
