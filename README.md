@@ -15,15 +15,16 @@ python manage.py collectstatic
 
 python manage.py loaddata Einsatzmittel/fixtures/wochentage.json
 
-python manage.py createsuperuser
+python manage.py loaddata Einsatzmittel/fixtures/busse.json
 
-Busse per Dialog anlegen
-
-Büros per Dialog anlegen
+python manage.py loaddata Einsatzmittel/fixtures/bueros.json
 
 python schreibe_strassennamen.py
 
 python schreibe_dienstleister.py
+
+python manage.py createsuperuser
+
 
 
 
