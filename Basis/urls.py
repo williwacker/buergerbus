@@ -6,7 +6,6 @@ from Basis.views import UserView, UserAddView, UserChangeView, UserDeleteView
 from Basis.views import GroupView, GroupAddView, GroupChangeView, GroupDeleteView
 from Basis.views import DocumentPDFView, DocumentListView, DocumentAddView, DocumentChangeView, DocumentDeleteView
 from Basis.views import FeedbackView
-from django_downloadview import ObjectDownloadView
 from Basis.models import Document
 
 download = ObjectDownloadView.as_view(model=Document, file_field='document')
