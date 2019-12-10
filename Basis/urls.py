@@ -8,7 +8,6 @@ from Basis.views import DocumentPDFView, DocumentListView, DocumentAddView, Docu
 from Basis.views import FeedbackView
 from Basis.models import Document
 
-download = ObjectDownloadView.as_view(model=Document, file_field='document')
 app_name = 'Basis'
 urlpatterns = [
     path('benutzer/', UserView.as_view(), name='userview'),
