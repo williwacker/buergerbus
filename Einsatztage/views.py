@@ -1,6 +1,6 @@
 import subprocess
 from django.template.loader import get_template
-from django.http import Http404, HttpResponse, HttpResponseRedirect, HttpResponseForbidden
+from django.http import Http404, HttpResponse, HttpResponseRedirect, HttpResponseForbidden, FileResponse
 from django.shortcuts import get_object_or_404, render
 from django.http import HttpResponse
 from django.contrib import messages
@@ -65,8 +65,8 @@ class FahrplanAsPDF(MyView):
 				with open(filepath, 'wb') as f:
 					f.write(response.content)
 				f.close()
-				subprocess.Popen([filepath],shell=True)
-				response['Content-Disposition'] = 'attachment; filename=' + filename
+				response = FileResponse(open(filepath, 'rb'), content_type="application/pdf")
+				response["Content-Disposition"] = "filename={}".format(filename)
 				return response
 			except:
 				messages.error(request, 'Dokument <b>'+filename+'</b> ist noch geöffnet.')

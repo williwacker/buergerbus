@@ -1,10 +1,15 @@
 from django.urls import path
+from django.conf.urls import url
 from django.views.generic import TemplateView
 
-from .views import UserView, UserAddView, UserChangeView, UserDeleteView
-from .views import GroupView, GroupAddView, GroupChangeView, GroupDeleteView
-from .views import FeedbackView
+from Basis.views import UserView, UserAddView, UserChangeView, UserDeleteView
+from Basis.views import GroupView, GroupAddView, GroupChangeView, GroupDeleteView
+from Basis.views import DocumentPDFView, DocumentListView, DocumentAddView, DocumentChangeView, DocumentDeleteView
+from Basis.views import FeedbackView
+from django_downloadview import ObjectDownloadView
+from Basis.models import Document
 
+download = ObjectDownloadView.as_view(model=Document, file_field='document')
 app_name = 'Basis'
 urlpatterns = [
     path('benutzer/', UserView.as_view(), name='userview'),
@@ -17,4 +22,9 @@ urlpatterns = [
     path('gruppen/<int:pk>/delete/', GroupDeleteView.as_view(), name='groupview_delete'),
     path('logout_success/', TemplateView.as_view(template_name='Basis/logout_success.html'), name='logout_success'),
     path('feedback/', FeedbackView.as_view()),
-]
+    path('documents/', DocumentListView.as_view()),
+    path('documents/add/', DocumentAddView.as_view()),
+    path('documents/<int:pk>/', DocumentChangeView.as_view()),
+    path('documents/<int:pk>/delete/', DocumentDeleteView.as_view()),
+    path('documents/<int:pk>/view/<str:str>.pdf', DocumentPDFView.as_view()),
+] 

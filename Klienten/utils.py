@@ -1,6 +1,9 @@
 from django.contrib import messages
 from django.conf import settings
 import googlemaps
+import logging
+
+logger = logging.getLogger(__name__)
 
 '''
 def del_message(request):
@@ -23,6 +26,7 @@ class GeoLocation():
 	def getLocation(self, instance):
 		if settings.USE_GOOGLE:
 			address = ' '.join([instance.strasse.strasse, instance.hausnr, instance.ort.plz, instance.ort.ort])
+			logger.info("{}: {} {}".format(__name__, instance.name, address))
 			location = self.client.geocode(address)
 			instance.longitude=location[0]['geometry']['location']['lng']
 			instance.latitude =location[0]['geometry']['location']['lat']

@@ -5,6 +5,9 @@ from .models import Tour
 from Einsatztage.models import Fahrtag
 from Einsatzmittel.models import Bus
 from Klienten.models import Klienten
+import logging
+
+logger = logging.getLogger(__name__)
 
 class DistanceMatrix():
 
@@ -20,6 +23,7 @@ class DistanceMatrix():
 		origins      = [o.strasse.strasse+" "+o.hausnr+", "+o.ort.ort]
 		destinations = [d.strasse.strasse+" "+d.hausnr+", "+d.ort.ort]
 		startuhrzeit = datetime.combine(startdatum, startzeit)
+		logger.info("{}: origin={} destination={} start={}".format(__name__, origins, destinations, str(startuhrzeit)))
 
 		googleDict = {}
 		try:
@@ -42,15 +46,15 @@ class DistanceMatrix():
 # calculate earliest departure time from last arrival time
 class DepartureTime():
 
-	def time(self, cleaned_data):
-		uhrzeit = cleaned_data['uhrzeit']
-		datum   = cleaned_data['datum']
-		bus     = cleaned_data['bus']
+	def time(self, form):
+		uhrzeit = form.cleaned_data['uhrzeit']
+		datum   = form.cleaned_data['datum']
+		bus     = form.cleaned_data['bus']
 		bus_id  = Bus.objects.get(bus=bus)
-		abholklient = cleaned_data['abholklient']
+		abholklient = form.cleaned_data['abholklient']
 		instance = Tour.objects.order_by('uhrzeit').filter(bus=bus_id, datum=datum, uhrzeit__lt=uhrzeit).last()
-		if instance and instance.ankunft and ('id' not in cleaned_data or instance.id != cleaned_data['id']):
-			if cleaned_data['zustieg']:
+		if instance and instance.ankunft and ('id' not in form.cleaned_data or instance.id != form.cleaned_data['id']):
+			if form.cleaned_data['zustieg']:
 				googleDict = DistanceMatrix().getMatrix(
 					instance.abholklient, 
 					abholklient, 
@@ -68,30 +72,33 @@ class DepartureTime():
 # calculate latest departure time based on planned departure time of next customer
 class Latest_DepartureTime():
 
-	def time(self, cleaned_data):
-		bus_id   = Bus.objects.get(bus=cleaned_data['bus'])
-		instance = Tour.objects.order_by('uhrzeit').filter(bus=bus_id, datum=cleaned_data['datum'], uhrzeit__gt=cleaned_data['uhrzeit']).first()
-		if instance and ('id' not in cleaned_data or instance.id != cleaned_data['id']):
+	def time(self, form):
+		bus_id   = Bus.objects.get(bus=form.cleaned_data['bus'])
+		instance = Tour.objects.order_by('uhrzeit').filter(bus=bus_id, datum=form.cleaned_data['datum'], uhrzeit__gt=form.cleaned_data['uhrzeit']).first()
+		if instance and ('id' not in form.cleaned_data or instance.id != form.cleaned_data['id']):
 			latest_departuretime = datetime.combine(instance.datum.datum, instance.uhrzeit)
 			if instance.zustieg:
 				# calculate time to next departure place
 				googleDict = DistanceMatrix().getMatrix(
-						cleaned_data['abholklient'],
+						form.cleaned_data['abholklient'],
 						instance.abholklient,
-						cleaned_data['datum'].datum, 
-						cleaned_data['uhrzeit'])
+						form.cleaned_data['datum'].datum, 
+						form.cleaned_data['uhrzeit'])
 				latest_departuretime = (latest_departuretime - timedelta(seconds=googleDict['duration_value'])).time()	
 			else:
 				# calculate time to destination
-				googleDict = DistanceMatrix().getMatrix(
-						cleaned_data['abholklient'],
-						cleaned_data['zielklient'],
-						cleaned_data['datum'].datum, 
-						cleaned_data['uhrzeit'])
-				latest_departuretime = (latest_departuretime - timedelta(seconds=googleDict['duration_value']))
+				if set(['abholklient','zielklient','datum','uhrzeit']).intersection(set(form.changed_data)):
+					googleDict = DistanceMatrix().getMatrix(
+							form.cleaned_data['abholklient'],
+							form.cleaned_data['zielklient'],
+							form.cleaned_data['datum'].datum, 
+							form.cleaned_data['uhrzeit'])
+					latest_departuretime = (latest_departuretime - timedelta(seconds=googleDict['duration_value']))
+				else:
+					latest_departuretime = datetime.combine(instance.datum.datum, form.cleaned_data['ankunft'])
 				# calculate time back to next client departure place
 				googleDict = DistanceMatrix().getMatrix(
-						cleaned_data['zielklient'],
+						form.cleaned_data['zielklient'],
 						instance.abholklient,
 						instance.datum.datum, 
 						instance.uhrzeit)
@@ -101,12 +108,12 @@ class Latest_DepartureTime():
 
 class GuestCount():
 
-	def get(self, cleaned_data):
-		guest_count = int(cleaned_data['personenzahl'])
-		uhrzeit = cleaned_data['uhrzeit']
-		datum   = cleaned_data['datum']
-		bus     = Bus.objects.get(bus=cleaned_data['bus'])
-		zustieg = cleaned_data['zustieg']
+	def get(self, form):
+		guest_count = int(form.cleaned_data['personenzahl'])
+		uhrzeit = form.cleaned_data['uhrzeit']
+		datum   = form.cleaned_data['datum']
+		bus     = Bus.objects.get(bus=form.cleaned_data['bus'])
+		zustieg = form.cleaned_data['zustieg']
 		while zustieg:
 			instance = Tour.objects.order_by('uhrzeit').filter(bus=bus, datum=datum, uhrzeit__lt=uhrzeit).last()
 			guest_count += int(instance.personenzahl)

@@ -4,6 +4,7 @@ from django.conf import settings
 from django.forms import BaseForm, ModelForm
 from jet.filters import RelatedFieldAjaxListFilter
 from django.utils.translation import ugettext_lazy as _
+from django.utils.encoding import force_text
 
 from Tour.models import Tour
 from .utils import DistanceMatrix, DepartureTime, Latest_DepartureTime, GuestCount
@@ -11,6 +12,9 @@ from Klienten.models import Klienten
 from Einsatzmittel.models import Bus
 from Einsatztage.models import Fahrtag
 from Einsatzmittel.utils import get_bus_list
+import logging
+
+logger = logging.getLogger(__name__)
 
 class MyModelForm(ModelForm):
 	def __init__(self,*args,**kwargs):
@@ -23,28 +27,28 @@ class MyModelForm(ModelForm):
 
 		# Sind genügend Plätze verfügbar ?
 		bus = Bus.objects.get(bus=self.cleaned_data['bus'])
-		if GuestCount().get(self.cleaned_data) > bus.sitzplaetze:
+		if GuestCount().get(self) > bus.sitzplaetze:
 			if self.cleaned_data['zustieg']:
 				raise forms.ValidationError("Maximale Anzahl Fahrgäste überschritten. Kein Zustieg möglich. Bitte Extrafahrt planen")
 			else:
 				raise forms.ValidationError("Maximale Anzahl Fahrgäste überschritten. Bitte Extrafahrt planen")
 
 		# Kann der Bus zum gewünschten Zeitpunkt am Anholort sein ?
-		frueheste_abfahrt = DepartureTime().time(self.cleaned_data)
+		frueheste_abfahrt = DepartureTime().time(self)
 		if frueheste_abfahrt == time(0,0,0):
 			self.cleaned_data['zustieg'] = False
 		if frueheste_abfahrt > self.cleaned_data['uhrzeit']:
 			self.cleaned_data['konflikt'] += "Abfahrtszeit kann nicht eingehalten werden. Frühest mögliche Abfahrt um {}".format(str(frueheste_abfahrt))
-			self.cleaned_data['konflikt_richtung'] += '↑'
+			self.cleaned_data['konflikt_richtung'] += force_text('↑', encoding='utf-8', strings_only=False, errors='strict')
 			if not self.cleaned_data['konflikt_ignorieren']:	
 				raise forms.ValidationError(self.cleaned_data['konflikt'])
 
 		# Kann der nächste Fahrgast zum geplanten Zeitpunkt abgeholt werden?
-		spaeteste_abfahrt = Latest_DepartureTime().time(self.cleaned_data)
+		spaeteste_abfahrt = Latest_DepartureTime().time(self)
 		if spaeteste_abfahrt != time(0,0,0) and spaeteste_abfahrt < self.cleaned_data['uhrzeit']:
 			self.cleaned_data['konflikt'] += "<br>" if len(self.cleaned_data['konflikt']) > 0 else ''
 			self.cleaned_data['konflikt'] += "Abfahrtszeit des nächsten Fahrgastes kann nicht eingehalten werden. Empfohlene Abfahrt um {}".format(str(spaeteste_abfahrt))
-			self.cleaned_data['konflikt_richtung'] += '↓'
+			self.cleaned_data['konflikt_richtung'] += force_text('↓', encoding='utf-8', strings_only=False, errors='strict')
 			if not self.cleaned_data['konflikt_ignorieren']:
 				raise forms.ValidationError(self.cleaned_data['konflikt'])
 

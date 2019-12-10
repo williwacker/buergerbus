@@ -1,6 +1,6 @@
 import subprocess
 from django import template
-from django.http import Http404, HttpResponse, HttpResponseRedirect
+from django.http import Http404, HttpResponse, HttpResponseRedirect, FileResponse
 from django.shortcuts import get_object_or_404, render
 from django.conf import settings
 from django.contrib import messages
@@ -174,8 +174,8 @@ class DSGVOasPDFView(MyView):
 				with open(filepath, 'wb') as f:
 					f.write(response.content)
 				f.close()
-				subprocess.Popen([filepath],shell=True)
-				response['Content-Disposition'] = 'attachment; filename=' + filename
+				response = FileResponse(open(filepath, 'rb'), content_type="application/pdf")
+				response["Content-Disposition"] = "filename={}".format(filename)
 				return response
 			except:
 				messages.error(request, 'Dokument <b>'+filename+'</b> ist noch geöffnet.')

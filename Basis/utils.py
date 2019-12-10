@@ -76,10 +76,12 @@ def get_sidebar(user):
 		sidebar.append({'name':'Einsatzmittel', 'value':value})
 
 	value = []
+	if user.has_perm('Basis.view_document'):
+		value.append({'name':'Dokumente','value':'/Basis/documents/'})
 	if list(User.objects.filter(is_superuser=True).values_list('email', flat=True)):
 		value.append({'name':'Feedback','value':'/Basis/feedback/'})
 	if value:
-		sidebar.append({'name':'Kontakt', 'value':value})		
+		sidebar.append({'name':'Hilfe', 'value':value})		
 	return sidebar
 
 def url_args(request):

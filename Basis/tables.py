@@ -1,6 +1,7 @@
 import django_tables2 as tables
 
 from django.contrib.auth.models import User, Group
+from Basis.models import Document
 
 class UserTable(tables.Table):
     username = tables.TemplateColumn(
@@ -30,4 +31,22 @@ class GroupTable(tables.Table):
         model = Group
         fields = ('name', )        
 
-  
+class DocumentTable(tables.Table):
+    description = tables.TemplateColumn(
+        template_code='''
+            {% if perms.Basis.change_document %}
+                <a href="{{ record.id }}/{{ url_args }}">{{ record.description |safe }}</a>
+            {% else %}
+                {{ record.description |safe }}
+            {% endif %}
+        '''
+    )
+    document = tables.TemplateColumn(
+        template_code='''
+            {% load my_tags %}
+            <a href="{{ record.id }}/view/{{ record.relative_path }}" target="_blank">{{ record.document |safe }}</a>
+        '''
+    )
+    class Meta:
+        model = Document
+        fields = ('description', 'document', 'uploaded_at')

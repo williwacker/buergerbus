@@ -1,6 +1,7 @@
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.views.generic import ListView, DetailView, View, CreateView, UpdateView, DeleteView
+from django.views.generic.detail import BaseDetailView
 from Basis.multiform import MultiFormsView
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
@@ -10,7 +11,6 @@ from django.contrib import messages
 from django.core.exceptions import PermissionDenied
 from django import forms
 from Basis.utils import get_sidebar, get_relation_dict, url_args
-from Basis.forms import FeedbackForm
 from django.core.mail import EmailMessage
 
 def my_custom_bad_request_view(request, exception):  #400
@@ -101,48 +101,5 @@ class BasisView(LoginRequiredMixin, ListView):
 		context['sidebar_liste'] = get_sidebar(self.request.user)
 		return context
 
-# Feedback View
-
-class FeedbackView(MyDetailView):
-	form_class = FeedbackForm
-	permission_required = 'Tour.view_tour'
-	success_url = '/'
-	context = {}
-
-	def get_context_data(self):
-		self.context['sidebar_liste'] = get_sidebar(self.request.user)
-		self.context['title'] = 'Feedback senden'
-		self.context['submit_button'] = "Senden"
-		self.context['back_button'] = ["Abbrechen",self.success_url+url_args(self.request)]
-		self.context['url_args'] = url_args(self.request)
-
-	def get(self, request, *args, **kwargs):
-		admin_email = list(User.objects.filter(is_superuser=True).values_list('email', flat=True))
-		self.get_context_data()
-		self.initial['von'] = settings.EMAIL_HOST_USER
-		self.initial['an'] = ';'.join(admin_email)
-		self.initial['betreff'] = '[Bürgerbus] Feedback '
-		form = self.form_class(initial=self.initial)
-		self.context['form'] = form
-		return render(request, self.template_name, self.context)
-
-	def post(self, request, *args, **kwargs):
-		form = self.form_class(request.POST)
-		self.context['form'] = form
-		if form.is_valid():
-			post = form.cleaned_data
-			email = EmailMessage(
-				post['betreff'],
-				post['text'],
-				post['von'],
-				post['an'].split(";"),
-				reply_to=post['von'].split(";"),
-			)
-#			if post['cc']:
-#				email.cc = post['cc'].split(";")
-			email.send(fail_silently=False)	
-			messages.success(request, post['betreff']+' wurde erfolgreich versandt.')
-			return HttpResponseRedirect(self.success_url+url_args(request))
-		else:
-			messages.error(request, form.errors)			
-		return render(request, self.template_name, self.context)		
+class MyBaseDetailView(LoginRequiredMixin, PermissionRequiredMixin, BaseDetailView):
+	login_url = settings.LOGIN_URL

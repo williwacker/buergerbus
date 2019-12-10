@@ -18,12 +18,17 @@ from Einsatzmittel.utils import get_bus_list
 from Basis.utils import get_sidebar, render_to_pdf, url_args
 from datetime import datetime, timedelta, time
 from Basis.views import MyListView, MyDetailView, MyView, MyDeleteView, MyUpdateView, MyCreateView
+import logging
+
+logger = logging.getLogger(__name__)
 
 class GoogleMixin():
 	def get_google(self, form):
 		googleDict = {}
 		if settings.USE_GOOGLE:
-			if form.cleaned_data['entfernung'] == '' or set(['abholklient','zielklient','datum','uhrzeit']).intersection(set(form.changed_data)):
+			if 'entfernung' not in form.cleaned_data \
+			or form.cleaned_data['entfernung'] == '' \
+			or set(['abholklient','zielklient','datum','uhrzeit']).intersection(set(form.changed_data)):
 				googleDict = DistanceMatrix().getMatrix(
 					form.cleaned_data['abholklient'], 
 					form.cleaned_data['zielklient'], 
@@ -131,14 +136,15 @@ class TourAddView2(MyCreateView, GoogleMixin):
 	def form_valid(self, form):
 		instance = form.save(commit=False)
 		instance.updated_by = self.request.user
-		googleDict = self.get_google(form)	
+		try:
+			googleDict = self.get_google(form)
+		except:
+			logger.error("{}: Error in get_google".format(__name__))
+			googleDict = None
 		if googleDict:
 			instance.entfernung = googleDict['distance']
 			instance.ankunft    = googleDict['arrivaltime']
 		instance.save()
-#		if url_args(self.request):
-#			self.success_url += url_args(self.request)+'&datum='+str(instance.datum_id)
-#		else:
 		self.success_url += '?datum='+str(instance.datum_id)
 		self.success_message = self.model._meta.verbose_name.title()+' "<a href="'+self.success_url+str(instance.id)+'">'+instance.klient.name+' am '+str(instance.datum)+' um '+str(instance.uhrzeit) +'</a>" wurde erfolgreich hinzugefügt.'
 		if instance.konflikt != '':

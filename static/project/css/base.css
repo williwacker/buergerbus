@@ -11,6 +11,9 @@ body {
 #container {
     min-width: unset;
 }
+#header a, #header a:hover, #header a:visited {
+    text-decoration: none;
+} 
 .headline {
     text-align: left;
     margin-bottom: 2em;

@@ -12,7 +12,7 @@ def verbose_name(obj):
 def verbose_name_plural(obj):
     return obj._meta.verbose_name_plural
 
-ALLOWABLE_VALUES = ("PORTAL", "WELCOME",)
+ALLOWABLE_VALUES = ("PORTAL", "WELCOME", "MEDIA_ROOT", "MEDIA_URL")
 
 # settings value
 @register.simple_tag

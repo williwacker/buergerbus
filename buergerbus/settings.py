@@ -10,7 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/2.2/ref/settings/
 """
 
-import os
+import os, copy
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -31,26 +31,26 @@ ALLOWED_HOSTS = ['localhost']
 # Application definition
 
 INSTALLED_APPS = [
-    'smart_selects',
-    'Basis.apps.BasisConfig',
-    'Einsatzmittel.apps.EinsatzmittelConfig',
-    'Einsatztage.apps.EinsatztageConfig',
-    'Klienten.apps.KlientenConfig',
-    'Team.apps.TeamConfig',
-    'Tour.apps.TourConfig',
-    'jet.dashboard',
-    'jet',
-    'django_filters',
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'multiselectfield',
-    'django_tables2',
-    'django_cron',
-    'qr_code',
+	'smart_selects',
+	'Basis.apps.BasisConfig',
+	'Einsatzmittel.apps.EinsatzmittelConfig',
+	'Einsatztage.apps.EinsatztageConfig',
+	'Klienten.apps.KlientenConfig',
+	'Team.apps.TeamConfig',
+	'Tour.apps.TourConfig',
+	'jet.dashboard',
+	'jet',
+	'django_filters',
+	'django.contrib.admin',
+	'django.contrib.auth',
+	'django.contrib.contenttypes',
+	'django.contrib.sessions',
+	'django.contrib.messages',
+	'django.contrib.staticfiles',
+	'multiselectfield',
+	'django_tables2',
+	'django_cron',
+	'qr_code',
 #    'crispy_forms',
 #    'test_app',
 #    'bootstrap_modal_forms',
@@ -58,39 +58,39 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django_session_timeout.middleware.SessionTimeoutMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+	'django.middleware.security.SecurityMiddleware',
+	'django.contrib.sessions.middleware.SessionMiddleware',
+	'django_session_timeout.middleware.SessionTimeoutMiddleware',
+	'django.middleware.common.CommonMiddleware',
+	'django.middleware.csrf.CsrfViewMiddleware',
+	'django.contrib.auth.middleware.AuthenticationMiddleware',
+	'django.contrib.messages.middleware.MessageMiddleware',
+	'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
 CRON_CLASSES = [
-    'Basis.cron.EinsatztageCronJob',
+	'Basis.cron.EinsatztageCronJob',
 ]
 
 ROOT_URLCONF = 'buergerbus.urls'
 
 TEMPLATES = [
-    {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [
-            os.path.join(BASE_DIR, 'templates'),
-        ],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
-                'Basis.utils.messages',
-            ],
-        },
-    },
+	{
+		'BACKEND': 'django.template.backends.django.DjangoTemplates',
+		'DIRS': [
+			os.path.join(BASE_DIR, 'templates'),
+		],
+		'APP_DIRS': True,
+		'OPTIONS': {
+			'context_processors': [
+				'django.template.context_processors.debug',
+				'django.template.context_processors.request',
+				'django.contrib.auth.context_processors.auth',
+				'django.contrib.messages.context_processors.messages',
+				'Basis.utils.messages',
+			],
+		},
+	},
 ]
 
 WSGI_APPLICATION = 'buergerbus.wsgi.application'
@@ -100,32 +100,32 @@ WSGI_APPLICATION = 'buergerbus.wsgi.application'
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'postgres',
-        'USER': 'postgres',
-        'PASSWORD': 'postgres',
-        'HOST': '127.0.0.1',
-        'PORT': '5432',
-    }
+	'default': {
+		'ENGINE': 'django.db.backends.postgresql',
+		'NAME': 'postgres',
+		'USER': 'postgres',
+		'PASSWORD': 'postgres',
+		'HOST': '127.0.0.1',
+		'PORT': '5432',
+	}
 }
 
 # Password validation
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
+	{
+		'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+	},
+	{
+		'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+	},
+	{
+		'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+	},
+	{
+		'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+	},
 ]
 
 
@@ -149,7 +149,7 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "static"),
+	os.path.join(BASE_DIR, "static"),
 ]
 
 
@@ -160,14 +160,71 @@ JET_SIDE_MENU_COMPACT = True
 JET_CHANGE_FORM_SIBLING_LINKS = True
 
 INTERNAL_IPS = [
-    # ...
-    '127.0.0.1',
-    # ...
+	# ...
+	'127.0.0.1',
+	# ...
 ]
 
 LOGIN_URL           = '/accounts/login/'
 LOGIN_REDIRECT_URL  = '/Basis/'
 LOGOUT_REDIRECT_URL = '/accounts/logout_success/'
+
+LOCAL_APPS = [
+	'Basis',
+	'Einsatzmittel',
+	'Einsatztage',
+	'Klienten',
+	'Team',
+	'Tour'
+]
+
+local_logger_conf = {
+	'handlers':['file'],
+	'propagate': True,
+	'level':'INFO',
+}
+
+LOGGING = {
+	'version': 1,
+	'disable_existing_loggers': False,
+	'formatters': {
+		'verbose': {
+			'format' : "[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(message)s",
+			'datefmt' : "%Y-%m-%d %H:%M:%S"
+		},
+		'simple': {
+			'format': '%(levelname)s %(message)s'
+		},
+	},
+	'handlers': {
+		'file': {
+			'level': 'DEBUG',
+			'class': 'logging.FileHandler',
+			'filename': '/var/log/buergerbus.log',
+			'formatter': 'verbose'
+		},
+		'mail_admins': {
+			'level': 'ERROR',
+			'class': 'django.utils.log.AdminEmailHandler',
+		}
+	},
+	'loggers': {
+		'django': {
+			'handlers':['file'],
+			'propagate': True,
+			'level':'INFO',
+		},
+		'django.request': {
+			'handlers': ['mail_admins'],
+			'propagate': True,
+			'level': 'ERROR',
+		}
+	}
+}
+LOGGING['loggers'].update({app: copy.deepcopy(local_logger_conf) for app in LOCAL_APPS})
+
+MEDIA_URL = '/uploads/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'uploads')
 
 # Expire nach 30 min
 SESSION_EXPIRE_SECONDS = 1800

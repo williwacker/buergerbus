@@ -1,0 +1,18 @@
+[
+  {
+    "model": "Einsatzmittel.Buero",
+    "pk": 1,
+    "fields": {
+      "buero": "Erbes-Büdesheim",
+      "buerotage" : [1,2,3,4]
+    }
+  },
+  {
+    "model": "Einsatzmittel.Buero",
+    "pk": 2,
+    "fields": {
+      "buero": "Gau-Heppenheim",
+      "buerotage" : [1,2,3,4]
+    }
+  }   
+]

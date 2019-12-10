@@ -30,16 +30,16 @@ class Tour(models.Model):
 	@property
 	def abholort(self):
 		if (self.klient == self.abholklient):
-			return ', '.join([self.abholklient.ort.ort, self.abholklient.strasse.strasse +" "+self.abholklient.hausnr])
+			return ' '.join([self.abholklient.ort.ort+'\n', self.abholklient.strasse.strasse +" "+self.abholklient.hausnr])
 		else:
-			return ', '.join([self.abholklient.name, self.abholklient.ort.ort, self.abholklient.strasse.strasse +" "+self.abholklient.hausnr])
+			return ' '.join([self.abholklient.name+'\n', self.abholklient.ort.ort+'\n', self.abholklient.strasse.strasse +" "+self.abholklient.hausnr])
 
 	@property
 	def zielort(self):
 		if (self.klient == self.zielklient):
-			return ', '.join([self.zielklient.ort.ort, self.zielklient.strasse.strasse +" "+self.zielklient.hausnr])
+			return ' '.join([self.zielklient.ort.ort+'\n', self.zielklient.strasse.strasse +" "+self.zielklient.hausnr])
 		else:
-			return ', '.join([self.zielklient.name, self.zielklient.ort.ort, self.zielklient.strasse.strasse +" "+self.zielklient.hausnr])
+			return ' '.join([self.zielklient.name+'\n', self.zielklient.ort.ort+'\n', self.zielklient.strasse.strasse +" "+self.zielklient.hausnr])
 
 	@property
 	def fahrgast(self):
@@ -80,6 +80,9 @@ class Tour(models.Model):
 		
 	def klienten_bus(self):
 		return str(self.klient.bus)
+
+	def __unicode__(self):
+		return self.name
 
 	def __str__(self):
 		return ' '.join([self.klient.name,str(self.klienten_bus()),str(self.datum),str(self.uhrzeit)])

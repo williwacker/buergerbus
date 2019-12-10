@@ -1,0 +1,42 @@
+[
+  {
+    "model": "Einsatzmittel.Bus",
+    "pk": 1,
+    "fields": {
+      "bus": "Bus 1",
+      "sitzplaetze": 8,
+      "fahrtage" : [2,4],
+      "plantage" : 13
+    }
+  },
+  {
+    "model": "Einsatzmittel.Bus",
+    "pk": 2,
+    "fields": {
+      "bus": "Bus 2",
+      "sitzplaetze": 8,
+      "fahrtage" : [3,5],
+      "plantage" : 13
+    }
+  },
+  {
+    "model": "Einsatzmittel.Bus",
+    "pk": 3,
+    "fields": {
+      "bus": "Bus 3",
+      "sitzplaetze": 8,
+      "fahrtage" : [2,4],
+      "plantage" : 13
+    }
+  },
+  {
+    "model": "Einsatzmittel.Bus",
+    "pk": 4,
+    "fields": {
+      "bus": "Bus 4",
+      "sitzplaetze": 8,
+      "fahrtage" : [3,5],
+      "plantage" : 13
+    }
+  }      
+]

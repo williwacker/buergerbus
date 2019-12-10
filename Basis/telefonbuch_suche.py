@@ -15,6 +15,9 @@ import urllib3
 import urllib.parse
 import certifi
 import re
+import logging
+
+logger = logging.getLogger(__name__)
 
 class Telefonbuch():
 	def __init__(self):
@@ -52,6 +55,7 @@ class Telefonbuch():
 					result.append(data_dict)
 		except:
 			pass
+		logger.info("{}: {},{},{} Count:{}".format(__name__, name, city, typ, len(result)))
 		return result
 
 	def dasoertliche_gewerbe(self, line, data_dict):
@@ -82,6 +86,7 @@ class Telefonbuch():
 					result.append(data)
 		except:
 			pass	
+		logger.info("{}: {},{},{} Count:{}".format(__name__, name, city, typ, len(result)))
 		return result
 
 	def _init_dict(self):

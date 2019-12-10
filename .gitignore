@@ -130,6 +130,8 @@ migrations/
 *.bak
 *.txt
 *.csv
+*.pdf
 
 Strassennamen.txt
 settings.json
+uploads/Buergerbus_Fahrplan_Bus_2_2019-12-116.pdf
