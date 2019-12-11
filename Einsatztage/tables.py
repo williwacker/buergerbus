@@ -19,7 +19,8 @@ class FahrtagTable(tables.Table):
             {% if record.gaeste_vormittag > 0 or record.gaeste_nachmittag > 0 %}
                 {% load static %}
                 <a href="/Einsatztage/fahrer/{{ record.id }}/fahrplan/{{ url_args }}"><img src="{% static "project/img/fahrplan.png" %}" alt="Fahrplan anzeigen" title="Fahrplan anzeigen"></a>
-                <a href="/Einsatztage/fahrer/{{ record.id }}/fahrplanAsPDF/" target="_blank"><img src="{% static "project/img/icon_pdf.png" %}" alt="Fahrplan als PDF anzeigen/herunterladen" title="Fahrplan als PDF anzeigen/herunterladen"></a>
+                <a href="/Einsatztage/fahrer/{{ record.id }}/fahrplanAsPDF/" target="_blank"><img src="{% static "project/img/icon_pdf.png" %}" alt="Fahrplan als PDF anzeigen" title="Fahrplan als PDF anzeigen"></a>
+                <!--a href="/Einsatztage/fahrer/{{ record.id }}/fahrplanAsCSV/"><img src="{% static "project/img/icon_pdf.png" %}" alt="Fahrplan als CSV speichern" title="Fahrplan als CSV anzeigen"></a-->
                 {% if record.hat_fahrer %}
                     <a href="/Einsatztage/fahrer/{{ record.id }}/fahrplanAsEmail/{{ url_args }}"><img src="{% static "project/img/send.png" %}" alt="Fahrplan verschicken" title="Fahrplan verschicken"></a>
                 {% endif %}

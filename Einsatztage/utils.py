@@ -1,11 +1,17 @@
-import datetime, time
+import datetime, time, csv, io, os
 from os import environ,getcwd
+from django.core.mail import EmailMessage, get_connection
 from django.http import HttpResponse
 from django.template.loader import get_template
 from django.contrib.auth.models import Permission
 from django.conf import settings
 from .models import Fahrtag
 from Einsatzmittel.models import Bus, Buero
+from Tour.models import Tour
+from Einsatztage.models import Fahrtag
+import logging
+
+logger = logging.getLogger(__name__)
 
 ### Fahrtage und Bürotage schreiben
 from Basis.berechnung_feiertage import Holidays
@@ -24,10 +30,9 @@ def get_holidays():
 
 class FahrtageSchreiben():
 
-	def __init__(self, user):
-		if user.has_perm('Einsatztage.change_fahrtag'):
-			self.write_new_fahrtage()
-			self.archive_past_fahrtage()
+	def __init__(self):
+		self.write_new_fahrtage()
+		self.archive_past_fahrtage()
 
 	def write_new_fahrtage(self,changedate=None):
 		# die nächsten Feiertage ausrechnen
@@ -64,10 +69,9 @@ class FahrtageSchreiben():
 
 class BuerotageSchreiben():
 
-	def __init__(self,user):
-		if user.has_perm('Einsatztage.change_buerotag'):
-			self.write_new_buerotage()
-			self.archive_past_buerotage()
+	def __init__(self):
+		self.write_new_buerotage()
+		self.archive_past_buerotage()
 
 	def write_new_buerotage(self,changedate=None):
 		# die nächsten Feiertage ausrechnen
@@ -101,3 +105,77 @@ class BuerotageSchreiben():
 					t = Buerotag.objects.get(pk=id)
 					t.archiv=True
 					t.save()
+
+# write fahrplan to csv file for backup purposes
+
+class FahrplanBackup():
+	
+	def __init__(self):
+		self.send_backup()
+
+	def send_backup(self):
+		mail_backend = get_connection()
+		bus_list = list(Bus.objects.values_list('id','bus','email'))
+		for [bus_id, bus, email] in bus_list:
+			filelist = []
+			id_list = list(Tour.objects.filter(archiv=False, bus_id=bus_id).values_list('datum', flat=True).distinct())
+			for id in id_list:
+				filelist += self.export_as_csv(id)
+			if not email or not filelist:
+				continue
+			mail_text = 'Liebe Koordinatoren,\nAnbei die bisherigen Fahrpläne. Diese sind nur zu verwenden im Fall daß der Web-Server des Bürgerbus Portals ausfällt.' 
+			message = EmailMessage(
+						from_email='willi1wacker@gmx.de',
+						to=[email,],
+						connection=mail_backend,
+						subject="Fahrplan Backup {} vom {}".format(bus, datetime.date.today()), 
+						body=mail_text,
+					)
+			attachments = []  # start with an empty list
+			for filename in filelist:
+				# create the attachment triple for this filename
+				content = open(filename, 'rb').read()
+				import os
+				attachment = (os.path.basename(filename), content, 'application/csv')
+				# add the attachment to the list
+				attachments.append(attachment)
+			message.attachments = attachments
+			message.send()
+
+	def export_as_csv(self, id):
+		fahrtag   = Fahrtag.objects.get(pk=id)
+		tour_list = Tour.objects.order_by('uhrzeit').filter(datum=id)
+		filename = 'Buergerbus_Fahrplan_{}_{}.csv'.format(str(fahrtag.team).replace(' ','_'), fahrtag.datum)
+		response = HttpResponse(content_type='text/csv')
+		response['Content-Disposition'] = 'attachment; filename=filename'
+		filepath = settings.TOUR_PATH + filename
+		writer = csv.writer(response)
+		writer.writerow(['sep=,'])
+		writer.writerow(['','Fahrer Vormittag',fahrtag.fahrer_vormittag])
+		writer.writerow(['','Fahrer Nachmittag',fahrtag.fahrer_nachmittag])
+		writer.writerow([''])
+		writer.writerow(['Uhrzeit', 'Fahrgast', 'Telefon', 'Zustieg', 'Anzahl', 'Abholort', 'Zielort', 'Entfernung', 'Ankunft', 'Bemerkung'])
+
+		for tour in tour_list:
+			list = []
+			list.append(tour.uhrzeit.strftime("%H:%M"))
+			list.append(tour.klient.name)
+			list.append('' if not tour.klient.telefon else tour.klient.telefon + '' if not tour.klient.mobil else tour.klient.mobil)
+			list.append('N' if not tour.zustieg else 'J')
+			list.append(str(tour.personenzahl))
+			list.append(tour.abholort.replace('\n',' '))
+			list.append(tour.zielort.replace('\n',' '))
+			list.append(tour.entfernung)
+			list.append(tour.ankunft.strftime("%H:%M") if tour.ankunft else '')
+			list.append(tour.bemerkung + tour.klient.bemerkung)
+			writer.writerow(list)
+			try:
+				with open(filepath, 'wb') as f:
+					f.write(response.content)
+				with io.open(filepath, mode="r", encoding="utf8") as fd:
+					content = fd.read()
+				with io.open(filepath, mode="w", encoding="cp1252") as fd:
+					fd.write(content)		
+			except:
+				logger.info("{}: document={} could not be written".format(__name__, filepath))
+			return [filepath]					

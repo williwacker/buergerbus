@@ -1,16 +1,28 @@
 import datetime
 from django_cron import CronJobBase, Schedule
-from Einsatztage.utils import FahrtageSchreiben, BuerotageSchreiben
+from Einsatztage.utils import FahrtageSchreiben, BuerotageSchreiben, FahrplanBackup
+import logging
+
+logger = logging.getLogger(__name__)
 
 class EinsatztageCronJob(CronJobBase):
-    RUN_EVERY_MINS = 1
+    RUN_EVERY_MINS = 720  # every 12h
 
     schedule = Schedule(run_every_mins = RUN_EVERY_MINS)
-    code = 'Basis.cron.EinsatztageCronJob'
+    code = __name__
 
     def do(self):
-        print('EinsatztageCronJob')
-        FahrtageSchreiben(None)
-        print('Fahrtage updated '+str(datetime.datetime.today()))
-        BuerotageSchreiben(None)
-        print('Buerotage updated '+str(datetime.datetime.today()))
+        FahrtageSchreiben()
+        logger.info("{}: Fahrtage updated".format(__name__))
+        BuerotageSchreiben()
+        logger.info("{}: Buerotage updated".format(__name__))
+
+class BackupCronJob(CronJobBase):
+    RUN_EVERY_MINS = 1440  # every 24h
+
+    schedule = Schedule(run_every_mins = RUN_EVERY_MINS)
+    code = __name__
+
+    def do(self):
+        FahrplanBackup()
+        logger.info("{}: FahrplanBackup sent".format(__name__))       

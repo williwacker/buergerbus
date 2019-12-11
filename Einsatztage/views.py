@@ -1,4 +1,3 @@
-import subprocess
 from django.template.loader import get_template
 from django.http import Http404, HttpResponse, HttpResponseRedirect, HttpResponseForbidden, FileResponse
 from django.shortcuts import get_object_or_404, render
@@ -14,7 +13,7 @@ from django.core.mail import EmailMessage
 
 from .tables import FahrtagTable, BuerotagTable, TourTable, FahrerTable
 from .filters import FahrtagFilter, BuerotagFilter
-from .utils import FahrtageSchreiben, BuerotageSchreiben
+from .utils import FahrtageSchreiben, BuerotageSchreiben, FahrplanBackup
 from .forms import FahrtagChgForm, BuerotagChgForm, FahrplanEmailForm
 from .models import Fahrtag, Buerotag
 from Klienten.models import Klienten
@@ -72,6 +71,24 @@ class FahrplanAsPDF(MyView):
 				messages.error(request, 'Dokument <b>'+filename+'</b> ist noch geöffnet.')
 			return HttpResponseRedirect(self.success_url+url_args(request))
 		return HttpResponse("Kein Dokument vorhanden")
+
+class FahrplanAsCSV(MyView):
+	permission_required = 'Tour.view_tour'
+	success_url = '/Einsatztage/fahrer/'
+
+	def get(self, request, id):
+		FahrplanBackup().export_as_csv(id)
+		return HttpResponseRedirect(self.success_url+url_args(request))
+
+class FahrplanBackupView(MyView):
+	permission_required = 'Tour.view_tour'
+	success_url = '/Einsatztage/fahrer/'
+
+	def get(self, request):
+		FahrplanBackup().send_backup()
+		return HttpResponseRedirect(self.success_url+url_args(request))		
+
+
 
 class FahrplanEmailView(MyDetailView):
 	form_class = FahrplanEmailForm
@@ -189,7 +206,8 @@ class FahrtageListView(MyListView):
 	permission_required = 'Einsatztage.view_fahrtag'
 
 	def get_queryset(self):
-		FahrtageSchreiben(self.request.user)
+		if self.request.user.has_perm('Einsatztage.change_fahrtag'):
+			FahrtageSchreiben()
 		team = self.request.GET.get('team')
 		sort = self.request.GET.get('sort')
 		qs = Fahrtag.objects.order_by('datum','team').filter(archiv=False, team__in=get_bus_list(self.request))
@@ -242,7 +260,8 @@ class BuerotageListView(MyListView):
 	permission_required = 'Einsatztage.view_buerotag'
 	
 	def get_queryset(self):
-		BuerotageSchreiben(self.request.user)
+		if self.request.user.has_perm('Einsatztage.change_buerotag'):
+			BuerotageSchreiben()
 		team = self.request.GET.get('team')
 		sort = self.request.GET.get('sort')
 		qs = Buerotag.objects.order_by('team','datum').filter(archiv=False, team__in=get_buero_list(self.request))

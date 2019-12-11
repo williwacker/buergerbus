@@ -70,6 +70,7 @@ MIDDLEWARE = [
 
 CRON_CLASSES = [
 	'Basis.cron.EinsatztageCronJob',
+	'Basis.cron.BackupCronJob',
 ]
 
 ROOT_URLCONF = 'buergerbus.urls'
@@ -215,7 +216,7 @@ LOGGING = {
 			'level':'INFO',
 		},
 		'django.request': {
-			'handlers': ['mail_admins'],
+			'handlers': ['file','mail_admins'],
 			'propagate': True,
 			'level': 'ERROR',
 		}
