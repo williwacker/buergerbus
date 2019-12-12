@@ -34,7 +34,7 @@
     </div>
     <div class="submit-row">
         {% if back_button %}
-        {% if popup %}
+            {% if popup %}
                 <a href="javascript:opener.location.reload(false);window.close();" class="closelink">{{ back_button.0|upper }}</a>
             {% else %}
                 <a href="{{ back_button.1 }}" class="closelink">{{ back_button.0|upper }}</a>
