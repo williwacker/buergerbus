@@ -1,7 +1,8 @@
 import django_tables2 as tables
+from django.contrib.auth.models import Group, User
 
-from django.contrib.auth.models import User, Group
 from Basis.models import Document
+
 
 class UserTable(tables.Table):
     username = tables.TemplateColumn(

@@ -1,10 +1,10 @@
 ﻿from django.contrib import admin
-from Einsatzmittel.utils import get_bus_list, get_buero_list
-
-from Einsatztage.models import Fahrtag, Buerotag
-from Einsatzmittel.models import Bus, Buero
+from Einsatzmittel.models import Buero, Bus
+from Einsatzmittel.utils import get_buero_list, get_bus_list
+from Einsatztage.models import Buerotag, Fahrtag
 from Team.models import Fahrer, Koordinator
-from .utils import FahrtageSchreiben, BuerotageSchreiben
+
+from .utils import BuerotageSchreiben, FahrtageSchreiben
 
 
 class FahrtagAdmin(admin.ModelAdmin):

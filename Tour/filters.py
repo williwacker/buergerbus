@@ -1,5 +1,7 @@
 import django_filters
+
 from .models import Tour
+
 
 class TourFilter(django_filters.FilterSet):
 

@@ -1,19 +1,21 @@
 from django import template
-from django.http import Http404, HttpResponse, HttpResponseRedirect
-from django.shortcuts import get_object_or_404, render
-from django.http import HttpResponse
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.models import User
+from django.http import Http404, HttpResponse, HttpResponseRedirect
+from django.shortcuts import get_object_or_404, render
 
-from .models import Fahrer, Koordinator
-from Einsatzmittel.models import Bus, Buero
-from .forms import FahrerAddForm, FahrerChgForm, KoordinatorAddForm, KoordinatorChgForm
-from .tables import FahrerTable, KoordinatorTable
-from .filters import FahrerFilter, KoordinatorFilter
 from Basis.utils import get_sidebar, url_args
-from Einsatzmittel.utils import get_bus_list, get_buero_list
-from Basis.views import MyListView, MyDetailView, MyView, MyUpdateView, MyDeleteView
+from Basis.views import (MyDeleteView, MyDetailView, MyListView, MyUpdateView,
+                         MyView)
+from Einsatzmittel.models import Buero, Bus
+from Einsatzmittel.utils import get_buero_list, get_bus_list
+
+from .filters import FahrerFilter, KoordinatorFilter
+from .forms import (FahrerAddForm, FahrerChgForm, KoordinatorAddForm,
+                    KoordinatorChgForm)
+from .models import Fahrer, Koordinator
+from .tables import FahrerTable, KoordinatorTable
 
 register = template.Library()
 
@@ -72,14 +74,15 @@ class FahrerAddView(MyDetailView):
 		context['form'] = form
 		if form.is_valid():
 			post = request.POST.dict()
-			fahrer = Fahrer(	name=post['name'], 
-								email=post['email'],
-								telefon=post['telefon'],
-								mobil=post['mobil'],
-								aktiv=True,
-								team=Bus.objects.get(pk=int(post['team'])),
-								updated_by = request.user
-							)
+			fahrer = Fahrer(	
+				name=post['name'], 
+				email=post['email'],
+				telefon=post['telefon'],
+				mobil=post['mobil'],
+				aktiv=True,
+				team=Bus.objects.get(pk=int(post['team'])),
+				updated_by = request.user
+			)
 			fahrer.save()
 			storage = messages.get_messages(request)
 			storage.used = True			
@@ -99,8 +102,7 @@ class FahrerChangeView(MyUpdateView):
 		context = {}
 		context['sidebar_liste'] = get_sidebar(request.user)
 		context['title'] = "Fahrer ändern"
-		if self.request.user.has_perm('Team.delete_fahrer'):
-			context['delete_button'] = "Löschen"
+		if self.request.user.has_perm('Team.delete_fahrer'): context['delete_button'] = "Löschen"
 		context['submit_button'] = "Sichern"
 		context['back_button'] = ["Abbrechen",self.success_url+url_args(self.request)]
 		context['url_args'] = url_args(self.request)
@@ -143,10 +145,8 @@ class KoordinatorView(MyListView):
 		team = self.request.GET.get('team')
 		sort = self.request.GET.get('sort')
 		qs = self.get_fg_queryset()
-		if team:
-			qs = qs.filter(team=team)
-		if sort:
-			qs = qs.order_by(sort)
+		if team: qs = qs.filter(team=team)
+		if sort: qs = qs.order_by(sort)
 		return KoordinatorTable(qs)
 
 	def get_context_data(self, **kwargs):
@@ -186,14 +186,14 @@ class KoordinatorAddView(MyDetailView):
 			post = request.POST.dict()
 			u = User.objects.get(pk=int(post['benutzer']))
 			koordinator = Koordinator(
-								benutzer=u, 
-#								email=post['email'],
-								telefon=post['telefon'],
-								mobil=post['mobil'],
-								aktiv=True,
-								team=Buero.objects.get(pk=int(post['team'])),
-								updated_by = request.user
-							)
+				benutzer=u, 
+#				email=post['email'],
+				telefon=post['telefon'],
+				mobil=post['mobil'],
+				aktiv=True,
+				team=Buero.objects.get(pk=int(post['team'])),
+				updated_by = request.user
+			)
 			koordinator.save()
 			storage = messages.get_messages(request)
 			storage.used = True			

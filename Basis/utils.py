@@ -1,16 +1,18 @@
-from django.contrib.auth.models import Permission
-from Einsatzmittel.models import Bus, Buero
-from django.template import loader, Context
-from django.http import HttpResponse
-from django.utils.http import is_safe_url
-from django.contrib import messages
-from django.contrib.auth.models import User
-from xhtml2pdf import pisa
-from io import BytesIO
-from django.db.models.deletion import Collector
 from collections import OrderedDict
+from io import BytesIO
+
+from django.contrib import messages
+from django.contrib.auth.models import Permission, User
 from django.contrib.messages.api import get_messages
 from django.contrib.messages.constants import DEFAULT_LEVELS
+from django.db.models.deletion import Collector
+from django.http import HttpResponse
+from django.template import Context, loader
+from django.utils.http import is_safe_url
+from xhtml2pdf import pisa
+
+from Einsatzmittel.models import Buero, Bus
+
 
 def render_to_pdf(template_src, context_dict={}):
 	template = loader.get_template(template_src)

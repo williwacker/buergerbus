@@ -1,11 +1,13 @@
 ﻿import datetime
 
-from django.forms import ModelForm
-from django.db import models
 from django.conf import settings
+from django.db import models
+from django.forms import ModelForm
 from django.utils import timezone
-from Team.models import Fahrer, Koordinator
 from smart_selects.db_fields import ChainedForeignKey, GroupedForeignKey
+
+from Team.models import Fahrer, Koordinator
+
 
 class Fahrtag(models.Model):
 	datum      = models.DateField(blank=True)
@@ -39,6 +41,10 @@ class Fahrtag(models.Model):
 	updated_on = models.DateTimeField(auto_now=True, blank=True, null=True)
 	updated_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL)
 
+	class Meta():
+		verbose_name_plural = "Fahrtage"
+		verbose_name = "Fahrtag"
+
 	def __str__(self):
 		return str(self.datum)
 	
@@ -68,10 +74,6 @@ class Fahrtag(models.Model):
 		return True
 			
 
-	class Meta():
-		verbose_name_plural = "Fahrtage"
-		verbose_name = "Fahrtag"
-
 class Buerotag(models.Model):
 	datum      = models.DateField(blank=True)
 	team       = models.ForeignKey('Einsatzmittel.Buero', on_delete=models.CASCADE)	
@@ -88,7 +90,11 @@ class Buerotag(models.Model):
 	archiv     = models.BooleanField(default=False)
 	updated_on = models.DateTimeField(auto_now=True, blank=True, null=True)
 	updated_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL)
-
+		
+	class Meta():
+		verbose_name_plural = "Bürotage"
+		verbose_name = "Bürotag"
+		
 	def __str__(self):
 		return str(self.datum)
 
@@ -96,7 +102,3 @@ class Buerotag(models.Model):
 	def wochentag(self):
 		wochentage = ['Mo','Di','Mi','Do','Fr','Sa','So']
 		return wochentage[self.datum.weekday()]
-		
-	class Meta():
-		verbose_name_plural = "Bürotage"
-		verbose_name = "Bürotag"		

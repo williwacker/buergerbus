@@ -1,7 +1,10 @@
 import datetime
-from django_cron import CronJobBase, Schedule
-from Einsatztage.utils import FahrtageSchreiben, BuerotageSchreiben, FahrplanBackup
 import logging
+
+from django_cron import CronJobBase, Schedule
+
+from Einsatztage.utils import (BuerotageSchreiben, FahrplanBackup,
+                               FahrtageSchreiben)
 
 logger = logging.getLogger(__name__)
 

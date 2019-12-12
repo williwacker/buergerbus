@@ -2,10 +2,11 @@ from django.contrib import admin
 from django.contrib.admin.options import ModelAdmin
 from jet.filters import RelatedFieldAjaxListFilter
 
+from Einsatzmittel.models import Bus
+
 from .models import Klienten, Orte, Strassen
 #from .forms import KlientenForm
 from .sites import my_admin_site
-from Einsatzmittel.models import Bus
 
 #class KlientenModelAdmin(admin.ModelAdmin):
 #	form = KlientenForm()
@@ -76,6 +77,5 @@ class StrassenAdmin(admin.ModelAdmin):
 			return []
 
 admin.site.register(Klienten, KlientenAdmin)
-#admin.site.register(KlientenBus, KlientenBusAdmin)
 admin.site.register(Orte, OrteAdmin)
 admin.site.register(Strassen, StrassenAdmin)

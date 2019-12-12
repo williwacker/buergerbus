@@ -1,11 +1,13 @@
-from django.db import models
-from django.core.exceptions import ValidationError
-from smart_selects.db_fields import ChainedForeignKey, GroupedForeignKey
+from datetime import date, datetime, timedelta
+
 from django.conf import settings
-from datetime import datetime, date, timedelta
+from django.core.exceptions import ValidationError
+from django.db import models
+from smart_selects.db_fields import ChainedForeignKey, GroupedForeignKey
 
 from Einsatzmittel.models import Bus
 from Einsatztage.models import Fahrtag
+
 
 class Tour(models.Model):
 	klient  = models.ForeignKey('Klienten.Klienten', related_name='klient', on_delete=models.CASCADE)
@@ -55,18 +57,14 @@ class Tour(models.Model):
 
 	@property
 	def hat_abhol_qr(self):
-		if self.abholklient.latitude == 0:
-			return False
-		if self.abholklient.longitude == 0:
-			return False
+		if self.abholklient.latitude == 0: return False
+		if self.abholklient.longitude == 0: return False
 		return True	
 
 	@property
 	def hat_ziel_qr(self):
-		if self.zielklient.latitude == 0:
-			return False
-		if self.zielklient.longitude == 0:
-			return False
+		if self.zielklient.latitude == 0: return False
+		if self.zielklient.longitude == 0: return False
 		return True						
 
 	def einsatz_bus(self):
@@ -91,4 +89,3 @@ class Tour(models.Model):
 		verbose_name_plural = "Touren"
 		verbose_name = "Tour"
 #		constraints = [models.UniqueConstraint(fields=['klient','bus','datum','uhrzeit'], name='unique_tour')]
-

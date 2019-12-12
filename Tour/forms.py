@@ -1,18 +1,21 @@
-from datetime import datetime, timedelta, time
+import logging
+from datetime import datetime, time, timedelta
+
 from django import forms
 from django.conf import settings
 from django.forms import BaseForm, ModelForm
-from jet.filters import RelatedFieldAjaxListFilter
-from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import force_text
+from django.utils.translation import ugettext_lazy as _
+from jet.filters import RelatedFieldAjaxListFilter
 
-from Tour.models import Tour
-from .utils import DistanceMatrix, DepartureTime, Latest_DepartureTime, GuestCount
-from Klienten.models import Klienten
 from Einsatzmittel.models import Bus
-from Einsatztage.models import Fahrtag
 from Einsatzmittel.utils import get_bus_list
-import logging
+from Einsatztage.models import Fahrtag
+from Klienten.models import Klienten
+from Tour.models import Tour
+
+from .utils import (DepartureTime, DistanceMatrix, GuestCount,
+                    Latest_DepartureTime)
 
 logger = logging.getLogger(__name__)
 

@@ -1,3 +1,3 @@
-from .my_models import *
-from .auth import *
-from .views import *
+from .my_models import * # isort:skip
+from .auth import * # isort:skip
+from .base import * # isort:skip

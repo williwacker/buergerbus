@@ -1,21 +1,24 @@
 import subprocess
-from django import template
-from django.http import Http404, HttpResponse, HttpResponseRedirect, FileResponse
-from django.shortcuts import get_object_or_404, render
+
+from django import forms, template
 from django.conf import settings
 from django.contrib import messages
+from django.http import (FileResponse, Http404, HttpResponse,
+                         HttpResponseRedirect)
+from django.shortcuts import get_object_or_404, render
 from jet.filters import RelatedFieldAjaxListFilter
-from django import forms
-from Klienten.forms import FahrgastAddForm, FahrgastChgForm
-from Klienten.models import Klienten, Orte, Strassen
-from Klienten.tables import FahrgaesteTable
-from Klienten.filters import FahrgaesteFilter
-from Klienten.utils import GeoLocation
+
+from Basis.utils import get_sidebar, render_to_pdf, url_args
+from Basis.views import (MyCreateView, MyDeleteView, MyDetailView, MyListView,
+                         MyUpdateView, MyView)
 from Einsatzmittel.models import Bus
 from Einsatzmittel.utils import get_bus_list
 from Einsatztage.views import FahrplanAsPDF
-from Basis.utils import get_sidebar, render_to_pdf, url_args
-from Basis.views import MyListView, MyDetailView, MyView, MyUpdateView, MyDeleteView, MyCreateView
+from Klienten.filters import FahrgaesteFilter
+from Klienten.forms import FahrgastAddForm, FahrgastChgForm
+from Klienten.models import Klienten, Orte, Strassen
+from Klienten.tables import FahrgaesteTable
+from Klienten.utils import GeoLocation
 
 register = template.Library()
 
@@ -24,7 +27,7 @@ class FahrgastView(MyListView):
 
 	def get_fg_queryset(self):
 		allow = settings.ALLOW_OUTSIDE_CLIENTS
-		if allow:
+		if allow: 
 			return Klienten.objects.order_by('name','ort').filter(typ='F', bus__in=get_bus_list(self.request)) | Klienten.objects.order_by('name','ort').filter(typ='F', bus__isnull=True)
 		else:
 			return Klienten.objects.order_by('name','ort').filter(typ='F', bus__in=get_bus_list(self.request))
@@ -34,12 +37,9 @@ class FahrgastView(MyListView):
 		bus = self.request.GET.get('bus')
 		sort = self.request.GET.get('sort')
 		qs = self.get_fg_queryset()
-		if ort:
-			qs = qs.filter(ort=ort)
-		if bus:
-			qs = qs.filter(bus=bus)
-		if sort:
-			qs = qs.order_by(sort)
+		if ort: qs = qs.filter(ort=ort)
+		if bus: qs = qs.filter(bus=bus)
+		if sort: qs = qs.order_by(sort)
 		return FahrgaesteTable(qs)
 
 
@@ -47,8 +47,7 @@ class FahrgastView(MyListView):
 		context = super().get_context_data(**kwargs)
 		context['sidebar_liste'] = get_sidebar(self.request.user)
 		context['title'] = "Fahrgäste"
-		if self.request.user.has_perm('Klienten.add_klienten'):
-			context['add'] = "Fahrgast"
+		if self.request.user.has_perm('Klienten.add_klienten'): context['add'] = "Fahrgast"
 		context['url_args'] = url_args(self.request)
 		context['filter'] = FahrgaesteFilter(self.request.GET, queryset=self.get_fg_queryset())
 		return context
@@ -102,8 +101,7 @@ class FahrgastChangeView(MyUpdateView):
 		context = {}
 		context['sidebar_liste'] = get_sidebar(request.user)
 		context['title'] = "Fahrgast ändern"
-		if request.user.has_perm('Klienten.delete_klienten'):
-			context['delete_button'] = "Löschen"
+		if request.user.has_perm('Klienten.delete_klienten'): context['delete_button'] = "Löschen"
 		context['submit_button'] = "Sichern"
 		context['back_button'] = ["Abbrechen",self.success_url+url_args(self.request)]
 		context['url_args'] = url_args(request)

@@ -1,9 +1,8 @@
 from django.urls import path
 
 from . import views
-
-from .views import BusView, BusAddView, BusChangeView, BusDeleteView
-from .views import BueroView, BueroAddView, BueroChangeView, BueroDeleteView
+from .views import (BueroAddView, BueroChangeView, BueroDeleteView, BueroView,
+                    BusAddView, BusChangeView, BusDeleteView, BusView)
 
 app_name = 'Einsatzmittel'
 urlpatterns = [

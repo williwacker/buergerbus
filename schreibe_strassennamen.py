@@ -12,13 +12,16 @@ Lese die Datei mit den Orts und Strassennamen und schreibe sie in die entspreche
 
 import configparser
 import os
-os.environ.setdefault('DJANGO_SETTINGS_MODULE','buergerbus.settings')
 
 import django
+
+from Einsatzmittel.models import Bus
+from Klienten.models import Orte, Strassen
+
+os.environ.setdefault('DJANGO_SETTINGS_MODULE','buergerbus.settings')
+
 django.setup()
 
-from Klienten.models import Orte, Strassen
-from Einsatzmittel.models import Bus
 
 class ReadNames():
 	def __init__(self,filename):

@@ -1,28 +1,30 @@
-from django.template.loader import get_template
-from django.http import Http404, HttpResponse, HttpResponseRedirect, HttpResponseForbidden, FileResponse
-from django.shortcuts import get_object_or_404, render
-from django.http import HttpResponse
-from django.contrib import messages
-from django.conf import settings
 from django import forms
-from django.utils.safestring import mark_safe
-from django.core.exceptions import PermissionDenied
+from django.conf import settings
+from django.contrib import messages
 from django.contrib.auth.models import Group
-from trml2pdf import trml2pdf
+from django.core.exceptions import PermissionDenied
 from django.core.mail import EmailMessage
+from django.http import (FileResponse, Http404, HttpResponse,
+                         HttpResponseForbidden, HttpResponseRedirect)
+from django.shortcuts import get_object_or_404, render
+from django.template.loader import get_template
+from django.utils.safestring import mark_safe
+from trml2pdf import trml2pdf
 
-from .tables import FahrtagTable, BuerotagTable, TourTable, FahrerTable
-from .filters import FahrtagFilter, BuerotagFilter
-from .utils import FahrtageSchreiben, BuerotageSchreiben, FahrplanBackup
-from .forms import FahrtagChgForm, BuerotagChgForm, FahrplanEmailForm
-from .models import Fahrtag, Buerotag
-from Klienten.models import Klienten
-from Tour.models import Tour
-from Team.models import Fahrer, Koordinator
-from Einsatzmittel.models import Bus
-from Einsatzmittel.utils import get_bus_list, get_buero_list
 from Basis.utils import get_sidebar, url_args
-from Basis.views import MyListView, MyDetailView, MyView, MyUpdateView
+from Basis.views import MyDetailView, MyListView, MyUpdateView, MyView
+from Einsatzmittel.models import Bus
+from Einsatzmittel.utils import get_buero_list, get_bus_list
+from Klienten.models import Klienten
+from Team.models import Fahrer, Koordinator
+from Tour.models import Tour
+
+from .filters import BuerotagFilter, FahrtagFilter
+from .forms import BuerotagChgForm, FahrplanEmailForm, FahrtagChgForm
+from .models import Buerotag, Fahrtag
+from .tables import BuerotagTable, FahrerTable, FahrtagTable, TourTable
+from .utils import BuerotageSchreiben, FahrplanBackup, FahrtageSchreiben
+
 
 class FahrplanView(MyListView):
 	permission_required = 'Tour.view_tour'
@@ -88,8 +90,6 @@ class FahrplanBackupView(MyView):
 		FahrplanBackup().send_backup()
 		return HttpResponseRedirect(self.success_url+url_args(request))		
 
-
-
 class FahrplanEmailView(MyDetailView):
 	form_class = FahrplanEmailForm
 	permission_required = 'Tour.view_tour'
@@ -110,8 +110,7 @@ class FahrplanEmailView(MyDetailView):
 	def get_dsgvo_klienten(self):
 		klienten_liste = {}
 		for tour in self.context['tour_liste']:
-			if tour.klient.dsgvo == '01':
-				klienten_liste[tour.klient.name] = tour.klient
+			if tour.klient.dsgvo == '01': klienten_liste[tour.klient.name] = tour.klient
 		return klienten_liste
 
 	def writeDSGVO(self):
@@ -158,12 +157,9 @@ class FahrplanEmailView(MyDetailView):
 		self.initial['von'] = settings.EMAIL_HOST_USER
 		ft = self.context['fahrtag_liste']
 		email_to = []
-		if ft.fahrer_vormittag:
-			email_to.append(ft.fahrer_vormittag.email)
-		if ft.fahrer_nachmittag:
-			email_to.append(ft.fahrer_nachmittag.email)
-		if ft.team.email:
-			email_to.append(ft.team.email)	
+		if ft.fahrer_vormittag: email_to.append(ft.fahrer_vormittag.email)
+		if ft.fahrer_nachmittag: email_to.append(ft.fahrer_nachmittag.email)
+		if ft.team.email: email_to.append(ft.team.email)	
 		self.initial['an'] = "; ".join(email_to)
 		self.initial['betreff'] = '[Bürgerbus] Fahrplan {} am {}'.format(ft.team,ft.datum)
 		self.initial['datei'] = '\n'.join(self.context['filepath'])
@@ -182,8 +178,7 @@ class FahrplanEmailView(MyDetailView):
 				post['an'].split(";"),
 				reply_to=post['von'].split(";"),
 			)
-			if post['cc']:
-				email.cc = post['cc'].split(";")
+			if post['cc']: email.cc = post['cc'].split(";")
 			for filepath in post['datei'].split('\n'):
 				email.attach_file(filepath.strip('\r'))
 			email.send(fail_silently=False)
@@ -206,15 +201,12 @@ class FahrtageListView(MyListView):
 	permission_required = 'Einsatztage.view_fahrtag'
 
 	def get_queryset(self):
-		if self.request.user.has_perm('Einsatztage.change_fahrtag'):
-			FahrtageSchreiben()
+		if self.request.user.has_perm('Einsatztage.change_fahrtag'): FahrtageSchreiben()
 		team = self.request.GET.get('team')
 		sort = self.request.GET.get('sort')
 		qs = Fahrtag.objects.order_by('datum','team').filter(archiv=False, team__in=get_bus_list(self.request))
-		if team:
-			qs = qs.filter(team=team)
-		if sort:
-			qs = qs.order_by(sort)
+		if team: qs = qs.filter(team=team)
+		if sort: qs = qs.order_by(sort)
 		table = FahrtagTable(qs)
 		table.paginate(page=self.request.GET.get("page", 1), per_page=20)
 		return table
@@ -260,15 +252,12 @@ class BuerotageListView(MyListView):
 	permission_required = 'Einsatztage.view_buerotag'
 	
 	def get_queryset(self):
-		if self.request.user.has_perm('Einsatztage.change_buerotag'):
-			BuerotageSchreiben()
+		if self.request.user.has_perm('Einsatztage.change_buerotag'): BuerotageSchreiben()
 		team = self.request.GET.get('team')
 		sort = self.request.GET.get('sort')
 		qs = Buerotag.objects.order_by('team','datum').filter(archiv=False, team__in=get_buero_list(self.request))
-		if team:
-			qs = qs.filter(team=team)
-		if sort:
-			qs = qs.order_by(sort)
+		if team: qs = qs.filter(team=team)
+		if sort: qs = qs.order_by(sort)
 		table = BuerotagTable(qs)
 		table.paginate(page=self.request.GET.get("page", 1), per_page=20)
 		return table

@@ -1,23 +1,26 @@
 import subprocess
-from fuzzywuzzy import fuzz, process
-from django import template
-from django.http import Http404, HttpResponse, HttpResponseRedirect
-from django.shortcuts import get_object_or_404, render
+
+from django import forms, template
 from django.conf import settings
 from django.contrib import messages
+from django.http import Http404, HttpResponse, HttpResponseRedirect
+from django.shortcuts import get_object_or_404, render
+from fuzzywuzzy import fuzz, process
 from jet.filters import RelatedFieldAjaxListFilter
-from django import forms
-from Klienten.forms import DienstleisterAddForm, DienstleisterChgForm, KlientenSearchForm, KlientenSearchResultForm
-from Klienten.models import Klienten, Orte, Strassen, DIENSTLEISTER_AUSWAHL
-from Klienten.tables import DienstleisterTable
-from Klienten.filters import DienstleisterFilter
-from Klienten.utils import GeoLocation
+
+from Basis.telefonbuch_suche import Telefonbuch
+from Basis.utils import get_sidebar, render_to_pdf, url_args
+from Basis.views import (MyDeleteView, MyDetailView, MyListView,
+                         MyMultiFormsView, MyUpdateView, MyView)
 from Einsatzmittel.models import Bus
 from Einsatzmittel.utils import get_bus_list
-from Basis.utils import get_sidebar, render_to_pdf, url_args
-from Basis.views import MyListView, MyDetailView, MyView, MyUpdateView, MyDeleteView, MyMultiFormsView
 from Einsatztage.views import FahrplanAsPDF
-from Basis.telefonbuch_suche import Telefonbuch
+from Klienten.filters import DienstleisterFilter
+from Klienten.forms import (DienstleisterAddForm, DienstleisterChgForm,
+                            KlientenSearchForm, KlientenSearchResultForm)
+from Klienten.models import DIENSTLEISTER_AUSWAHL, Klienten, Orte, Strassen
+from Klienten.tables import DienstleisterTable
+from Klienten.utils import GeoLocation
 
 register = template.Library()
 
@@ -30,22 +33,17 @@ class DienstleisterView(MyListView):
 		kategorie = self.request.GET.get('kategorie')
 		sort = self.request.GET.get('sort')
 		qs = Klienten.objects.order_by('name','ort').filter(typ='D')
-		if ort:
-			qs = qs.filter(ort=ort)
-		if name:
-			qs = qs.filter(name=name)
-		if kategorie:
-			qs = qs.filter(kategorie=kategorie)
-		if sort:
-			qs = qs.order_by(sort)
+		if ort: qs = qs.filter(ort=ort)
+		if name: qs = qs.filter(name=name)
+		if kategorie: qs = qs.filter(kategorie=kategorie)
+		if sort: qs = qs.order_by(sort)
 		return DienstleisterTable(qs)
 
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
 		context['sidebar_liste'] = get_sidebar(self.request.user)
 		context['title'] = "Dienstleister"
-		if self.request.user.has_perm('Klienten.add_klienten'):
-			context['add'] = "Dienstleister"
+		if self.request.user.has_perm('Klienten.add_klienten'): context['add'] = "Dienstleister"
 		context['filter'] = DienstleisterFilter(self.request.GET, queryset=Klienten.objects.order_by('name','ort').filter(typ='D'))
 		context['url_args'] = url_args(self.request)
 		return context		
@@ -100,8 +98,7 @@ class DienstleisterChangeView(MyUpdateView):
 		context = {}
 		context['sidebar_liste'] = get_sidebar(request.user)
 		context['title'] = "Fahrgast ändern"
-		if self.request.user.has_perm('Klienten.delete_klienten'):
-			context['delete_button'] = "Löschen"
+		if self.request.user.has_perm('Klienten.delete_klienten'): context['delete_button'] = "Löschen"
 		context['submit_button'] = "Sichern"
 		context['back_button'] = ["Abbrechen",self.success_url+url_args(self.request)]
 		context['url_args'] = url_args(request)
@@ -174,8 +171,7 @@ class DienstleisterSearchMultiformsView(MyMultiFormsView):
 			for i in range(len(result_list)):
 				# na = Name, pc = PLZ, ci = City, st = Street, hn = house-no, ph = phone, mph = mobile phone
 				choices.append((i+1,'{} {} {} {} {}'.format(result_list[i]['na'],result_list[i]['pc'],result_list[i]['ci'],result_list[i]['st'],result_list[i]['hn'])))
-				if i+1 == initial['choice']:
-					sel_choice = choices[i]
+				if i+1 == initial['choice']: sel_choice = choices[i]
 		choices.append((0,'Adresse manuell eingeben'))
 
 		form = self.form_classes['anlegen'](self.request.POST or None, initial={'suchergebnis':sel_choice})

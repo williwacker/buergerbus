@@ -1,11 +1,12 @@
-from django.contrib.admin.widgets import RelatedFieldWidgetWrapper
 from django import forms
+from django.contrib.admin.widgets import RelatedFieldWidgetWrapper
 from django.forms import ModelForm, modelformset_factory
-from jet.filters import RelatedFieldAjaxListFilter
 from django.utils.translation import ugettext_lazy as _
+from jet.filters import RelatedFieldAjaxListFilter
 
-from .models import Klienten, Orte, Strassen, DSGVO_AUSWAHL
 from Einsatzmittel.utils import get_bus_list
+
+from .models import DSGVO_AUSWAHL, Klienten, Orte, Strassen
 from .sites import my_admin_site
 
 StammdatenFormSet = modelformset_factory(Klienten, fields=('name','telefon','mobil'))
@@ -26,14 +27,12 @@ class KlientenForm(ModelForm):
 
 	def clean_telefon(self):
 		data = self.cleaned_data['telefon']
-		if data:
-			data = data.replace('/','-')
+		if data: data = data.replace('/','-')
 		return data
 
 	def clean_mobil(self):
 		data = self.cleaned_data['mobil']
-		if data:
-			data = data.replace('/','-')
+		if data: data = data.replace('/','-')
 		return data
 
 class KlientenSearchForm(forms.Form):
@@ -49,22 +48,19 @@ class KlientenSearchResultForm(forms.Form):
 
 	def clean_suchergebnis(self):
 		data = self.cleaned_data['suchergebnis']
-		if not data:
-			raise forms.ValidationError("Bitte erst einen Eintrag aus der Liste wählen")
+		if not data: raise forms.ValidationError("Bitte erst einen Eintrag aus der Liste wählen")
 		return data	
 
 class DienstleisterForm(ModelForm):
 
 	def clean_telefon(self):
 		data = self.cleaned_data['telefon']
-		if data:
-			data = data.replace('/','-')
+		if data: data = data.replace('/','-')
 		return data
 
 	def clean_mobil(self):
 		data = self.cleaned_data['mobil']
-		if data:
-			data = data.replace('/','-')
+		if data: data = data.replace('/','-')
 		return data				
 
 class FahrgastAddForm(KlientenForm):
@@ -97,14 +93,14 @@ class OrtAddForm(ModelForm):
 		fields = ['ort','plz','bus']
 
 class OrtChgForm(ModelForm):
+	class Meta:
+		model = Orte
+		fields = ['ort','plz','bus']
+
 	def __init__(self, *args, **kwargs):
 		super(OrtChgForm, self).__init__(*args, **kwargs)
 		self.fields['ort'].disabled = True
-		self.fields['ort'].required = False	
-
-	class Meta:
-		model = Orte
-		fields = ['ort','plz','bus']		
+		self.fields['ort'].required = False			
 
 class StrassenForm(ModelForm):
 	class Meta:
@@ -117,10 +113,12 @@ class StrassenAddForm(ModelForm):
 		fields = ['ort','strasse']	
 
 class StrassenChgForm(ModelForm):
+	
+	class Meta:
+		model = Strassen
+		fields = ['ort','strasse']
+
 	def __init__(self, *args, **kwargs):
 		super(StrassenChgForm, self).__init__(*args, **kwargs)
 		self.fields['ort'].disabled = True
-		self.fields['ort'].required = False		
-	class Meta:
-		model = Strassen
-		fields = ['ort','strasse']	
+		self.fields['ort'].required = False			

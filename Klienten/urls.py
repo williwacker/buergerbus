@@ -1,9 +1,11 @@
 from django.urls import path, re_path
-from .views import FahrgastView, DienstleisterView, DSGVOView, DSGVOasPDFView, FahrgastAddView, FahrgastChangeView, FahrgastDeleteView
-from .views import DienstleisterView, DienstleisterAddView, DienstleisterChangeView, DienstleisterDeleteView
-from .views import DienstleisterSearchMultiformsView
-from .views import OrtView, OrtAddView, OrtChangeView, OrtDeleteView
-from .views import StrassenView, StrassenAddView, StrassenChangeView, StrassenDeleteView
+
+from .views import (
+    DienstleisterAddView, DienstleisterChangeView, DienstleisterDeleteView,
+    DienstleisterSearchMultiformsView, DienstleisterView, DSGVOasPDFView,
+    DSGVOView, FahrgastAddView, FahrgastChangeView, FahrgastDeleteView,
+    FahrgastView, OrtAddView, OrtChangeView, OrtDeleteView, OrtView,
+    StrassenAddView, StrassenChangeView, StrassenDeleteView, StrassenView)
 
 app_name = 'Klienten'
 urlpatterns = [

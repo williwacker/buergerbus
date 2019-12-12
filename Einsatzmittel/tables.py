@@ -1,6 +1,7 @@
 import django_tables2 as tables
 
-from .models import Bus, Buero
+from .models import Buero, Bus
+
 
 class BusTable(tables.Table):
     bus = tables.TemplateColumn(
@@ -12,6 +13,7 @@ class BusTable(tables.Table):
             {% endif %}
         '''
     )
+
     class Meta:
         model = Bus
         fields = ('bus', 'plantage', 'sitzplaetze', 'fahrtage', 'email')
@@ -26,6 +28,7 @@ class BueroTable(tables.Table):
         {% endif %}
         '''
     )
+    
     class Meta:
         model = Buero
         fields = ('buero','buerotage')      

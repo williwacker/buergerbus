@@ -1,15 +1,17 @@
+from django.contrib import messages
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.models import Group, User
+from django.contrib.auth.views import PasswordChangeView
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
-from django.contrib.auth.models import User, Group
-from django.contrib import messages
-from django.contrib.auth.views import PasswordChangeView
 from django.views.generic import TemplateView
+
+from Basis.forms import MyGroupChangeForm, MyUserChangeForm
+from Basis.tables import GroupTable, UserTable
 from Basis.utils import get_sidebar, url_args
-from Basis.tables import UserTable, GroupTable
-from Basis.views import MyListView, MyDetailView, MyUpdateView, MyView, MyDeleteView
-from Basis.forms import MyUserChangeForm, MyGroupChangeForm
-from django.contrib.auth.forms import UserCreationForm
-from django.views.generic import ListView, DetailView, CreateView, UpdateView
+from Basis.views import (MyDeleteView, MyDetailView, MyListView, MyUpdateView,
+                         MyView)
+
 
 class UserView(MyListView):
 	permission_required = 'auth.view_user'

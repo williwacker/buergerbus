@@ -1,7 +1,8 @@
 import django_tables2 as tables
 
-from .models import Fahrtag, Buerotag
 from Tour.models import Tour
+
+from .models import Buerotag, Fahrtag
 
 
 class FahrtagTable(tables.Table):
@@ -54,6 +55,7 @@ class FahrtagTable(tables.Table):
         '''
     )
     wochentag = tables.Column(orderable=False)
+
     class Meta:
         model = Fahrtag
         fields = ('datum','wochentag','team','fahrer_vormittag','gaeste_vormittag','fahrer_nachmittag','gaeste_nachmittag','fahrplan')
@@ -95,6 +97,7 @@ class TourTable(tables.Table):
         template_code='''{{ record.klient.telefon |default_if_none:"-" }}<br/>{{ record.klient.mobil |default_if_none:"" }}
         '''
     )
+    
     class Meta:
         model = Tour
         fields = ('fahrgast','telefon','uhrzeit','zustieg','personenzahl','abholort','zielort','entfernung','ankunft','bemerkungen')

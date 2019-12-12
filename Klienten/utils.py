@@ -1,7 +1,8 @@
-from django.contrib import messages
-from django.conf import settings
-import googlemaps
 import logging
+
+import googlemaps
+from django.conf import settings
+from django.contrib import messages
 
 logger = logging.getLogger(__name__)
 

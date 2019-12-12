@@ -1,17 +1,21 @@
-from django.http import Http404, HttpResponse, HttpResponseRedirect
-from django.shortcuts import get_object_or_404, render
-from django.views.generic import ListView, DetailView, View, CreateView, UpdateView, DeleteView
-from django.views.generic.detail import BaseDetailView
-from Basis.multiform import MultiFormsView
-from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
-from django.contrib.messages.views import SuccessMessageMixin
-from django.contrib.auth.models import User
+from django import forms
 from django.conf import settings
 from django.contrib import messages
+from django.contrib.auth.mixins import (LoginRequiredMixin,
+                                        PermissionRequiredMixin)
+from django.contrib.auth.models import User
+from django.contrib.messages.views import SuccessMessageMixin
 from django.core.exceptions import PermissionDenied
-from django import forms
-from Basis.utils import get_sidebar, get_relation_dict, url_args
 from django.core.mail import EmailMessage
+from django.http import Http404, HttpResponse, HttpResponseRedirect
+from django.shortcuts import get_object_or_404, render
+from django.views.generic import (
+    CreateView, DeleteView, DetailView, ListView, UpdateView, View)
+from django.views.generic.detail import BaseDetailView
+
+from Basis.multiform import MultiFormsView
+from Basis.utils import get_relation_dict, get_sidebar, url_args
+
 
 def my_custom_bad_request_view(request, exception):  #400
     return render(request,'Basis/400.html')

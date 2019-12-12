@@ -1,12 +1,13 @@
-from django.urls import path
 from django.conf.urls import url
+from django.urls import path
 from django.views.generic import TemplateView
 
-from Basis.views import UserView, UserAddView, UserChangeView, UserDeleteView
-from Basis.views import GroupView, GroupAddView, GroupChangeView, GroupDeleteView
-from Basis.views import DocumentPDFView, DocumentListView, DocumentAddView, DocumentChangeView, DocumentDeleteView
-from Basis.views import FeedbackView
 from Basis.models import Document
+from Basis.views import (
+    DocumentAddView, DocumentChangeView, DocumentDeleteView, DocumentListView,
+    DocumentPDFView, FeedbackView, GroupAddView, GroupChangeView,
+    GroupDeleteView, GroupView, UserAddView, UserChangeView, UserDeleteView,
+    UserView)
 
 app_name = 'Basis'
 urlpatterns = [

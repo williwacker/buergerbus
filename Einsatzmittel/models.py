@@ -1,20 +1,21 @@
 ﻿from django.db import models
-from django.db.models import DEFERRED
-from django.utils import timezone
 from django.conf import settings
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
+from django.db.models import DEFERRED
+from django.utils import timezone
+
 
 class Wochentage(models.Model):
 	name = models.CharField(max_length=10, verbose_name = "Wochentag")
-
-	def __str__(self):
-		return self.name
 
 	class Meta():
 		verbose_name_plural = "Wochentage"
 		verbose_name = "Wochentag"
 		ordering = ["id"]	
+
+	def __str__(self):
+		return self.name
 
 
 class Buero(models.Model):
@@ -23,6 +24,12 @@ class Buero(models.Model):
 	updated_on = models.DateTimeField(auto_now=True, blank=True, null=True)
 	updated_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, related_name="buero_updated_by", on_delete=models.SET_NULL)
 	
+	class Meta():
+		verbose_name_plural = "Büros"
+		verbose_name = "Büro"
+		ordering = ["buero"]
+		constraints = [models.UniqueConstraint(fields=['buero'], name='unique_buero')]
+
 	def __str__(self):
 		return str(self.buero)
 
@@ -63,12 +70,6 @@ class Buero(models.Model):
 			pass
 		super().delete(*args, **kwargs)
 
-	class Meta():
-		verbose_name_plural = "Büros"
-		verbose_name = "Büro"
-		ordering = ["buero"]
-		constraints = [models.UniqueConstraint(fields=['buero'], name='unique_buero')]
-
 class Bus(models.Model):
 	bus         = models.CharField(max_length=25, verbose_name="Bus")
 	sitzplaetze = models.IntegerField(default=8, verbose_name="Anzahl Sitzplätze") 
@@ -77,6 +78,12 @@ class Bus(models.Model):
 	plantage    = models.IntegerField(default=0, verbose_name="Anzahl planbarer Kalendertage")
 	updated_on  = models.DateTimeField(auto_now=True, blank=True, null=True)
 	updated_by  = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, related_name="bus_updated_by", on_delete=models.SET_NULL)
+
+	class Meta():
+		verbose_name_plural = "Busse"
+		verbose_name = "Bus"
+		ordering = ["bus"]
+		constraints = [models.UniqueConstraint(fields=['bus'], name='unique_bus')]
 
 	def __str__(self):
 		return str(self.bus)
@@ -117,9 +124,3 @@ class Bus(models.Model):
 		except Permission.DoesNotExist:
 			pass
 		super().delete(*args, **kwargs)
-
-	class Meta():
-		verbose_name_plural = "Busse"
-		verbose_name = "Bus"
-		ordering = ["bus"]
-		constraints = [models.UniqueConstraint(fields=['bus'], name='unique_bus')]

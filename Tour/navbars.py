@@ -1,6 +1,6 @@
 from django import template
-from django.utils.safestring import mark_safe
 from django.conf import settings
+from django.utils.safestring import mark_safe
 
 register = template.Library()
 

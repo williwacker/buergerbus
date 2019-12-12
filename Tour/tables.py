@@ -1,7 +1,9 @@
+from datetime import date, datetime
+
 import django_tables2 as tables
-from datetime import datetime, date
 
 from .models import Tour
+
 
 class TourTable(tables.Table):
 	fahrgast = tables.TemplateColumn(
@@ -40,6 +42,7 @@ class TourTable(tables.Table):
 		template_code ='''{{ record.klient.bemerkung  |safe|default_if_none:""  }}<br/>{{ record.bemerkung|default_if_none:""  }} ''',
 		orderable=False
 	)
+	
 	class Meta:
 		model = Tour
 		fields = ('fahrgast','bus','datum','uhrzeit','zustieg','personenzahl','abholort','zielort','entfernung','ankunft','bemerkung')

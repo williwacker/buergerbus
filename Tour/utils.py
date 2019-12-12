@@ -1,11 +1,14 @@
-from datetime import datetime, timedelta, time, date
+import logging
+from datetime import date, datetime, time, timedelta
+
 import googlemaps
 from django.conf import settings
-from .models import Tour
-from Einsatztage.models import Fahrtag
+
 from Einsatzmittel.models import Bus
+from Einsatztage.models import Fahrtag
 from Klienten.models import Klienten
-import logging
+
+from .models import Tour
 
 logger = logging.getLogger(__name__)
 

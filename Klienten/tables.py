@@ -1,6 +1,7 @@
 import django_tables2 as tables
 
-from .models import Orte, Strassen, Klienten
+from .models import Klienten, Orte, Strassen
+
 
 class FahrgaesteTable(tables.Table):
     name = tables.TemplateColumn(
@@ -48,15 +49,15 @@ class FahrgaesteTable(tables.Table):
         verbose_name='Anzahl Touren'
     )
 
+    class Meta:
+        model = Klienten
+        fields = ('name','telefon','adresse','bus','bemerkung','tour','dsgvo','anzahl_fahrgast_touren')
+
     def before_render(self, request):
         if request.user.is_superuser:
             self.columns.show('anzahl_fahrgast_touren')
         else:
             self.columns.hide('anzahl_fahrgast_touren')
-
-    class Meta:
-        model = Klienten
-        fields = ('name','telefon','adresse','bus','bemerkung','tour','dsgvo','anzahl_fahrgast_touren')
 
 class DienstleisterTable(tables.Table):
     name = tables.TemplateColumn(
@@ -81,16 +82,15 @@ class DienstleisterTable(tables.Table):
         verbose_name='Anzahl Touren'
     )
 
+    class Meta:
+        model = Klienten
+        fields = ('name','telefon','adresse','bemerkung','kategorie','anzahl_dienstleister_touren')
+
     def before_render(self, request):
         if request.user.is_superuser:
             self.columns.show('anzahl_dienstleister_touren')
         else:
             self.columns.hide('anzahl_dienstleister_touren')
-
-    class Meta:
-        model = Klienten
-        fields = ('name','telefon','adresse','bemerkung','kategorie','anzahl_dienstleister_touren')
-
         
 class OrteTable(tables.Table):
     ort = tables.TemplateColumn(
@@ -102,6 +102,7 @@ class OrteTable(tables.Table):
             {% endif %}     
         '''
     )
+
     class Meta:
         model = Orte
         fields = ('ort','plz','bus')
@@ -116,6 +117,7 @@ class StrassenTable(tables.Table):
             {% endif %} 
         '''
     )
+    
     class Meta:
         model = Strassen
         fields = ('ort','strasse')       

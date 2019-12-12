@@ -2,6 +2,7 @@ from django.contrib import admin
 
 from .models import Fahrer, Koordinator
 
+
 class FahrerAdmin(admin.ModelAdmin):
 	
     list_display = ('name', 'team', 'email', 'mobil', 'aktiv')

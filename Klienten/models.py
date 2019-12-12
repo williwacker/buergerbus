@@ -1,9 +1,10 @@
 import datetime
 
+from django.conf import settings
 from django.db import models
 from django.utils import timezone
-from django.conf import settings
 from smart_selects.db_fields import ChainedForeignKey
+
 from Einsatzmittel.models import Bus
 from Tour.models import Tour
 
@@ -34,14 +35,14 @@ class Orte(models.Model):
 	updated_on = models.DateTimeField(auto_now=True, blank=True, null=True)
 	updated_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL)
 	
-	def __str__(self):
-		return self.ort
-	
 	class Meta():
 		verbose_name_plural = "Orte"
 		verbose_name = "Ort"
 		ordering = ["ort"]
 		constraints = [models.UniqueConstraint(fields=['ort'], name='unique_ort')]
+
+	def __str__(self):
+		return self.ort	
 
 class Strassen(models.Model):
 	ort     = models.ForeignKey(Orte, null=True, on_delete=models.CASCADE)
@@ -49,13 +50,13 @@ class Strassen(models.Model):
 	updated_on = models.DateTimeField(auto_now=True, blank=True, null=True)
 	updated_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL)
 	
-	def __str__(self):
-		return self.strasse
-
 	class Meta():
 		verbose_name_plural = "Strassen"
 		verbose_name = "Strasse"
 		constraints = [models.UniqueConstraint(fields=['ort','strasse'], name='unique_strasse')]
+
+	def __str__(self):
+		return self.strasse
 
 class Klienten(models.Model):
 	name    = models.CharField(max_length=100, help_text="Name, Vorname")
@@ -82,7 +83,12 @@ class Klienten(models.Model):
 	longitude = models.DecimalField(max_digits=7, decimal_places=4, default=0)
 	updated_on = models.DateTimeField(auto_now=True, blank=True, null=True)
 	updated_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL)
-	
+
+	class Meta():
+		verbose_name_plural = "Klienten"
+		verbose_name = "Klient"
+		constraints = [models.UniqueConstraint(fields=['name','ort','strasse','hausnr'], name='unique_klient')]
+
 	def __str__(self):
 		if self.typ=='D':
 			return " ".join([self.name, self.ort.ort, self.strasse.strasse])
@@ -117,8 +123,3 @@ class Klienten(models.Model):
 	@property
 	def anzahl_fahrgast_touren(self):
 		return Tour.objects.filter(klient_id=self.id).count()
-
-	class Meta():
-		verbose_name_plural = "Klienten"
-		verbose_name = "Klient"
-		constraints = [models.UniqueConstraint(fields=['name','ort','strasse','hausnr'], name='unique_klient')]

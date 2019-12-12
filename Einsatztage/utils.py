@@ -1,21 +1,27 @@
-import datetime, time, csv, io, os
-from os import environ,getcwd
+import csv
+import datetime
+import io
+import logging
+import os
+import time
+from os import environ, getcwd
+
+from django.conf import settings
+from django.contrib.auth.models import Permission
 from django.core.mail import EmailMessage, get_connection
 from django.http import HttpResponse
 from django.template.loader import get_template
-from django.contrib.auth.models import Permission
-from django.conf import settings
-from .models import Fahrtag
-from Einsatzmittel.models import Bus, Buero
-from Tour.models import Tour
-from Einsatztage.models import Fahrtag
-import logging
-
-logger = logging.getLogger(__name__)
 
 ### Fahrtage und Bürotage schreiben
 from Basis.berechnung_feiertage import Holidays
-from Einsatztage.models import Fahrtag, Buerotag
+from Einsatzmittel.models import Buero, Bus
+from Einsatztage.models import Buerotag, Fahrtag
+from Tour.models import Tour
+
+from .models import Fahrtag
+
+logger = logging.getLogger(__name__)
+
 
 def get_holidays():
 	# die nächsten Feiertage ausrechnen

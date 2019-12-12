@@ -1,19 +1,21 @@
 import subprocess
-from django import template
-from django.http import Http404, HttpResponse, HttpResponseRedirect
-from django.shortcuts import get_object_or_404, render
+
+from django import forms, template
 from django.conf import settings
 from django.contrib import messages
+from django.http import Http404, HttpResponse, HttpResponseRedirect
+from django.shortcuts import get_object_or_404, render
 from jet.filters import RelatedFieldAjaxListFilter
-from django import forms
-from Klienten.forms import StrassenAddForm, StrassenChgForm
-from Klienten.models import Strassen, Orte
-from Klienten.tables import StrassenTable
-from Klienten.filters import StrassenFilter
+
+from Basis.utils import get_sidebar, render_to_pdf, url_args
+from Basis.views import (MyCreateView, MyDeleteView, MyDetailView, MyListView,
+                         MyUpdateView, MyView)
 from Einsatzmittel.models import Bus
 from Einsatzmittel.utils import get_bus_list
-from Basis.utils import get_sidebar, render_to_pdf, url_args
-from Basis.views import MyListView, MyDetailView, MyView, MyUpdateView, MyDeleteView, MyCreateView
+from Klienten.filters import StrassenFilter
+from Klienten.forms import StrassenAddForm, StrassenChgForm
+from Klienten.models import Orte, Strassen
+from Klienten.tables import StrassenTable
 
 register = template.Library()
 
@@ -24,10 +26,8 @@ class StrassenView(MyListView):
 		ort = self.request.GET.get('ort')
 		strasse = self.request.GET.get('strasse')
 		qs = Strassen.objects.order_by('ort','strasse')
-		if ort:
-			qs = qs.filter(ort=ort)
-		if strasse:
-			qs = qs.filter(strasse=strasse)
+		if ort: qs = qs.filter(ort=ort)
+		if strasse: qs = qs.filter(strasse=strasse)
 		table = StrassenTable(qs)
 		table.paginate(page=self.request.GET.get("page", 1), per_page=20)
 		return table
@@ -36,8 +36,7 @@ class StrassenView(MyListView):
 		context = super().get_context_data(**kwargs)
 		context['sidebar_liste'] = get_sidebar(self.request.user)
 		context['title'] = "Strassen"
-		if self.request.user.has_perm('Klienten.add_strassen'):
-			context['add'] = "Strasse"
+		if self.request.user.has_perm('Klienten.add_strassen'): context['add'] = "Strasse"
 		context['filter'] = StrassenFilter(self.request.GET, queryset=Strassen.objects.all())
 		context['url_args'] = url_args(self.request)
 		return context
@@ -83,8 +82,7 @@ class StrassenChangeView(MyUpdateView):
 		context = {}
 		context['sidebar_liste'] = get_sidebar(request.user)
 		context['title'] = "Strasse ändern"
-		if self.request.user.has_perm('Klienten.delete_strassen'):
-			context['delete_button'] = "Löschen"
+		if self.request.user.has_perm('Klienten.delete_strassen'): context['delete_button'] = "Löschen"
 		context['submit_button'] = "Sichern"
 		context['back_button'] = ["Abbrechen",self.success_url+url_args(self.request)]
 		context['url_args'] = url_args(request)

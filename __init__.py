@@ -17,8 +17,8 @@
 
 __version__ = "3.0.2"
 
-from googlemaps.client import Client
 import googlemaps.exceptions
+from googlemaps.client import Client
 
 # Allow sphinx to pick up these symbols for the documentation.
 __all__ = ["Client"]

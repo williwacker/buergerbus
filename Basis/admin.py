@@ -1,8 +1,8 @@
 from django.contrib import admin
+from django.contrib.auth.admin import User, UserAdmin
 
 # Register your models here.
 
-from django.contrib.auth.admin import UserAdmin, User
 
 class RestrictedUserAdmin(UserAdmin):
     model = User

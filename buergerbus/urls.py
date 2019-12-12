@@ -13,16 +13,16 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from django.contrib import admin
-from django.urls import path, include, reverse_lazy
-from django.conf.urls import url
-from smart_selects import urls as smart_selects_urls
-from django.contrib.auth.views import PasswordChangeView
-from django.views.generic import TemplateView
 import debug_toolbar
-from Basis.views import BasisView
-from Basis.views import MyPasswordChangeView, MyPasswordChangeDoneView
+from django.conf.urls import url
+from django.contrib import admin
+from django.contrib.auth.views import PasswordChangeView
+from django.urls import include, path, reverse_lazy
+from django.views.generic import TemplateView
+from smart_selects import urls as smart_selects_urls
 
+from Basis.views import (BasisView, MyPasswordChangeDoneView,
+                         MyPasswordChangeView)
 
 urlpatterns = [
     path('', BasisView.as_view()),
@@ -51,4 +51,3 @@ handler500 = 'Basis.views.my_custom_error_view'
 admin.site.site_header = "Bürgerbus Admin"
 admin.site.site_title = "Alzey-Land Bürgerbus Portal"
 admin.site.index_title = "Willkommen zum Bürgerbus Portal der VG Alzey-Land"
-

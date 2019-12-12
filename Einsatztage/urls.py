@@ -1,10 +1,13 @@
 from django.urls import path
 from django.views.generic import TemplateView
 
+from Einsatztage.views import (BuerotageChangeView, BuerotageListView,
+                               FahrplanAsCSV, FahrplanAsPDF,
+                               FahrplanBackupView, FahrplanEmailView,
+                               FahrplanView, FahrtageChangeView,
+                               FahrtageListView)
+
 from . import views
-from Einsatztage.views import FahrplanView, FahrplanAsPDF, FahrplanEmailView, FahrplanAsCSV, FahrplanBackupView 
-from Einsatztage.views import FahrtageListView, FahrtageChangeView
-from Einsatztage.views import BuerotageListView, BuerotageChangeView
 
 app_name = 'Einsatztage'
 urlpatterns = [

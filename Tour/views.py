@@ -1,24 +1,26 @@
+import logging
+from datetime import datetime, time, timedelta
+
+from django import forms
+from django.conf import settings
+from django.contrib import messages
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
-from django.conf import settings
-from django import forms
 from jet.filters import RelatedFieldAjaxListFilter
-from django.contrib import messages
 
-from .forms import TourAddForm1, TourAddForm2, TourChgForm
-from .utils import DistanceMatrix, TourArchive, GuestCount
-from .models import Tour
-from .tables import TourTable
-from .filters import TourFilter
-from .navbars import tour_navbar
-from Klienten.models import Klienten
-from Einsatztage.models import Fahrtag
-
-from Einsatzmittel.utils import get_bus_list
 from Basis.utils import get_sidebar, render_to_pdf, url_args
-from datetime import datetime, timedelta, time
-from Basis.views import MyListView, MyDetailView, MyView, MyDeleteView, MyUpdateView, MyCreateView
-import logging
+from Basis.views import (MyCreateView, MyDeleteView, MyDetailView, MyListView,
+                         MyUpdateView, MyView)
+from Einsatzmittel.utils import get_bus_list
+from Einsatztage.models import Fahrtag
+from Klienten.models import Klienten
+
+from .filters import TourFilter
+from .forms import TourAddForm1, TourAddForm2, TourChgForm
+from .models import Tour
+from .navbars import tour_navbar
+from .tables import TourTable
+from .utils import DistanceMatrix, GuestCount, TourArchive
 
 logger = logging.getLogger(__name__)
 
@@ -43,16 +45,14 @@ class TourView(MyListView):
 		TourArchive()
 		datum = self.request.GET.get('datum')
 		qs = Tour.objects.order_by('bus','datum','uhrzeit').filter(archiv=False,bus__in=get_bus_list(self.request))
-		if datum:
-			qs = qs.filter(datum=datum)
+		if datum: qs = qs.filter(datum=datum)
 		return TourTable(qs)
 
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
 		context['sidebar_liste'] = get_sidebar(self.request.user)
 		context['title'] = "Touren"
-		if self.request.user.has_perm('Tour.add_tour'):
-			context['add'] = "Tour"
+		if self.request.user.has_perm('Tour.add_tour'): context['add'] = "Tour"
 		context['nav_bar'] = tour_navbar(Fahrtag.objects.order_by('datum').filter(archiv=False, urlaub=False, team__in=get_bus_list(self.request),datum__gte=datetime.now(),datum__lte=datetime.now()+timedelta(settings.COUNT_TOUR_DAYS)),self.request.GET.get('datum'))
 		context['url_args'] = url_args(self.request)
 		return context	

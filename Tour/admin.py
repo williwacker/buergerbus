@@ -1,12 +1,14 @@
-from django.contrib import admin
-from django.conf import settings
+from datetime import datetime, time, timedelta
 
-from Klienten.models import Klienten, Orte, Strassen
-from Einsatztage.models import Fahrtag
-from Einsatzmittel.models import Bus
-from .models import Tour
-from datetime import datetime, timedelta, time
 import googlemaps
+from django.conf import settings
+from django.contrib import admin
+
+from Einsatzmittel.models import Bus
+from Einsatztage.models import Fahrtag
+from Klienten.models import Klienten, Orte, Strassen
+
+from .models import Tour
 
 
 class DistanceMatrix():

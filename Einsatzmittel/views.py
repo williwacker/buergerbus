@@ -1,16 +1,17 @@
 from django import template
-from django.http import Http404, HttpResponse, HttpResponseRedirect
-from django.shortcuts import get_object_or_404, render
-from django.http import HttpResponse
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.models import User
+from django.http import Http404, HttpResponse, HttpResponseRedirect
+from django.shortcuts import get_object_or_404, render
 
-from .models import Bus, Buero
-from .forms import BusChgForm, BueroChgForm
-from .tables import BusTable, BueroTable
-from Basis.utils import get_sidebar, url_args, get_relation_dict
-from Basis.views import MyListView, MyDetailView, MyView, MyUpdateView,MyDeleteView
+from Basis.utils import get_relation_dict, get_sidebar, url_args
+from Basis.views import (MyDeleteView, MyDetailView, MyListView, MyUpdateView,
+                         MyView)
+
+from .forms import BueroChgForm, BusChgForm
+from .models import Buero, Bus
+from .tables import BueroTable, BusTable
 
 register = template.Library()
 
@@ -24,8 +25,7 @@ class BusView(MyListView):
 		context = super().get_context_data(**kwargs)
 		context['sidebar_liste'] = get_sidebar(self.request.user)
 		context['title'] = "Busse"
-		if self.request.user.has_perm('Einsatzmittel.add_bus'):
-			context['add'] = "Bus"
+		if self.request.user.has_perm('Einsatzmittel.add_bus'): context['add'] = "Bus"
 		context['url_args'] = url_args(self.request)
 		return context
 
@@ -73,8 +73,7 @@ class BusChangeView(MyUpdateView):
 		context = super().get_context_data(**kwargs)
 		context['sidebar_liste'] = get_sidebar(self.request.user)
 		context['title'] = "Bus ändern"
-		if self.request.user.has_perm('Einsatzmittel.delete_bus'):
-			context['delete_button'] = "Löschen"
+		if self.request.user.has_perm('Einsatzmittel.delete_bus'): context['delete_button'] = "Löschen" 
 		context['submit_button'] = "Sichern"
 		context['back_button'] = ["Abbrechen",self.success_url+url_args(self.request)]
 		context['url_args'] = url_args(self.request)
@@ -107,8 +106,7 @@ class BueroView(MyListView):
 		context = super().get_context_data(**kwargs)
 		context['sidebar_liste'] = get_sidebar(self.request.user)
 		context['title'] = "Büros"
-		if self.request.user.has_perm('Einsatzmittel.add_buero'):
-			context['add'] = "Büro"
+		if self.request.user.has_perm('Einsatzmittel.add_buero'): context['add'] = "Büro"
 		context['url_args'] = url_args(self.request)
 		return context
 
@@ -155,8 +153,7 @@ class BueroChangeView(MyUpdateView):
 		context = super().get_context_data(**kwargs)
 		context['sidebar_liste'] = get_sidebar(self.request.user)
 		context['title'] = "Büro ändern"
-		if self.request.user.has_perm('Einsatzmittel.delete_buero'):
-			context['delete_button'] = "Löschen"
+		if self.request.user.has_perm('Einsatzmittel.delete_buero'): context['delete_button'] = "Löschen"
 		context['submit_button'] = "Sichern"
 		context['back_button'] = ["Abbrechen",self.success_url+url_args(self.request)]
 		context['url_args'] = url_args(self.request)

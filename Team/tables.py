@@ -1,7 +1,8 @@
 import django_tables2 as tables
+from django.contrib.auth.models import User
 
 from .models import Fahrer, Koordinator
-from django.contrib.auth.models import User
+
 
 class FahrerTable(tables.Table):
     name = tables.TemplateColumn(
@@ -18,7 +19,8 @@ class FahrerTable(tables.Table):
     )    
     email = tables.TemplateColumn(
         template_code='''<a href="mailto:{{ record.email }}">{{ record.email }}</a>'''
-    )        
+    )
+
     class Meta:
         model = Fahrer
         fields = ('name','team','email','telefon','aktiv')
@@ -39,7 +41,8 @@ class KoordinatorTable(tables.Table):
     email = tables.TemplateColumn(
         template_code='''<a href="mailto:{{ record.benutzer.email }}">{{ record.benutzer.email }}</a>''',
         orderable=False
-    )    
+    )
+       
     class Meta:
         model = Koordinator
         fields = ('name','team','email','telefon','aktiv')

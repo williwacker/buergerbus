@@ -10,7 +10,9 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/2.2/ref/settings/
 """
 
-import os, copy
+import os
+import copy
+from decouple import config, Csv
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -20,12 +22,12 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = ''
+SECRET_KEY = config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = config('DEBUG', default=False, cast=bool)
 
-ALLOWED_HOSTS = ['localhost']
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost', cast=Csv())
 
 
 # Application definition
@@ -102,13 +104,14 @@ WSGI_APPLICATION = 'buergerbus.wsgi.application'
 
 DATABASES = {
 	'default': {
-		'ENGINE': 'django.db.backends.postgresql',
-		'NAME': 'postgres',
-		'USER': 'postgres',
-		'PASSWORD': 'postgres',
-		'HOST': '127.0.0.1',
-		'PORT': '5432',
-	}
+		'ENGINE': 	config('DATABASE_ENGINE'),
+		'NAME': 	config('DATABASE_NAME'),
+		'USER': 	config('DATABASE_USER'),
+		'PASSWORD': config('DATABASE_PASSWORD'),
+		'HOST': 	config('DATABASE_HOST', default='localhost'),
+		'PORT': 	config('DATABASE_PORT', cast=int),
+		'OPTIONS':  config('DATABASE_OPTIONS', default={}),
+	},
 }
 
 # Password validation
@@ -153,6 +156,15 @@ STATICFILES_DIRS = [
 	os.path.join(BASE_DIR, "static"),
 ]
 
+SECURE_CONTENT_TYPE_NOSNIFF 	= config('SECURE_CONTENT_TYPE_NOSNIFF', default=False, cast=bool)
+X_FRAME_OPTIONS 				= config('X_FRAME_OPTIONS', default='DENY')
+CSRF_COOKIE_SECURE 				= config('CSRF_COOKIE_SECURE', default=False, cast=bool)
+SESSION_COOKIE_SECURE 			= config('SESSION_COOKIE_SECURE', default=False, cast=bool)
+SECURE_SSL_REDIRECT 			= config('SECURE_SSL_REDIRECT', default=False, cast=bool)
+SECURE_BROWSER_XSS_FILTER 		= config('SECURE_BROWSER_XSS_FILTER', default=False, cast=bool)
+SECURE_HSTS_SECONDS 			= config('SECURE_HSTS_SECONDS', default=3600, cast=int)
+SECURE_HSTS_PRELOAD 			= config('SECURE_HSTS_PRELOAD', default=False, cast=bool)
+SECURE_HSTS_INCLUDE_SUBDOMAINS  = config('SECURE_HSTS_INCLUDE_SUBDOMAINS', default=False, cast=bool)
 
 USE_DJANGO_JQUERY = True
 
@@ -160,11 +172,7 @@ USE_DJANGO_JQUERY = True
 JET_SIDE_MENU_COMPACT = True
 JET_CHANGE_FORM_SIBLING_LINKS = True
 
-INTERNAL_IPS = [
-	# ...
-	'127.0.0.1',
-	# ...
-]
+INTERNAL_IPS = config('INTERNAL_IPS', default='127.0.0.1', cast=Csv())
 
 LOGIN_URL           = '/accounts/login/'
 LOGIN_REDIRECT_URL  = '/Basis/'
@@ -224,40 +232,42 @@ LOGGING = {
 }
 LOGGING['loggers'].update({app: copy.deepcopy(local_logger_conf) for app in LOCAL_APPS})
 
-MEDIA_URL = '/uploads/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'uploads')
+MEDIA_URL 			= '/uploads/'
+MEDIA_ROOT 			= os.path.join(BASE_DIR, 'uploads')
 
 # Expire nach 30 min
-SESSION_EXPIRE_SECONDS = 1800
+SESSION_EXPIRE_SECONDS 				= config('SESSION_EXPIRE_SECONDS', default=1800, cast=int)
 # Expire nach Aktivität
-SESSION_EXPIRE_AFTER_LAST_ACTIVITY = True
+SESSION_EXPIRE_AFTER_LAST_ACTIVITY 	= config('SESSION_EXPIRE_AFTER_LAST_ACTIVITY', default=True, cast=bool)
 
 
 # Klienten von ausserhalb der VG können hinzugefügt werden
-ALLOW_OUTSIDE_CLIENTS = True
+ALLOW_OUTSIDE_CLIENTS = config('ALLOW_OUTSIDE_CLIENTS', default=False, cast=bool)
 # Anzahl planbarer Fahrtage (Fahrer) /Bürotage (Koordinatoren)
-COUNT_DRIVING_DAYS = 30
-COUNT_OFFICE_DAYS  = 30
+COUNT_DRIVING_DAYS 	= config('COUNT_DRIVING_DAYS', default=30, cast=int)
+COUNT_OFFICE_DAYS  	= config('COUNT_OFFICE_DAYS', default=30, cast=int)
 
 # Anzahl planbarer Tage für Touren
-COUNT_TOUR_DAYS = 13
+COUNT_TOUR_DAYS 	= config('COUNT_TOUR_DAYS', default=13, cast=int)
 
 # Pfad für die Tourlisten zu speichern
-TOUR_PATH = ''
+TOUR_PATH  			= config('TOUR_PATH', default='tour\\')
 
 # Fahrzeit und Ankunftszeit mittels Google Maps errechnen
-USE_GOOGLE = True
+USE_GOOGLE 			= config('USE_GOOGLE', default=True, cast=bool)
+GOOGLEMAPS_KEY 		= config('GOOGLEMAPS_KEY', default='')
 # Ein/Aussteigezeit in Minuten (nur relevant mit USE_GOOGLE)
-TRANSFER_TIME = 3
+TRANSFER_TIME 		= config('TRANSFER_TIME', default=3, cast=int)
 
 # DSGVO mit dem Fahrplan versenden
-SEND_DSGVO = True
+SEND_DSGVO 			= config('SEND_DSGVO', default=True, cast=bool)
 
-PORTAL = 'Bürgerbus Portal'
-WELCOME = 'Willkommen auf dem Bürgerbus Portal'
 
-# import settings.json
-import json
-base_dir = os.path.dirname(__file__)
-overrides = json.loads(open(os.path.join(base_dir,'settings.json'), encoding='UTF-8').read())
-globals().update(overrides)
+DSGVO_PATH          =   config('DSGVO_PATH', default='tour\\')
+EMAIL_HOST          =   config('EMAIL_HOST', default='localhost')
+EMAIL_PORT          =   config('EMAIL_PORT', default=25, cast=int)
+EMAIL_HOST_USER     =   config('EMAIL_HOST_USER', default='')
+EMAIL_HOST_PASSWORD =   config('EMAIL_HOST_PASSWORD', default='')
+EMAIL_USE_TLS       =   config('EMAIL_USE_TLS', default=False, cast=bool)
+PORTAL              =   config('PORTAL', default='Bürgerbus Portal')
+WELCOME 			=   config('PORTAL', default='Willkommen auf dem Bürgerbus Portal')

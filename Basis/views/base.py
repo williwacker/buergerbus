@@ -1,14 +1,17 @@
 import os
-from django.shortcuts import render, get_object_or_404
-from django.http import HttpResponse, HttpResponseRedirect, FileResponse
+
 from django.conf import settings
-from django.core.files.storage import FileSystemStorage
 from django.contrib import messages
-from Basis.views import MyView, MyListView, MyDetailView, MyUpdateView, MyDeleteView, MyBaseDetailView
-from Basis.forms import FeedbackForm, DocumentAddForm, DocumentChangeForm
-from Basis.utils import get_sidebar, url_args
-from Basis.tables import DocumentTable
+from django.core.files.storage import FileSystemStorage
+from django.http import FileResponse, HttpResponse, HttpResponseRedirect
+from django.shortcuts import get_object_or_404, render
+
+from Basis.forms import DocumentAddForm, DocumentChangeForm, FeedbackForm
 from Basis.models import Document
+from Basis.tables import DocumentTable
+from Basis.utils import get_sidebar, url_args
+from Basis.views import (MyBaseDetailView, MyDeleteView, MyDetailView,
+                         MyListView, MyUpdateView, MyView)
 
 # Documents View
 
@@ -153,8 +156,6 @@ class FeedbackView(MyDetailView):
 				post['an'].split(";"),
 				reply_to=post['von'].split(";"),
 			)
-#			if post['cc']:
-#				email.cc = post['cc'].split(";")
 			email.send(fail_silently=False)	
 			messages.success(request, post['betreff']+' wurde erfolgreich versandt.')
 			return HttpResponseRedirect(self.success_url+url_args(request))

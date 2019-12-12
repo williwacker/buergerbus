@@ -1,5 +1,7 @@
 import django_filters
-from .models import Fahrtag, Buerotag
+
+from .models import Buerotag, Fahrtag
+
 
 class FahrtagFilter(django_filters.FilterSet):
     class Meta:

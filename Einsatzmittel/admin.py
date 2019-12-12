@@ -1,6 +1,7 @@
 from django.contrib import admin
 
-from .models import Bus, Buero, Wochentage
+from .models import Buero, Bus, Wochentage
+
 
 class BusAdmin(admin.ModelAdmin):
 	ordering = ('bus',)
@@ -29,4 +30,3 @@ class WochentageAdmin(admin.ModelAdmin):
 admin.site.register(Bus, BusAdmin)
 admin.site.register(Buero, BueroAdmin)
 admin.site.register(Wochentage, WochentageAdmin)
-

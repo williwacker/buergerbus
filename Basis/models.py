@@ -1,8 +1,9 @@
-import os
-from django.db import models
-from django.conf import settings
-from django.dispatch import receiver
 import logging
+import os
+
+from django.conf import settings
+from django.db import models
+from django.dispatch import receiver
 
 logger = logging.getLogger(__name__)
 
@@ -11,6 +12,10 @@ class Document(models.Model):
 	description = models.CharField(max_length=255, blank=True, null=True, verbose_name='Beschreibung')
 	uploaded_at = models.DateTimeField(auto_now_add=True, blank=True, null=True, verbose_name='hochgeladen am')
 
+	class Meta():
+		verbose_name = "Dokument"
+		constraints = [models.UniqueConstraint(fields=['document'], name='unique_document')]
+		
 	def __str__(self):
 		return str(self.document)
 
@@ -18,9 +23,7 @@ class Document(models.Model):
 	def relative_path(self):
 		return os.path.relpath(self.document.path, settings.MEDIA_ROOT)		
 
-	class Meta():
-		verbose_name = "Dokument"
-		constraints = [models.UniqueConstraint(fields=['document'], name='unique_document')]
+
 
 # These two auto-delete files from filesystem when they are unneeded:
 

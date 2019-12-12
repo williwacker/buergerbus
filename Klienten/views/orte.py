@@ -1,20 +1,22 @@
 import subprocess
-from fuzzywuzzy import fuzz, process
-from django import template
-from django.http import Http404, HttpResponse, HttpResponseRedirect
-from django.shortcuts import get_object_or_404, render
+
+from django import forms, template
 from django.conf import settings
 from django.contrib import messages
+from django.http import Http404, HttpResponse, HttpResponseRedirect
+from django.shortcuts import get_object_or_404, render
+from fuzzywuzzy import fuzz, process
 from jet.filters import RelatedFieldAjaxListFilter
-from django import forms
+
+from Basis.utils import get_sidebar, render_to_pdf, url_args
+from Basis.views import (MyCreateView, MyDeleteView, MyDetailView, MyListView,
+                         MyUpdateView, MyView)
+from Einsatzmittel.models import Bus
+from Einsatzmittel.utils import get_bus_list
+from Klienten.filters import OrteFilter
 from Klienten.forms import OrtAddForm, OrtChgForm
 from Klienten.models import Orte
 from Klienten.tables import OrteTable
-from Klienten.filters import OrteFilter
-from Einsatzmittel.models import Bus
-from Einsatzmittel.utils import get_bus_list
-from Basis.utils import get_sidebar, render_to_pdf, url_args
-from Basis.views import MyListView, MyDetailView, MyView, MyUpdateView, MyDeleteView, MyCreateView
 
 register = template.Library()
 
@@ -27,20 +29,16 @@ class OrtView(MyListView):
 		bus = self.request.GET.get('bus')
 		# nur managed orte anzeigen
 		qs = Orte.objects.order_by('ort').filter(bus__in=get_bus_list(self.request)) | Orte.objects.order_by('ort').filter(bus__isnull=True)
-		if ort:
-			qs = qs.filter(ort=ort)
-		if plz:
-			qs = qs.filter(plz=plz)
-		if bus:
-			qs = qs.filter(bus=bus)
+		if ort: qs = qs.filter(ort=ort)
+		if plz: qs = qs.filter(plz=plz)
+		if bus: qs = qs.filter(bus=bus)
 		return OrteTable(qs)
 
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
 		context['sidebar_liste'] = get_sidebar(self.request.user)
 		context['title'] = "Orte"
-		if self.request.user.has_perm('Klienten.add_orte'):
-			context['add'] = "Ort"
+		if self.request.user.has_perm('Klienten.add_orte'): context['add'] = "Ort"
 		context['filter'] = OrteFilter(self.request.GET, queryset=Orte.objects.all())
 		context['url_args'] = url_args(self.request)
 		return context		
@@ -84,8 +82,7 @@ class OrtChangeView(MyUpdateView):
 		context = {}
 		context['sidebar_liste'] = get_sidebar(request.user)
 		context['title'] = "Ort ändern"
-		if self.request.user.has_perm('Klienten.delete_orte'):
-			context['delete_button'] = "Löschen"
+		if self.request.user.has_perm('Klienten.delete_orte'): context['delete_button'] = "Löschen"
 		context['submit_button'] = "Sichern"
 		context['back_button'] = ["Abbrechen",self.success_url+url_args(self.request)]
 		context['url_args'] = url_args(request)

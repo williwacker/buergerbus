@@ -1,7 +1,8 @@
 from django.urls import path
 
-from .views import FahrerView, FahrerAddView, FahrerChangeView, FahrerDeleteView
-from .views import KoordinatorView, KoordinatorAddView, KoordinatorChangeView, KoordinatorDeleteView
+from .views import (FahrerAddView, FahrerChangeView, FahrerDeleteView,
+                    FahrerView, KoordinatorAddView, KoordinatorChangeView,
+                    KoordinatorDeleteView, KoordinatorView)
 
 app_name = 'Team'
 urlpatterns = [

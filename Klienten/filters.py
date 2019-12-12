@@ -1,5 +1,7 @@
 import django_filters
-from .models import Orte, Strassen, Klienten
+
+from .models import Klienten, Orte, Strassen
+
 
 class StrassenFilter(django_filters.FilterSet):
     class Meta:

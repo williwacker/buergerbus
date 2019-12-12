@@ -14,7 +14,7 @@
 
  
 import datetime
- 
+
 state_codes = {
                  'Baden-Württemberg':'BW',
                  'Bayern':'BY',

@@ -1,5 +1,8 @@
 from django.urls import path
-from .views import TourView, TourAddView, TourAddView2, TourChangeView, TourDeleteView
+
+from .views import (TourAddView, TourAddView2, TourChangeView, TourDeleteView,
+                    TourView)
+
 #from .forms import TourAddForm1, TourAddForm2
 
 app_name = 'Tour'

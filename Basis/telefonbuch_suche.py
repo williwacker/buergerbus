@@ -11,11 +11,12 @@ Search the phone book (DasTelefonbuch.de) for the given name / city and return t
 
 __version__ = '0.0.1'
 
-import urllib3
-import urllib.parse
-import certifi
-import re
 import logging
+import re
+import urllib.parse
+
+import certifi
+import urllib3
 
 logger = logging.getLogger(__name__)
 
@@ -113,4 +114,3 @@ class Telefonbuch():
 			# ignore entries without street name or zip
 			if data_dict['pc'] and data_dict['st'] and data_dict['hn']:
 				return data_dict
-

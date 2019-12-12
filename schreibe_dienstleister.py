@@ -11,14 +11,18 @@ Lese die csv Datei der Dienstleister schreibe sie in die Klienten SQL Tabelle
 """
 
 import configparser
-import os, re
-os.environ.setdefault('DJANGO_SETTINGS_MODULE','buergerbus.settings')
+import os
+import re
 
 import django
-django.setup()
 
 from Klienten.models import Klienten, Orte, Strassen
 from Klienten.utils import GeoLocation
+
+os.environ.setdefault('DJANGO_SETTINGS_MODULE','buergerbus.settings')
+
+django.setup()
+
 
 class AddKlienten():
 
@@ -50,7 +54,6 @@ class AddKlienten():
 			[strasse, hausnr] = z.groups()
 			try:
 				s = Strassen.objects.get(ort=o,strasse=strasse.strip())
-#				s.index(strasse)
 			except:
 				print('{} hat keinen bekannten Strassennamen: {}'.format(name,strasse))
 				exit()
