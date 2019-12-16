@@ -1,11 +1,13 @@
 import datetime
 
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils import timezone
 from smart_selects.db_fields import ChainedForeignKey
 
 from Einsatzmittel.models import Bus
+from Klienten.utils import GeoLocation
 from Tour.models import Tour
 
 DSGVO_AUSWAHL = [
@@ -88,7 +90,23 @@ class Klienten(models.Model):
 		verbose_name_plural = "Klienten"
 		verbose_name = "Klient"
 		constraints = [models.UniqueConstraint(fields=['name','ort','strasse','hausnr'], name='unique_klient')]
+	
+	def clean(self):
+		if not settings.ALLOW_OUTSIDE_CLIENTS \
+		    and not self.ort.bus \
+			and self.typ=='F': 
+			raise ValidationError("Fahrgäste aus diesem Ort sind nicht erlaubt")
 
+	def save(self, *args, **kwargs):
+		if self.ort.bus != None and self.typ == 'F': self.bus=self.ort.bus
+		if self.typ == 'D': self.dsgvo = '99'
+		if self.latitude == 0: GeoLocation().getLocation(self)
+		if not settings.ALLOW_OUTSIDE_CLIENTS \
+		   	and not self.ort.bus \
+			and self.typ=='F': 
+			raise ValidationError("Fahrgäste aus diesem Ort sind nicht erlaubt")
+		super(Klienten, self).save(*args, **kwargs)
+	
 	def __str__(self):
 		if self.typ=='D':
 			return " ".join([self.name, self.ort.ort, self.strasse.strasse])

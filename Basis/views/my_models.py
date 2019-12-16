@@ -90,7 +90,7 @@ class MyDeleteView(SuccessMessageMixin, LoginRequiredMixin, PermissionRequiredMi
 
 	def post(self, request, *args, **kwargs):
 		instance = self.model.objects.get(pk=kwargs['pk'])
-		messages.success(request, self.model._meta.verbose_name.title()+' "'+str(instance)+'" wurde gelöscht.')
+		messages.success(request, self.model._meta.verbose_name_raw+' "'+str(instance)+'" wurde gelöscht.')
 		return self.delete(request, *args, **kwargs)
 
 class BasisView(LoginRequiredMixin, ListView):

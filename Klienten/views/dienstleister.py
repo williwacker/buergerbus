@@ -75,9 +75,9 @@ class DienstleisterAddView(MyDetailView):
 		context['form'] = form
 		if form.is_valid():
 			instance = form.save(commit=False)
-			if instance.latitude == 0 or set(['ort','strasse','hausnr']).intersection(set(form.changed_data)):
-				GeoLocation().getLocation(instance)
 			instance.updated_by = self.request.user
+			instance.dsgvo = '99'
+			instance.typ = 'D'
 			instance.save()	
 			messages.success(request, 'Dienstleister "<a href="'+self.success_url+str(instance.id)+'/'+url_args(request)+'">'+instance.name+'</a>" wurde erfolgreich hinzugefügt.')
 			context['messages'] = messages

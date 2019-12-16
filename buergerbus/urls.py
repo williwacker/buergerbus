@@ -36,6 +36,7 @@ urlpatterns = [
     path('Einsatztage/', include('Einsatztage.urls')),
     path('Klienten/', include('Klienten.urls')),
     path('Team/', include('Team.urls')),
+    path('Faq/', include('Faq.urls')),
     path('admin/', admin.site.urls),
     url(r'^chaining/', include('smart_selects.urls')),
     url(r'^jet/', include('jet.urls', 'jet')),

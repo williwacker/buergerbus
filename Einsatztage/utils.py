@@ -48,19 +48,19 @@ class FahrtageSchreiben():
 		array = [row for row in rows]
 		for item in array:
 			id, fahrtag = item
-			b = Bus.objects.get(pk=id)
-			rows = Fahrtag.objects.filter(team=b, archiv=False).values_list('datum',flat=True)
+			bus = Bus.objects.get(pk=id)
+			rows = Fahrtag.objects.filter(team=bus, archiv=False).values_list('datum',flat=True)
 			existierende_tage = [row for row in rows]
 
 			# die Fahrtage für die nächsten n Tage ausrechnen
-			max_days = max(settings.COUNT_DRIVING_DAYS, b.plantage, settings.COUNT_TOUR_DAYS)
+			max_days = max(settings.COUNT_DRIVING_DAYS, bus.plantage, settings.COUNT_TOUR_DAYS)
 			for i in range(1,max_days):
 				neuer_tag = datetime.date.today() + datetime.timedelta(days=i)
 				if neuer_tag not in existierende_tage:  # Tag ist nicht bereits definiert
 					if neuer_tag not in holiday_list:   # Tag ist kein Feiertag
 						if neuer_tag.isoweekday() == fahrtag:   # Tag ist ein Fahrtag
 							if changedate != neuer_tag:
-								t = Fahrtag(datum=neuer_tag, team=b)
+								t = Fahrtag(datum=neuer_tag, team=bus)
 								t.save()
 
 	def archive_past_fahrtage(self):

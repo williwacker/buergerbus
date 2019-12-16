@@ -78,10 +78,19 @@ def get_sidebar(user):
 		sidebar.append({'name':'Einsatzmittel', 'value':value})
 
 	value = []
+	if user.is_superuser:
+		value.append({'name':'Themen','value':'/Faq/topics/admin/'})
+		value.append({'name':'Fragen','value':'/Faq/questions/admin/'})
+	if value:
+		sidebar.append({'name':'FAQ', 'value':value})
+
+	value = []
 	if user.has_perm('Basis.view_document'):
 		value.append({'name':'Dokumente','value':'/Basis/documents/'})
 	if list(User.objects.filter(is_superuser=True).values_list('email', flat=True)):
 		value.append({'name':'Feedback','value':'/Basis/feedback/'})
+	if user.has_perm('Faq.view_question') and user.has_perm('Faq.view_topic'):
+		value.append({'name':'FAQ','value':'/Faq/questions/'})
 	if value:
 		sidebar.append({'name':'Hilfe', 'value':value})		
 	return sidebar
