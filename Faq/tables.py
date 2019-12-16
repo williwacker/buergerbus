@@ -16,7 +16,7 @@ class TopicTable(tables.Table):
     
     class Meta:
         model = Topic
-        fields = ('name','slug','sort_order')
+        fields = ('name','sort_order')
 
 class QuestionTopicTable(tables.Table):
     name = tables.TemplateColumn(

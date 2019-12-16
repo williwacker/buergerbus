@@ -9,6 +9,7 @@ from Einsatztage.utils import (BuerotageSchreiben, FahrplanBackup,
 logger = logging.getLogger(__name__)
 
 class EinsatztageCronJob(CronJobBase):
+    ALLOW_PARALLEL_RUNS = True
     RUN_EVERY_MINS = 720  # every 12h
 
     schedule = Schedule(run_every_mins = RUN_EVERY_MINS)
@@ -21,9 +22,10 @@ class EinsatztageCronJob(CronJobBase):
         logger.info("{}: Buerotage updated".format(__name__))
 
 class BackupCronJob(CronJobBase):
-    RUN_EVERY_MINS = 1440  # every 24h
+    ALLOW_PARALLEL_RUNS = True
+    RUN_AT_TIMES = ['23:00']
 
-    schedule = Schedule(run_every_mins = RUN_EVERY_MINS)
+    schedule = Schedule(run_at_times=RUN_AT_TIMES)
     code = __name__
 
     def do(self):
