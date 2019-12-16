@@ -121,7 +121,7 @@ DATABASES = {
 		'PASSWORD': config('DATABASE_PASSWORD'),
 		'HOST': 	config('DATABASE_HOST', default='localhost'),
 		'PORT': 	config('DATABASE_PORT', cast=int),
-		'OPTIONS':  config('DATABASE_OPTIONS', default={}),
+		'OPTIONS':  eval(config('DATABASE_OPTIONS', default='{}')),
 	},
 }
 
