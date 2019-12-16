@@ -40,6 +40,7 @@ INSTALLED_APPS = [
 	'Klienten.apps.KlientenConfig',
 	'Team.apps.TeamConfig',
 	'Tour.apps.TourConfig',
+	'Faq.apps.FaqConfig',
 	'jet.dashboard',
 	'jet',
 	'django_filters',
@@ -49,6 +50,7 @@ INSTALLED_APPS = [
 	'django.contrib.sessions',
 	'django.contrib.messages',
 	'django.contrib.staticfiles',
+	'django_nose',
 	'multiselectfield',
 	'django_tables2',
 	'django_cron',
@@ -58,6 +60,15 @@ INSTALLED_APPS = [
 #    'bootstrap_modal_forms',
 #    'bootstrap',
 ]
+
+# Use nose to run all tests
+#TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
+
+# Tell nose to measure coverage on the 'foo' and 'bar' apps
+#NOSE_ARGS = [
+#    '--with-coverage',
+#    '--cover-package=Einsatzmittel,Einsatztage,Klienten,Team,Tour,Basis',
+#]
 
 MIDDLEWARE = [
 	'django.middleware.security.SecurityMiddleware',
