@@ -30,4 +30,6 @@ class BackupCronJob(CronJobBase):
 
     def do(self):
         FahrplanBackup()
-        logger.info("{}: FahrplanBackup sent".format(__name__))       
+        logger.info("FahrplanBackup sent")
+        FaqNotification()
+        logger.info("FaqNotification sent")

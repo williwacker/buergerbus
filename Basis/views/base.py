@@ -5,6 +5,7 @@ from django.contrib import messages
 from django.core.files.storage import FileSystemStorage
 from django.http import FileResponse, HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
+from django.contrib.auth.models import User
 
 from Basis.forms import DocumentAddForm, DocumentChangeForm, FeedbackForm
 from Basis.models import Document
