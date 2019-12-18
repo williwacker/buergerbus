@@ -71,7 +71,7 @@ class Question(models.Model):
         return ('faq_question_detail', [self.topic.slug, self.slug])
 
     def clean(self):
-        if self.status == self.is_active and self.answer == '':
+        if self.is_active() and self.answer == '':
             raise ValidationError("Aktive Fragen müssen eine Antwort haben!")
 
     def is_header(self):

@@ -23,7 +23,7 @@ class QuestionTopicView(MyListView):
 	def get_queryset(self):
 		qs = Topic.objects.all()
 		table = QuestionTopicTable(qs)
-		table.paginate(page=self.request.GET.get("page", 1), per_page=20)
+		table.paginate(page=self.request.GET.get("page", 1), per_page=18)
 		return table
 
 	def get_context_data(self, **kwargs):
@@ -44,7 +44,9 @@ class QuestionListView(MyListView):
 			qs = Question.objects.active().filter(topic_id=topic).order_by('-created_on')
 		else:
 			qs = Question.objects.active().order_by('-created_on')
-		return QuestionTable(qs)
+		table = QuestionTable(qs)
+		table.paginate(page=self.request.GET.get("page", 1), per_page=17)
+		return table
 
 	def get_context_data(self, **kwargs):
 		context = super(QuestionListView, self).get_context_data(**kwargs)
