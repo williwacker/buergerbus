@@ -131,7 +131,7 @@ class FahrplanBackup():
 				continue
 			mail_text = 'Liebe Koordinatoren,\nAnbei die bisherigen Fahrpläne. Diese sind nur zu verwenden im Fall daß der Web-Server des Bürgerbus Portals ausfällt.' 
 			message = EmailMessage(
-						from_email='willi1wacker@gmx.de',
+						from_email=settings.EMAIL_HOST_USER,
 						to=[email,],
 						connection=mail_backend,
 						subject="Fahrplan Backup {} vom {}".format(bus, datetime.date.today()), 
