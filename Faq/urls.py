@@ -20,7 +20,7 @@ urlpatterns = [
 	path('questions/admin/<int:pk>/delete/', QuestionAdminDeleteView.as_view()),	
 
 	path('questions/', QuestionTopicView.as_view()),
-	path('questions/<int:pk>/', QuestionListView.as_view()),
-	path('questions/<int:pk>/add/', QuestionAddView.as_view()),
+	path('questions/list/', QuestionListView.as_view()),
+	path('questions/list/add/', QuestionAddView.as_view()),
 
 ]

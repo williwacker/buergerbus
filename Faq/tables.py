@@ -22,7 +22,7 @@ class QuestionTopicTable(tables.Table):
     name = tables.TemplateColumn(
         template_code='''
             {% if perms.Faq.view_question %}
-                <a href="{{ record.id }}/{{ url_args }}">{{ record.name |safe }}</a>
+                <a href="list/?topic={{ record.id }}">{{ record.name |safe }}</a>
             {% else %}
                 {{ record.name |safe }}
             {% endif %}            
@@ -34,7 +34,6 @@ class QuestionTopicTable(tables.Table):
         fields = ('name',)
 
 class QuestionTable(tables.Table):
-
     class Meta:
         model = Question
         fields = ('text', 'answer')

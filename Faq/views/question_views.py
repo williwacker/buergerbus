@@ -22,7 +22,9 @@ class QuestionTopicView(MyListView):
 
 	def get_queryset(self):
 		qs = Topic.objects.all()
-		return QuestionTopicTable(qs)
+		table = QuestionTopicTable(qs)
+		table.paginate(page=self.request.GET.get("page", 1), per_page=20)
+		return table
 
 	def get_context_data(self, **kwargs):
 		context = super(QuestionTopicView, self).get_context_data(**kwargs)
@@ -38,8 +40,10 @@ class QuestionListView(MyListView):
 
 	def get_queryset(self):
 		topic = self.request.GET.get('topic')
-		filter = topic if topic else self.kwargs['pk']
-		qs = Question.objects.active().filter(topic=filter).order_by('-created_on')
+		if topic:
+			qs = Question.objects.active().filter(topic_id=topic).order_by('-created_on')
+		else:
+			qs = Question.objects.active().order_by('-created_on')
 		return QuestionTable(qs)
 
 	def get_context_data(self, **kwargs):
@@ -48,30 +52,41 @@ class QuestionListView(MyListView):
 		context['title'] = "Fragen und Antworten"
 		if self.request.user.has_perm('Faq.add_question'): context['add'] = "Frage"
 		context['filter'] = TopicFilter()
+		topic = self.request.GET.get('topic')
+		if topic:
+			top = Topic.objects.get(id=topic)
+			context['table_header'] = '<p>'+top.name+'</p>'
 		context['url_args'] = url_args(self.request)
 		return context
 
 class QuestionAddView(MyCreateView):
 	form_class = SubmitFAQForm
 	permission_required = 'Faq.add_question'
-	success_url = '/Faq/questions/'
+	success_url = '/Faq/questions/list/'
 	model = Question
 
-	def get_context_data(self, **kwargs):
-		context = super(QuestionAddView, self).get_context_data(**kwargs)
+	def get_context_data(self, request):
+		context = {}
 		context['sidebar_liste'] = get_sidebar(self.request.user)
 		context['title'] = self.model._meta.verbose_name_raw+" - Frage hinzufügen"
 		context['submit_button'] = "Sichern"
 		context['back_button'] = ["Abbrechen",self.success_url+url_args(self.request)]
-		context['popup'] = self.request.GET.get('_popup',None)
 		return context
+
+	def get(self, request, *args, **kwargs):
+		context = self.get_context_data(request)
+		topic = self.request.GET.get('topic')
+		self.initial['topic'] = Topic.objects.filter(pk=topic).first() if topic else None
+		form = self.form_class(initial=self.initial)
+		context['form'] = form
+		return render(request, self.template_name, context)
 
 	def form_valid(self, form):
 		instance = form.save(commit=False)
 		instance.created_by = self.request.user
 		instance.save()
 		self.success_message = 'Vielen Dank. Ihre Frage wurde erfolgreich hinzugefügt und wird nach der Überprüfung durch den Administrator veröffentlicht.'
-		self.success_url
+		self.success_url += url_args(self.request)
 		return super(QuestionAddView, self).form_valid(form)
 
 ###

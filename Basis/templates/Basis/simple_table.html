@@ -25,6 +25,9 @@
             </form>
             {% endif %}
         </div>
+        {% if table_header %}
+            {{ table_header| safe }}
+        {% endif %}
         <form id="changelist-form">
             <div class="results">
                 {% render_table table %}
