@@ -37,7 +37,7 @@ class StrassenView(MyListView):
 		context['sidebar_liste'] = get_sidebar(self.request.user)
 		context['title'] = "Strassen"
 		if self.request.user.has_perm('Klienten.add_strassen'): context['add'] = "Strasse"
-		context['filter'] = StrassenFilter(self.request.GET, queryset=Strassen.objects.all())
+		context['filter'] = StrassenFilter()
 		context['url_args'] = url_args(self.request)
 		return context
 

@@ -39,7 +39,7 @@ class OrtView(MyListView):
 		context['sidebar_liste'] = get_sidebar(self.request.user)
 		context['title'] = "Orte"
 		if self.request.user.has_perm('Klienten.add_orte'): context['add'] = "Ort"
-		context['filter'] = OrteFilter(self.request.GET, queryset=Orte.objects.all())
+		context['filter'] = OrteFilter()
 		context['url_args'] = url_args(self.request)
 		return context		
 
