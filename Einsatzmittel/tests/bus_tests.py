@@ -17,7 +17,7 @@ class BusTestCase(TestCase):
         wt5 = Wochentage.objects.get(name='Freitag')
 
         if Bus.objects.count() == 0:
-            bus1 = Bus.objects.create(bus='Bus 1', sitzplaetze=8, email=None, plantage=settings.COUNT_TOUR_DAYS)
+            bus1 = Bus.objects.create(bus='Bus 1', sitzplaetze=8, plantage=settings.COUNT_TOUR_DAYS)
             bus1.fahrtage.add(wt2, wt4)
             bus2 = Bus.objects.create(bus='Bus 2', sitzplaetze=8, email='dummy@dummy.de', plantage=20)
             bus2.fahrtage.add(wt3,wt5)
