@@ -9,8 +9,8 @@ from django.shortcuts import get_object_or_404, render
 from jet.filters import RelatedFieldAjaxListFilter
 
 from Basis.utils import get_sidebar, render_to_pdf, url_args
-from Basis.views import (MyCreateView, MyDeleteView, MyDetailView, MyListView,
-                         MyUpdateView, MyView)
+from Basis.views import (MyCreateView, MyDeleteView, MyCreateView, MyListView,
+                         MyUpdateView, MyView, MyDetailView)
 from Einsatzmittel.models import Bus
 from Einsatzmittel.utils import get_bus_list
 from Einsatztage.views import FahrplanAsPDF
@@ -26,8 +26,7 @@ class FahrgastView(MyListView):
 	permission_required = 'Klienten.view_klienten'
 
 	def get_fg_queryset(self):
-		allow = settings.ALLOW_OUTSIDE_CLIENTS
-		if allow: 
+		if settings.ALLOW_OUTSIDE_CLIENTS: 
 			return Klienten.objects.order_by('name','ort').filter(typ='F', bus__in=get_bus_list(self.request)) | Klienten.objects.order_by('name','ort').filter(typ='F', bus__isnull=True)
 		else:
 			return Klienten.objects.order_by('name','ort').filter(typ='F', bus__in=get_bus_list(self.request))
@@ -58,9 +57,9 @@ class FahrgastAddView(MyCreateView):
 	success_url = '/Klienten/fahrgaeste/'
 	model = Klienten
 
-	def get_context_data(self, request):
+	def get_context_data(self, **kwargs):
 		context = {}
-		context['sidebar_liste'] = get_sidebar(request.user)
+		context['sidebar_liste'] = get_sidebar(self.request.user)
 		context['title'] = "Fahrgast hinzufügen"
 		context['submit_button'] = "Sichern"
 		context['back_button'] = ["Abbrechen",self.success_url+url_args(self.request)]
@@ -68,16 +67,28 @@ class FahrgastAddView(MyCreateView):
 		return context
 	
 	def get(self, request, *args, **kwargs):
-		context = self.get_context_data(request)
+		context = self.get_context_data(**kwargs)
 		form = self.form_class(initial=self.initial)
 		# nur managed orte anzeigen
-		allow = settings.ALLOW_OUTSIDE_CLIENTS
-		if allow:
+		if settings.ALLOW_OUTSIDE_CLIENTS:
 			form.fields['ort'].queryset = Orte.objects.order_by('ort').filter(bus__in=get_bus_list(request)) | Orte.objects.order_by('ort').filter(bus__isnull=True)
 		else:
 			form.fields['ort'].queryset = Orte.objects.order_by('ort').filter(bus__in=get_bus_list(request))
 		context['form'] = form
 		return render(request, self.template_name, context)
+
+	def form_invalid(self, form):
+		context = self.get_context_data()
+		# nur managed orte anzeigen
+		if settings.ALLOW_OUTSIDE_CLIENTS:
+			form.fields['ort'].queryset = Orte.objects.order_by('ort').filter(bus__in=get_bus_list(self.request)) | Orte.objects.order_by('ort').filter(bus__isnull=True)
+		else:
+			form.fields['ort'].queryset = Orte.objects.order_by('ort').filter(bus__in=get_bus_list(self.request))
+		if form.instance.ort.bus != None:
+			form.fields['bus'].widget = forms.HiddenInput()		
+		context['form'] = form
+		messages.error(self.request, form.errors)			
+		return render(self.request, self.template_name, context)
 
 	def form_valid(self, form):
 		instance = form.save(commit=False)
@@ -85,7 +96,7 @@ class FahrgastAddView(MyCreateView):
 			instance.bus=instance.ort.bus
 		if instance.latitude == 0 or set(['ort','strasse','hausnr']).intersection(set(form.changed_data)):
 			GeoLocation().getLocation(instance)
-		instance.updated_by = self.request.user
+		instance.created_by = self.request.user
 		instance.save()
 		self.success_message = 'Fahrgast "<a href="'+self.success_url+str(instance.id)+'/'+url_args(self.request)+'">'+instance.name+'</a>" wurde erfolgreich hinzugefügt.'
 		self.success_url += url_args(self.request)
@@ -97,22 +108,21 @@ class FahrgastChangeView(MyUpdateView):
 	success_url = '/Klienten/fahrgaeste/'
 	model = Klienten
 
-	def get_context_data(self, request):
+	def get_context_data(self, **kwargs):
 		context = {}
-		context['sidebar_liste'] = get_sidebar(request.user)
+		context['sidebar_liste'] = get_sidebar(self.request.user)
 		context['title'] = "Fahrgast ändern"
-		if request.user.has_perm('Klienten.delete_klienten'): context['delete_button'] = "Löschen"
+		if self.request.user.has_perm('Klienten.delete_klienten'): context['delete_button'] = "Löschen"
 		context['submit_button'] = "Sichern"
 		context['back_button'] = ["Abbrechen",self.success_url+url_args(self.request)]
-		context['url_args'] = url_args(request)
+		context['url_args'] = url_args(self.request)
 		return context
 	
 	def get(self, request, *args, **kwargs):
-		context = self.get_context_data(request)
+		context = self.get_context_data(**kwargs)
 		form = self.form_class(instance=Klienten.objects.get(pk=kwargs['pk']))
 		# nur managed orte anzeigen
-		allow = settings.ALLOW_OUTSIDE_CLIENTS
-		if allow:
+		if settings.ALLOW_OUTSIDE_CLIENTS:
 			form.fields['ort'].queryset = Orte.objects.order_by('ort').filter(bus__in=get_bus_list(request)) | Orte.objects.order_by('ort').filter(bus__isnull=True)
 		else:
 			form.fields['ort'].queryset = Orte.objects.order_by('ort').filter(bus__in=get_bus_list(request))
@@ -121,10 +131,21 @@ class FahrgastChangeView(MyUpdateView):
 		context['form'] = form
 		return render(request, self.template_name, context)
 
+	def form_invalid(self, form):
+		context = self.get_context_data()
+		# nur managed orte anzeigen
+		if settings.ALLOW_OUTSIDE_CLIENTS:
+			form.fields['ort'].queryset = Orte.objects.order_by('ort').filter(bus__in=get_bus_list(self.request)) | Orte.objects.order_by('ort').filter(bus__isnull=True)
+		else:
+			form.fields['ort'].queryset = Orte.objects.order_by('ort').filter(bus__in=get_bus_list(self.request))
+		if form.instance.ort.bus != None:
+			form.fields['bus'].widget = forms.HiddenInput()		
+		context['form'] = form
+		messages.error(self.request, form.errors)			
+		return render(self.request, self.template_name, context)
+	
 	def form_valid(self, form):
 		instance = form.save(commit=False)
-		if instance.ort.bus != None:
-			instance.bus=instance.ort.bus
 		if instance.latitude == 0 or set(['ort','strasse','hausnr']).intersection(set(form.changed_data)):
 			GeoLocation().getLocation(instance)
 		instance.updated_by = self.request.user

@@ -50,4 +50,4 @@ class DocumentTable(tables.Table):
     )
     class Meta:
         model = Document
-        fields = ('description', 'document', 'uploaded_at')
+        fields = ('description', 'document')

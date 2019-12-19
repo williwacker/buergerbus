@@ -81,8 +81,8 @@ class TopicChangeView(MyUpdateView):
 	success_url = '/Faq/topics/admin/'
 	model=Topic
 	
-	def get_context_data(self, request, **kwargs):
-		context = {}
+	def get_context_data(self, **kwargs):
+		context = super().get_context_data(**kwargs)
 		context['sidebar_liste'] = get_sidebar(self.request.user)
 		context['title'] = self.model._meta.verbose_name_raw+" ändern"
 		if self.request.user.has_perm('Faq.delete_topic'): context['delete_button'] = "Löschen" 
@@ -90,12 +90,6 @@ class TopicChangeView(MyUpdateView):
 		context['back_button'] = ["Abbrechen",self.success_url+url_args(self.request)]
 		context['url_args'] = url_args(self.request)
 		return context
-
-	def get(self, request, *args, **kwargs):
-		context = self.get_context_data(request)
-		form = self.form_class(instance=Topic.objects.get(pk=kwargs['pk']))
-		context['form'] = form
-		return render(request, self.template_name, context)
 
 	def form_valid(self, form):
 		instance = form.save(commit=False)

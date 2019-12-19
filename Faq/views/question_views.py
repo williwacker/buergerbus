@@ -67,7 +67,7 @@ class QuestionAddView(MyCreateView):
 	success_url = '/Faq/questions/list/'
 	model = Question
 
-	def get_context_data(self, request):
+	def get_context_data(self, **kwargs):
 		context = {}
 		context['sidebar_liste'] = get_sidebar(self.request.user)
 		context['title'] = self.model._meta.verbose_name_raw+" - Frage hinzufügen"
@@ -76,7 +76,7 @@ class QuestionAddView(MyCreateView):
 		return context
 
 	def get(self, request, *args, **kwargs):
-		context = self.get_context_data(request)
+		context = self.get_context_data(**kwargs)
 		topic = self.request.GET.get('topic')
 		self.initial['topic'] = Topic.objects.filter(pk=topic).first() if topic else None
 		form = self.form_class(initial=self.initial)
@@ -115,10 +115,10 @@ class QuestionAdminChangeView(MyUpdateView):
 	permission_required = 'Faq.change_question'
 	form_class = QuestionChangeForm
 	success_url = '/Faq/questions/admin/'
-	model=Question
+	model = Question
 	
-	def get_context_data(self, request, **kwargs):
-		context = {}
+	def get_context_data(self, **kwargs):
+		context = super().get_context_data(**kwargs)
 		context['sidebar_liste'] = get_sidebar(self.request.user)
 		context['title'] = self.model._meta.verbose_name_raw+" - Frage ändern"
 		if self.request.user.has_perm('Faq.delete_question'): context['delete_button'] = "Löschen" 
@@ -127,17 +127,11 @@ class QuestionAdminChangeView(MyUpdateView):
 		context['url_args'] = url_args(self.request)
 		return context
 
-	def get(self, request, *args, **kwargs):
-		context = self.get_context_data(request)
-		form = self.form_class(instance=Question.objects.get(pk=kwargs['pk']))
-		context['form'] = form
-		return render(request, self.template_name, context)
-
 	def form_valid(self, form):
 		instance = form.save(commit=False)
 		instance.updated_by = self.request.user
 		instance.save(force_update=True)
-#		self.success_url += url_args(self.request)		
+		self.success_url += url_args(self.request)		
 		messages.success(self.request, self.model._meta.verbose_name_raw+' "<a href="'+self.success_url+str(instance.id)+'">'+str(instance)+'</a>" wurde erfolgreich geändert.')
 		return super(QuestionAdminChangeView, self).form_valid(form) 
 

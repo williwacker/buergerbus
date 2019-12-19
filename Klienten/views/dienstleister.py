@@ -10,8 +10,8 @@ from jet.filters import RelatedFieldAjaxListFilter
 
 from Basis.telefonbuch_suche import Telefonbuch
 from Basis.utils import get_sidebar, render_to_pdf, url_args
-from Basis.views import (MyDeleteView, MyDetailView, MyListView,
-                         MyMultiFormsView, MyUpdateView, MyView)
+from Basis.views import (MyDeleteView, MyCreateView, MyListView,
+                         MyMultiFormsView, MyUpdateView)
 from Einsatzmittel.models import Bus
 from Einsatzmittel.utils import get_bus_list
 from Einsatztage.views import FahrplanAsPDF
@@ -48,15 +48,15 @@ class DienstleisterView(MyListView):
 		context['url_args'] = url_args(self.request)
 		return context		
 
-class DienstleisterAddView(MyDetailView):
+class DienstleisterAddView(MyCreateView):
 	form_class = DienstleisterAddForm
 	permission_required = 'Klienten.add_klienten'
 	success_url = '/Klienten/dienstleister/'
 	model = Klienten
 
-	def get_context_data(self, request):
+	def get_context_data(self, **kwargs):
 		context = {}
-		context['sidebar_liste'] = get_sidebar(request.user)
+		context['sidebar_liste'] = get_sidebar(self.request.user)
 		context['title'] = "Dienstleister hinzufügen"
 		context['submit_button'] = "Sichern"
 		context['popup'] = self.request.GET.get('_popup',None)
@@ -64,20 +64,19 @@ class DienstleisterAddView(MyDetailView):
 		return context
 	
 	def get(self, request, *args, **kwargs):
-		context = self.get_context_data(request)
+		context = self.get_context_data(**kwargs)
+		self.initial['typ'] = 'D'
 		form = self.form_class(initial=self.initial)
 		context['form'] = form
 		return render(request, self.template_name, context)
 
 	def post(self, request, *args, **kwargs):
-		context = self.get_context_data(request)
+		context = self.get_context_data(**kwargs)
 		form = self.form_class(request.POST)
 		context['form'] = form
 		if form.is_valid():
 			instance = form.save(commit=False)
-			instance.updated_by = self.request.user
-			instance.dsgvo = '99'
-			instance.typ = 'D'
+			instance.created_by = self.request.user
 			instance.save()	
 			messages.success(request, 'Dienstleister "<a href="'+self.success_url+str(instance.id)+'/'+url_args(request)+'">'+instance.name+'</a>" wurde erfolgreich hinzugefügt.')
 			context['messages'] = messages
@@ -94,22 +93,16 @@ class DienstleisterChangeView(MyUpdateView):
 	success_url = '/Klienten/dienstleister/'
 	model = Klienten
 
-	def get_context_data(self, request):
-		context = {}
-		context['sidebar_liste'] = get_sidebar(request.user)
+	def get_context_data(self, **kwargs):
+		context = super().get_context_data(**kwargs)
+		context['sidebar_liste'] = get_sidebar(self.request.user)
 		context['title'] = "Fahrgast ändern"
 		if self.request.user.has_perm('Klienten.delete_klienten'): context['delete_button'] = "Löschen"
 		context['submit_button'] = "Sichern"
 		context['back_button'] = ["Abbrechen",self.success_url+url_args(self.request)]
-		context['url_args'] = url_args(request)
+		context['url_args'] = url_args(self.request)
 		return context
 	
-	def get(self, request, *args, **kwargs):
-		context = self.get_context_data(request)
-		form = self.form_class(instance=Klienten.objects.get(pk=kwargs['pk']))
-		context['form'] = form
-		return render(request, self.template_name, context)
-
 	def form_valid(self, form):
 		instance = form.save(commit=False)
 		instance.updated_by = self.request.user
@@ -281,8 +274,7 @@ class DienstleisterSearchMultiformsView(MyMultiFormsView):
 			telefon = result['ph'],
 			mobil = result['mph'],
 			typ = 'D',
-			dsgvo = '99',
-			updated_by = self.request.user,
+			created_by = self.request.user,
 			kategorie = category,
 		)
 		klient.save()

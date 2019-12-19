@@ -225,20 +225,14 @@ class FahrtageChangeView(MyUpdateView):
 	success_url = '/Einsatztage/fahrer/'
 	model = Fahrtag
 	
-	def get_context_data(self):
-		context = {}
+	def get_context_data(self, **kwargs):
+		context = super().get_context_data(**kwargs)
 		context['sidebar_liste'] = get_sidebar(self.request.user)
 		context['title'] = "Fahrereinsatz ändern"
 		context['submit_button'] = "Sichern"
 		context['back_button'] = ["Abbrechen",self.success_url+url_args(self.request)]
 		context['url_args'] = url_args(self.request)
 		return context
-	
-	def get(self, request, *args, **kwargs):
-		context = self.get_context_data()
-		form = self.form_class(instance=Fahrtag.objects.get(pk=kwargs['pk']))
-		context['form'] = form
-		return render(request, self.template_name, context)
 
 	def form_valid(self, form):
 		instance = form.save(commit=False)
@@ -247,6 +241,8 @@ class FahrtageChangeView(MyUpdateView):
 		self.success_url += url_args(self.request)
 		self.success_message = self.model._meta.verbose_name.title()+' "<a href="'+self.success_url+str(instance.id)+'">'+str(instance.datum)+' '+str(instance.team)+'</a>" wurde erfolgreich geändert.'
 		return super(FahrtageChangeView, self).form_valid(form)	
+
+### Bürotage
 
 class BuerotageListView(MyListView):
 	permission_required = 'Einsatztage.view_buerotag'
@@ -276,20 +272,14 @@ class BuerotageChangeView(MyUpdateView):
 	success_url = '/Einsatztage/buero/'
 	model = Buerotag
 
-	def get_context_data(self, request):
-		context = {}
-		context['sidebar_liste'] = get_sidebar(request.user)
+	def get_context_data(self, **kwargs):
+		context = super().get_context_data(**kwargs)
+		context['sidebar_liste'] = get_sidebar(self.request.user)
 		context['title'] = "Bürotag ändern"
 		context['submit_button'] = "Sichern"
 		context['back_button'] = ["Abbrechen",self.success_url+url_args(self.request)]
 		context['url_args'] = url_args(self.request)
 		return context
-	
-	def get(self, request, *args, **kwargs):
-		context = self.get_context_data(request)
-		form = self.form_class(instance=Buerotag.objects.get(pk=kwargs['pk']))
-		context['form'] = form
-		return render(request, self.template_name, context)
 
 	def form_valid(self, form):
 		instance = form.save(commit=False)

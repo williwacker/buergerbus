@@ -10,9 +10,9 @@ logger = logging.getLogger(__name__)
 
 class EinsatztageCronJob(CronJobBase):
     ALLOW_PARALLEL_RUNS = True
-    RUN_EVERY_MINS = 720  # every 12h
+    RUN_AT_TIMES = ['01:00']
 
-    schedule = Schedule(run_every_mins = RUN_EVERY_MINS)
+    schedule = Schedule(run_at_times=RUN_AT_TIMES)
     code = __name__
 
     def do(self):
@@ -23,7 +23,7 @@ class EinsatztageCronJob(CronJobBase):
 
 class BackupCronJob(CronJobBase):
     ALLOW_PARALLEL_RUNS = True
-    RUN_AT_TIMES = ['23:00']
+    RUN_AT_TIMES = ['02:00']
 
     schedule = Schedule(run_at_times=RUN_AT_TIMES)
     code = __name__

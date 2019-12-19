@@ -34,8 +34,10 @@ class Orte(models.Model):
 	ort    = models.CharField(max_length=50)
 	plz    = models.CharField(max_length=5)
 	bus    = models.ForeignKey('Einsatzmittel.Bus', null=True, blank=True, on_delete=models.CASCADE)
-	updated_on = models.DateTimeField(auto_now=True, blank=True, null=True)
-	updated_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL)
+	created_on  = models.DateTimeField(auto_now_add=True, null=True)
+	created_by  = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, related_name="+", on_delete=models.SET_NULL)
+	updated_on  = models.DateTimeField(auto_now=True, blank=True, null=True)
+	updated_by  = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, related_name="+", on_delete=models.SET_NULL)
 	
 	class Meta():
 		verbose_name_plural = "Orte"
@@ -49,8 +51,10 @@ class Orte(models.Model):
 class Strassen(models.Model):
 	ort     = models.ForeignKey(Orte, null=True, on_delete=models.CASCADE)
 	strasse = models.CharField(max_length=50)
-	updated_on = models.DateTimeField(auto_now=True, blank=True, null=True)
-	updated_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL)
+	created_on  = models.DateTimeField(auto_now_add=True, null=True)
+	created_by  = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, related_name="+", on_delete=models.SET_NULL)
+	updated_on  = models.DateTimeField(auto_now=True, blank=True, null=True)
+	updated_by  = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, related_name="+", on_delete=models.SET_NULL)
 	
 	class Meta():
 		verbose_name_plural = "Strassen"
@@ -63,10 +67,10 @@ class Strassen(models.Model):
 class Klienten(models.Model):
 	name    = models.CharField(max_length=100, help_text="Name, Vorname")
 	name.short_description = "Name des Klienten"
-	telefon = models.CharField(max_length=30, null=True, blank=True, help_text="01234-1111")
-	mobil   = models.CharField(max_length=30, null=True, blank=True, help_text="0150-1111")
+	telefon = models.CharField(max_length=30, blank=True, help_text="01234-1111")
+	mobil   = models.CharField(max_length=30, blank=True, null=True, help_text="0150-1111")
 	ort     = models.ForeignKey(Orte, null=True, on_delete=models.CASCADE, verbose_name="Wohnort")
-	bus     = models.ForeignKey('Einsatzmittel.Bus', null=True, blank=True, on_delete=models.CASCADE, 
+	bus     = models.ForeignKey('Einsatzmittel.Bus', null=True, on_delete=models.CASCADE, 
 				help_text="Dem Wohnort ist kein Bus zugeordnet. Deshalb für den Fahrgast einen Bus auswählen!")
 	strasse = ChainedForeignKey(
         Strassen, # the model where you're populating your streets from
@@ -83,8 +87,10 @@ class Klienten(models.Model):
 	kategorie = models.CharField(choices=DIENSTLEISTER_AUSWAHL,max_length=100, blank=True, null=True)
 	latitude = models.DecimalField(max_digits=7, decimal_places=4, default=0)
 	longitude = models.DecimalField(max_digits=7, decimal_places=4, default=0)
-	updated_on = models.DateTimeField(auto_now=True, blank=True, null=True)
-	updated_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL)
+	created_on  = models.DateTimeField(auto_now_add=True, null=True)
+	created_by  = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, related_name="+", on_delete=models.SET_NULL)
+	updated_on  = models.DateTimeField(auto_now=True, blank=True, null=True)
+	updated_by  = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, related_name="+", on_delete=models.SET_NULL)
 
 	class Meta():
 		verbose_name_plural = "Klienten"

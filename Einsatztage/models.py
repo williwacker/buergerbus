@@ -38,12 +38,16 @@ class Fahrtag(models.Model):
 		sort=True)		
 	urlaub     = models.BooleanField(default=False)
 	archiv     = models.BooleanField(default=False)
-	updated_on = models.DateTimeField(auto_now=True, blank=True, null=True)
-	updated_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL)
+	created_on  = models.DateTimeField(auto_now_add=True, null=True)
+	created_by  = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, related_name="+", on_delete=models.SET_NULL)
+	updated_on  = models.DateTimeField(auto_now=True, blank=True, null=True)
+	updated_by  = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, related_name="+", on_delete=models.SET_NULL)
 
 	class Meta():
 		verbose_name_plural = "Fahrtage"
 		verbose_name = "Fahrtag"
+		constraints = [models.UniqueConstraint(fields=['datum','team'], name='unique_fahrtag')]
+
 
 	def __str__(self):
 		return str(self.datum)
@@ -88,12 +92,15 @@ class Buerotag(models.Model):
 		sort=True)
 	urlaub     = models.BooleanField(default=False)
 	archiv     = models.BooleanField(default=False)
-	updated_on = models.DateTimeField(auto_now=True, blank=True, null=True)
-	updated_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL)
+	created_on  = models.DateTimeField(auto_now_add=True, null=True)
+	created_by  = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, related_name="+", on_delete=models.SET_NULL)
+	updated_on  = models.DateTimeField(auto_now=True, blank=True, null=True)
+	updated_by  = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, related_name="+", on_delete=models.SET_NULL)
 		
 	class Meta():
 		verbose_name_plural = "Bürotage"
 		verbose_name = "Bürotag"
+		constraints = [models.UniqueConstraint(fields=['datum','team'], name='unique_buerotag')]
 		
 	def __str__(self):
 		return str(self.datum)

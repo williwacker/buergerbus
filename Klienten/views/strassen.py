@@ -47,9 +47,9 @@ class StrassenAddView(MyCreateView):
 	success_url = '/Klienten/strassen/'
 	model = Strassen
 
-	def get_context_data(self, request):
+	def get_context_data(self, **kwargs):
 		context = {}
-		context['sidebar_liste'] = get_sidebar(request.user)
+		context['sidebar_liste'] = get_sidebar(self.request.user)
 		context['title'] = "Strasse hinzufügen"
 		context['submit_button'] = "Sichern"
 		context['back_button'] = ["Abbrechen",self.success_url+url_args(self.request)]
@@ -57,7 +57,7 @@ class StrassenAddView(MyCreateView):
 		return context
 	
 	def get(self, request, *args, **kwargs):
-		context = self.get_context_data(request)
+		context = self.get_context_data(**kwargs)
 		ort = request.GET.get('ort')
 		self.initial['ort'] = Orte.objects.get(id=str(ort)) if ort else None
 		form = self.form_class(initial=self.initial)
@@ -66,7 +66,7 @@ class StrassenAddView(MyCreateView):
 
 	def form_valid(self, form):
 		instance = form.save(commit=False)
-		instance.updated_by = self.request.user
+		instance.created_by = self.request.user
 		instance.save()
 		self.success_message = self.model._meta.verbose_name.title()+' "<a href="'+self.success_url+str(instance.id)+'/'+url_args(self.request)+'">'+str(instance)+' in '+str(instance.ort)+'</a>" wurde erfolgreich hinzugefügt.'
 		self.success_url += url_args(self.request)
@@ -78,21 +78,15 @@ class StrassenChangeView(MyUpdateView):
 	success_url = '/Klienten/strassen/'
 	model = Strassen
 
-	def get_context_data(self, request):
-		context = {}
-		context['sidebar_liste'] = get_sidebar(request.user)
+	def get_context_data(self, **kwargs):
+		context = super().get_context_data(**kwargs)
+		context['sidebar_liste'] = get_sidebar(self.request.user)
 		context['title'] = "Strasse ändern"
 		if self.request.user.has_perm('Klienten.delete_strassen'): context['delete_button'] = "Löschen"
 		context['submit_button'] = "Sichern"
 		context['back_button'] = ["Abbrechen",self.success_url+url_args(self.request)]
-		context['url_args'] = url_args(request)
+		context['url_args'] = url_args(self.request)
 		return context
-	
-	def get(self, request, *args, **kwargs):
-		context = self.get_context_data(request)
-		form = self.form_class(instance=Strassen.objects.get(pk=kwargs['pk']))
-		context['form'] = form
-		return render(request, self.template_name, context)
 
 	def form_valid(self, form):
 		instance = form.save(commit=False)

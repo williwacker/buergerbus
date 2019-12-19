@@ -59,10 +59,11 @@ class TourView(MyListView):
 
 # Dies ist ein zweistufiger Prozess, der zuerst den Klient auswählen lässt, um im zweiten Bildschirm dann mithilfe des dem Klienten zugeordneten Busses
 # die richtigen Fahrtage auszuwählen für das Datumsfeld. An den zweiten Bildschirm wird über die URL die KlientenId übergeben.
-class TourAddView(MyDetailView):
+class TourAddView(MyCreateView):
 	form_class = TourAddForm1
 	permission_required = 'Tour.add_tour'
 	success_url = '/Tour/tour/'
+	model = Tour
 
 	def get_context_data(self):
 		context = {}
@@ -73,7 +74,7 @@ class TourAddView(MyDetailView):
 		return context
 
 	def get(self, request, *args, **kwargs):
-		context = self.get_context_data()
+		context = self.get_context_data(**kwargs)
 		form = self.form_class(initial=self.initial)
 		# nur managed klienten anzeigen
 		form.fields['fahrgast'].queryset = Klienten.objects.order_by('name').filter(typ='F', bus__in=get_bus_list(request))
@@ -86,8 +87,6 @@ class TourAddView(MyDetailView):
 		context['form'] = form
 		if form.is_valid():
 			post = request.POST.dict()
-			storage = messages.get_messages(request)
-			storage.used = True
 			return HttpResponseRedirect(self.success_url+'add/'+post['fahrgast']+url_args(request))
 		else:
 			messages.error(request, form.errors)
@@ -99,16 +98,16 @@ class TourAddView2(MyCreateView, GoogleMixin):
 	success_url = '/Tour/tour/'
 	model = Tour
 	
-	def get_context_data(self, request):
+	def get_context_data(self, **kwargs):
 		context = {}
-		context['sidebar_liste'] = get_sidebar(request.user)
+		context['sidebar_liste'] = get_sidebar(self.request.user)
 		context['title'] = "Tour hinzufügen"
 		context['submit_button'] = "Sichern"
 		context['back_button'] = ["Zurück","javascript:history.go(-1)"]
 		return context
 
 	def get(self, request, *args, **kwargs):
-		context = self.get_context_data(request)
+		context = self.get_context_data(**kwargs)
 		klient = Klienten.objects.get(pk=kwargs['pk'])
 		self.initial['klient'] = klient
 		self.initial['fahrgast'] = klient
@@ -135,7 +134,7 @@ class TourAddView2(MyCreateView, GoogleMixin):
 
 	def form_valid(self, form):
 		instance = form.save(commit=False)
-		instance.updated_by = self.request.user
+		instance.created_by = self.request.user
 		try:
 			googleDict = self.get_google(form)
 		except:
@@ -157,19 +156,18 @@ class TourChangeView(MyUpdateView, GoogleMixin):
 	success_url = '/Tour/tour/'
 	model = Tour
 	
-	def get_context_data(self, request):
+	def get_context_data(self, **kwargs):
 		context = {}
-		context['sidebar_liste'] = get_sidebar(request.user)
+		context['sidebar_liste'] = get_sidebar(self.request.user)
 		context['title'] = "Tour ändern"
-		if request.user.has_perm('Tour.delete_tour'):
-			context['delete_button'] = "Löschen"
+		if self.request.user.has_perm('Tour.delete_tour'): context['delete_button'] = "Löschen"
 		context['submit_button'] = "Sichern"
-		context['back_button'] = ["Abbrechen",self.success_url+url_args(request)]
-		context['url_args'] = url_args(request)
+		context['back_button'] = ["Abbrechen",self.success_url+url_args(self.request)]
+		context['url_args'] = url_args(self.request)
 		return context
 	
 	def get(self, request, *args, **kwargs):
-		context = self.get_context_data(request)
+		context = self.get_context_data(**kwargs)
 		instance=Tour.objects.get(pk=kwargs['pk'])
 		form = self.form_class(instance=instance)
 		form.fields["fahrgast"].initial = instance.klient.name

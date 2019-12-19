@@ -42,23 +42,20 @@ class MyListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
 
 class MyDetailView(SuccessMessageMixin, LoginRequiredMixin, PermissionRequiredMixin, DetailView):
 	login_url = settings.LOGIN_URL
-	initial = {'key': 'value'}
 	template_name = 'Basis/detail.html'
 
 class MyCreateView(SuccessMessageMixin, LoginRequiredMixin, PermissionRequiredMixin, CreateView):
 	login_url = settings.LOGIN_URL
-	initial = {'key': 'value'}
 	template_name = 'Basis/detail.html'	
-
+	
 	def form_invalid(self, form):
-		context = self.get_context_data(self.request)
+		context = self.get_context_data()
 		context['form'] = form
 		messages.error(self.request, form.errors)			
 		return render(self.request, self.template_name, context)
 	
 class MyMultiFormsView(LoginRequiredMixin, PermissionRequiredMixin, MultiFormsView):
 	login_url = settings.LOGIN_URL
-	initial = {'key': 'value'}
 	template_name = 'Basis/multiforms.html'
 
 class MyView(LoginRequiredMixin, PermissionRequiredMixin, View):
@@ -70,7 +67,7 @@ class MyUpdateView(SuccessMessageMixin, LoginRequiredMixin, PermissionRequiredMi
 	template_name = 'Basis/detail.html'
 	
 	def form_invalid(self, form):
-		context = self.get_context_data(self.request)
+		context = self.get_context_data()
 		context['form'] = form
 		messages.error(self.request, form.errors)			
 		return render(self.request, self.template_name, context)

@@ -26,8 +26,10 @@ class Tour(models.Model):
 	konflikt     = models.TextField(max_length=200, blank=True, null=True)
 	konflikt_richtung = models.CharField(max_length=2, blank=True, null=True)
 	archiv       = models.BooleanField(default=False)
-	updated_on   = models.DateTimeField(auto_now=True, blank=True, null=True)
-	updated_by   = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL)
+	created_on  = models.DateTimeField(auto_now_add=True, null=True)
+	created_by  = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, related_name="+", on_delete=models.SET_NULL)
+	updated_on  = models.DateTimeField(auto_now=True, blank=True, null=True)
+	updated_by  = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, related_name="+", on_delete=models.SET_NULL)
 
 	@property
 	def abholort(self):

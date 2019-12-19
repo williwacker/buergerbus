@@ -58,7 +58,9 @@ class DocumentAddView(MyDetailView):
 		form = self.form_class(request.POST, request.FILES)
 		context['form'] = form
 		if form.is_valid():
-			form.save()
+			instance = form.save(commit=False)
+			instance.uploaded_by = self.request.user
+			instance.save()
 			return HttpResponseRedirect(self.success_url+url_args(request))
 		else:
 			messages.error(request, form.errors)			
@@ -91,9 +93,8 @@ class DocumentChangeView(MyUpdateView):
 
 	def form_valid(self, form):
 		instance = form.save(commit=False)
+		instance.updated_by = self.request.user
 		instance.save(force_update=True)
-		storage = messages.get_messages(self.request)
-		storage.used = True
 		self.success_url += url_args(self.request)		
 		messages.success(self.request, self.model._meta.verbose_name_raw+' "<a href="'+self.success_url+str(instance.id)+'">'+str(instance)+'</a>" wurde erfolgreich geändert.')
 		return super(DocumentChangeView, self).form_valid(form) 

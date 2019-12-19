@@ -33,7 +33,7 @@ class DocumentAddForm(forms.ModelForm):
 
 	class Meta:
 		model = Document
-		fields = ('description', 'document', )	
+		fields = ('description', 'document')	
 		
 	def __init__(self, *args, **kwargs):
 		super(DocumentAddForm, self).__init__(*args, **kwargs)
