@@ -59,7 +59,7 @@
                 </div>
                 {% if sidebar_liste %}
                     {% block usertools %}
-                        {% if user.is_active and user.is_staff or has_permission %}
+                        {% if user.is_active or has_permission %}
                         <div id="user-tools">
                             {% block welcome-msg %}
                                 {% trans 'Welcome,' %}

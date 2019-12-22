@@ -7,8 +7,7 @@ from django.utils import timezone
 
 
 class Fahrer(models.Model):
-	name  = models.CharField(max_length=50, help_text="Name, Vorname")
-	email = models.EmailField(max_length=254)
+	benutzer = models.ForeignKey(User, related_name='+', on_delete=models.CASCADE)
 	telefon = models.CharField(max_length=30, blank=True, help_text="01234-1111")
 	mobil = models.CharField(max_length=30, blank=True, null=True, help_text="0150-1111")
 	team  = models.ForeignKey('Einsatzmittel.Bus', null=True, on_delete=models.SET_NULL)
@@ -21,10 +20,10 @@ class Fahrer(models.Model):
 	class Meta():
 		verbose_name_plural = "Fahrer(innen)"
 		verbose_name = "Fahrer(in)"
-		constraints = [models.UniqueConstraint(fields=['name','team'], name='unique_fahrer')]
+		constraints = [models.UniqueConstraint(fields=['benutzer','team'], name='unique_fahrer')]
 
 	def __str__(self):
-		return self.name
+		return ", ".join([str(self.benutzer.last_name),str(self.benutzer.first_name)])
 
 class Koordinator(models.Model):
 	benutzer = models.ForeignKey(User, related_name='+', on_delete=models.CASCADE)

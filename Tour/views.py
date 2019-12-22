@@ -75,7 +75,7 @@ class TourAddView(MyCreateView):
 
 	def get(self, request, *args, **kwargs):
 		context = self.get_context_data(**kwargs)
-		form = self.form_class(initial=self.initial)
+		form = self.form_class()
 		# nur managed klienten anzeigen
 		form.fields['fahrgast'].queryset = Klienten.objects.order_by('name').filter(typ='F', bus__in=get_bus_list(request))
 		context['form'] = form

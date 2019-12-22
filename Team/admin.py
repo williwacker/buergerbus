@@ -5,10 +5,10 @@ from .models import Fahrer, Koordinator
 
 class FahrerAdmin(admin.ModelAdmin):
 	
-    list_display = ('name', 'team', 'email', 'mobil', 'aktiv')
+    list_display = ('benutzer', 'team', 'mobil', 'aktiv')
     list_filter = ('team',)
-    list_editable = ('email','mobil')
-    ordering = ('name',)
+    list_editable = ('mobil',)
+    ordering = ('benutzer',)
 
     def get_queryset(self, request):
         qs = super(FahrerAdmin, self).get_queryset(request)

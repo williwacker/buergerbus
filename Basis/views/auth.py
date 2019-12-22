@@ -9,7 +9,7 @@ from django.views.generic import TemplateView
 from Basis.forms import MyGroupChangeForm, MyUserChangeForm
 from Basis.tables import GroupTable, UserTable
 from Basis.utils import get_sidebar, url_args
-from Basis.views import (MyDeleteView, MyDetailView, MyListView, MyUpdateView,
+from Basis.views import (MyDeleteView, MyCreateView, MyDetailView, MyListView, MyUpdateView,
                          MyView)
 
 
@@ -31,39 +31,28 @@ class UserView(MyListView):
 		context['url_args'] = url_args(self.request)
 		return context
 
-class UserAddView(MyDetailView):
-	permission_required = 'auth.change_user'
+class UserAddView(MyCreateView):
+	permission_required = 'auth.add_user'
 	form_class = UserCreationForm
 	success_url = '/Basis/benutzer/'
+	model = User
 
-	def get_context_data(self, request):
-		context = {}
+	def get_context_data(self, **kwargs):
+		context = super(UserAddView, self).get_context_data(**kwargs)
 		context['sidebar_liste'] = get_sidebar(self.request.user)
 		context['title'] = "Benutzer hinzufügen"
 		context['submit_button'] = "Sichern"
 		context['back_button'] = ["Abbrechen",self.success_url+url_args(self.request)]	
 		return context
-	
-	def get(self, request, *args, **kwargs):
-		context = self.get_context_data(request)
-		form = self.form_class(initial=self.initial)
-		context['form'] = form
-		return render(request, self.template_name, context)
 
-	def post(self, request, *args, **kwargs):
-		context = self.get_context_data(request)
-		form = self.form_class(request.POST)
-		context['form'] = form
-		if form.is_valid():
-			instance = form.save()
-			storage = messages.get_messages(request)
-			storage.used = True			
-			messages.success(request, 'Benutzer "<a href="'+self.success_url+str(instance.id)+'">'+instance.username+'</a>" wurde erfolgreich angelegt.')
-			return HttpResponseRedirect(self.success_url+url_args(request))
-		else:
-			messages.error(request, form.errors)
-		
-		return render(request, self.template_name, context)
+	def form_valid(self, form):
+		instance = form.save(commit=False)
+		instance.created_by = self.request.user
+		instance.save()
+		self.success_url += url_args(self.request)
+		self.success_message = self.model._meta.verbose_name.title()+' "<a href="'+self.success_url+str(instance.id)+'">'+instance.username+'</a>" wurde erfolgreich angelegt.'
+		return super(UserAddView, self).form_valid(form)
+
 
 class UserChangeView(MyUpdateView):
 	permission_required = 'auth.change_user'
@@ -93,8 +82,6 @@ class UserChangeView(MyUpdateView):
 	
 	def form_valid(self, form):
 		instance = form.save()
-		storage = messages.get_messages(self.request)
-		storage.used = True			
 		messages.success(self.request, 'Benutzer "<a href="'+self.success_url+str(instance.id)+'">'+instance.username+'</a>" wurde erfolgreich geändert.')
 		return super(UserChangeView, self).form_valid(form) 
 
@@ -123,44 +110,34 @@ class GroupView(MyListView):
 		context['url_args'] = url_args(self.request)
 		return context
 
-class GroupAddView(MyDetailView):
+class GroupAddView(MyCreateView):
 	permission_required = 'auth.change_group'
 	form_class = MyGroupChangeForm
 	success_url = '/Basis/gruppen/'
+	model=Group
 
-	def get_context_data(self, request):
-		context = {}
+	def get_context_data(self, **kwargs):
+		context = super(GroupAddView, self).get_context_data(**kwargs)
 		context['sidebar_liste'] = get_sidebar(self.request.user)
 		context['title'] = "Gruppe hinzufügen"
 		context['submit_button'] = "Sichern"
 		context['back_button'] = ["Abbrechen",self.success_url+url_args(self.request)]	
 		return context
-	
-	def get(self, request, *args, **kwargs):
-		context = self.get_context_data(request)
-		form = self.form_class(initial=self.initial)
-		context['form'] = form
-		return render(request, self.template_name, context)
 
-	def post(self, request, *args, **kwargs):
-		context = self.get_context_data(request)
-		form = self.form_class(request.POST)
-		context['form'] = form
-		if form.is_valid():
-			instance = form.save()
-			storage = messages.get_messages(request)
-			storage.used = True			
-			messages.success(request, 'Gruppe "<a href="'+self.success_url+str(instance.id)+'">'+instance.name+'</a>" wurde erfolgreich hinzugefügt.')
-			return HttpResponseRedirect(self.success_url+url_args(request))
-		else:
-			messages.error(request, form.errors)	
-		return render(request, self.template_name, context)
+	def form_valid(self, form):
+		instance = form.save(commit=False)
+		instance.created_by = self.request.user
+		instance.save()
+		self.success_url += url_args(self.request)
+		self.success_message = self.model._meta.verbose_name.title()+' "<a href="'+self.success_url+str(instance.id)+'">'+instance.name+'</a>" wurde erfolgreich angelegt.'
+		return super(GroupAddView, self).form_valid(form)
+
 
 class GroupChangeView(MyUpdateView):
 	permission_required = 'auth.change_group'
 	form_class = MyGroupChangeForm
-	model=Group
 	success_url = '/Basis/gruppen/'
+	model=Group
 
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
@@ -177,13 +154,14 @@ class GroupChangeView(MyUpdateView):
 		instance = form.save()
 		storage = messages.get_messages(self.request)
 		storage.used = True			
-		messages.success(self.request, 'Gruppe "<a href="'+self.success_url+str(instance.id)+'">'+instance.name+'</a>" wurde erfolgreich geändert.')
+		messages.success(self.request, self.model._meta.verbose_name.title()+' "<a href="'+self.success_url+str(instance.id)+'">'+instance.name+'</a>" wurde erfolgreich geändert.')
 		return super(GroupChangeView, self).form_valid(form) 
 
 class GroupDeleteView(MyDeleteView):
 	permission_required = 'auth.delete_group'
 	success_url = '/Basis/gruppen/'
 	model = Group
+
 
 class MyPasswordChangeView(PasswordChangeView):
 
@@ -203,7 +181,5 @@ class MyPasswordChangeDoneView(TemplateView):
 
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
-		context.update({
-			'sidebar_liste':get_sidebar(self.request.user)
-		})
+		context['sidebar_liste'] = get_sidebar(self.request.user)
 		return context

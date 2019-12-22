@@ -1,5 +1,7 @@
 from collections import OrderedDict
 from io import BytesIO
+from pathlib import Path
+from fuzzywuzzy import fuzz, process
 
 from django.contrib import messages
 from django.contrib.auth.models import Permission, User
@@ -9,6 +11,8 @@ from django.db.models.deletion import Collector
 from django.http import HttpResponse
 from django.template import Context, loader
 from django.utils.http import is_safe_url
+from django.utils.translation import gettext as _, ngettext
+from django.core.exceptions import ValidationError
 from xhtml2pdf import pisa
 
 from Einsatzmittel.models import Buero, Bus
@@ -111,15 +115,45 @@ def get_relation_dict(modelclass, kwargs):
 		return objects
 
 def messages(request):
-    # Remove duplicate messages
-    messages = []
-    unique_messages = []
-    for m in get_messages(request):
-        if m.message not in messages:
-            messages.append(m.message)
-            unique_messages.append(m)
+	# Remove duplicate messages
+	messages = []
+	unique_messages = []
+	for m in get_messages(request):
+		if m.message not in messages:
+			messages.append(m.message)
+			unique_messages.append(m)
 
-    return {
+	return {
 		'messages': unique_messages,
-        'DEFAULT_MESSAGE_LEVELS': DEFAULT_LEVELS,
+		'DEFAULT_MESSAGE_LEVELS': DEFAULT_LEVELS,
 	}		
+
+class MyPasswordValidator:
+	"""
+	Validate whether the password is a common password.
+
+	The password is rejected if it occurs in a provided list of passwords,
+	which may be gzipped. 
+	The password list must be lowercased to match the comparison in validate().
+	"""
+	DEFAULT_PASSWORD_LIST_PATH = Path(__file__).resolve().parent / 'my-passwords.ini'
+
+	def __init__(self, password_list_path=DEFAULT_PASSWORD_LIST_PATH):
+		try:
+			with open(str(password_list_path)) as f:
+				common_passwords_lines = f.read().splitlines()
+		except IOError:
+			with open(str(password_list_path)) as f:
+				common_passwords_lines = f.readlines()
+
+		self.passwords = [p.strip() for p in common_passwords_lines]
+
+	def validate(self, password, user=None):
+		if [sub[0] for sub in process.extract(password.lower().strip(), self.passwords, scorer=fuzz.token_set_ratio) if sub[1]>=85]:
+			raise ValidationError(
+				_("This password is too common."),
+				code='password_too_common',
+			)
+
+	def get_help_text(self):
+		return _("Your password can't be a commonly used password.")

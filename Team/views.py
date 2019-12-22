@@ -23,11 +23,7 @@ class FahrerView(MyListView):
 	permission_required = 'Team.view_fahrer'
 
 	def get_fg_queryset(self):
-#		if self.request.user.has_perm('Einsatzmittel.change_bus'):
-#			qs = Fahrer.objects.order_by('team','name')
-#		else:
-		return Fahrer.objects.order_by('team','name').filter(team__in=get_bus_list(self.request))
-#		return qs
+		return Fahrer.objects.order_by('team','benutzer').filter(team__in=get_bus_list(self.request))
 
 	def get_queryset(self):
 		team = self.request.GET.get('team')
@@ -67,7 +63,7 @@ class FahrerAddView(MyCreateView):
 		instance = form.save(commit=False)
 		instance.created_by = self.request.user
 		instance.save()
-		self.success_message = self.model._meta.verbose_name.title()+' "<a href="'+self.success_url+str(instance.id)+'/'+url_args(self.request)+'">'+instance.name+' '+str(instance.team)+'</a>" wurde erfolgreich hinzugefügt.'
+		self.success_message = self.model._meta.verbose_name_raw+' "<a href="'+self.success_url+str(instance.id)+'/'+url_args(self.request)+'">'+str(", ".join([instance.benutzer.last_name,instance.benutzer.first_name]))+' '+str(instance.team)+'</a>" wurde erfolgreich hinzugefügt.'
 		self.success_url += url_args(self.request)
 		return super(FahrerAddView, self).form_valid(form)	
 
@@ -78,7 +74,7 @@ class FahrerChangeView(MyUpdateView):
 	model = Fahrer
 
 	def get_context_data(self, **kwargs):
-		context = super().get_context_data(**kwargs)
+		context = {}
 		context['sidebar_liste'] = get_sidebar(self.request.user)
 		context['title'] = "Fahrer ändern"
 		if self.request.user.has_perm('Team.delete_fahrer'): context['delete_button'] = "Löschen"
@@ -86,12 +82,20 @@ class FahrerChangeView(MyUpdateView):
 		context['back_button'] = ["Abbrechen",self.success_url+url_args(self.request)]
 		context['url_args'] = url_args(self.request)
 		return context
-	
+
+	def get(self, request, *args, **kwargs):
+		context = self.get_context_data(**kwargs)
+		instance = Fahrer.objects.get(pk=kwargs['pk'])
+		form = self.form_class(instance=instance)
+		form.fields['name'].initial = ", ".join([instance.benutzer.last_name, instance.benutzer.first_name])
+		context['form'] = form
+		return render(request, self.template_name, context)
+
 	def form_valid(self, form):
 		instance = form.save(commit=False)
 		instance.updated_by = self.request.user
 		instance.save(force_update=True)
-		self.success_message = 'Fahrer(in) "<a href="'+self.success_url+str(instance.id)+'">'+instance.name+' '+str(instance.team)+'</a>" wurde erfolgreich geändert.'
+		self.success_message = self.model._meta.verbose_name_raw+' "<a href="'+self.success_url+str(instance.id)+'">'+str(", ".join([instance.benutzer.last_name,instance.benutzer.first_name]))+'</a>" wurde erfolgreich geändert.'
 		return super(FahrerChangeView, self).form_valid(form) 
 
 class FahrerDeleteView(MyDeleteView):
@@ -106,11 +110,7 @@ class KoordinatorView(MyListView):
 	permission_required = 'Team.view_koordinator'
 
 	def get_fg_queryset(self):
-#		if self.request.user.has_perm('Einsatzmittel.change_buero'):
-#			qs = Koordinator.objects.order_by('team','benutzer')
-#		else:
 		return Koordinator.objects.order_by('team','benutzer').filter(team__in=get_buero_list(self.request))
-#		return qs
 
 	def get_queryset(self):
 		team = self.request.GET.get('team')

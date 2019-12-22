@@ -8,7 +8,7 @@ class FahrerTable(tables.Table):
     name = tables.TemplateColumn(
         template_code='''
             {% if perms.Team.change_fahrer %}
-                <a href="{{ record.id }}/{{ url_args }}">{{ record.name |safe }}</a>
+                <a href="{{ record.id }}/{{ url_args }}">{{ record.benutzer.last_name }},&nbsp;{{ record.benutzer.first_name }}</a>
             {% else %}
                 {{ record.name |safe }}
             {% endif %}
@@ -18,7 +18,8 @@ class FahrerTable(tables.Table):
         template_code='''{{ record.telefon |default_if_none:"-" }}<br/>{{ record.mobil |default_if_none:"" }}'''
     )    
     email = tables.TemplateColumn(
-        template_code='''<a href="mailto:{{ record.email }}">{{ record.email }}</a>'''
+        template_code='''<a href="mailto:{{ record.benutzer.email }}">{{ record.benutzer.email }}</a>''',
+        orderable=False
     )
 
     class Meta:
