@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.core.mail import EmailMessage, get_connection
 
-from Faq.models import Question
+from Faq.models import Question, Topic
 import logging
 
 logger = logging.getLogger(__name__)
@@ -26,3 +26,11 @@ class FaqNotification():
 						body=mail_text,
 					)
 			message.send()
+
+def get_topic_list(request):
+	filterlist = []
+	qs = Topic.objects.values_list('id', flat=True)
+	for i in qs:
+		codename = "Faq.Topic_{}_editieren".format(i)
+		if request.user.has_perm(codename): filterlist.append(i)
+	return filterlist			

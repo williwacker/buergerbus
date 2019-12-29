@@ -2,6 +2,8 @@ import datetime
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
+from django.contrib.auth.models import Permission
+from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.template.defaultfilters import slugify
 from django.utils.translation import ugettext_lazy as _
@@ -24,6 +26,44 @@ class Topic(models.Model):
 
 	def __str__(self):
 		return self.name
+
+	def _permission_codename(self):
+		# gibt den codenamen der entsprechenden Berechtigung zurück
+		return  "Topic_{}_editieren".format(self.id)
+
+	def _permission_name(self):
+		# gibt den beschreibenden Namen der entsprechenden Berechtigung zurück
+		return "{} verwalten".format(self.name)
+
+	def save(self, *args, **kwargs):
+		# eigene save Methode, welche die Permission erzeugt für diesen Bus
+		super().save(*args, **kwargs)
+		content_type = ContentType.objects.get_for_model(self.__class__)
+		try:
+		# Falls es die Permission schon gibt, aktualisiere den Namen
+		# der codename enthält nur die ID des Topics und die ändert sich nicht
+			permission = Permission.objects.get(codename=self._permission_codename())
+			permission.name = self._permission_name()
+			permission.save()
+		except Permission.DoesNotExist:
+		# Falls es die Permission noch nicht gibt, erzeuge sie
+			permission = Permission.objects.create(
+				codename=self._permission_codename(),
+				name=self._permission_name(),
+				content_type=content_type)
+
+	def delete(self, *args, **kwargs):
+		# eigene delete Methode, die die Permission wieder löscht, falls das
+		# Topic Objekt gelöscht wird
+		try:
+		# Falls es die Permission schon gibt, aktualisiere den Namen
+		# der codename enthält nur die ID des Topics und die ändert sich nicht
+			permission = Permission.objects.get(codename=self._permission_codename())
+			permission.delete()
+		except Permission.DoesNotExist:
+			pass
+		super().delete(*args, **kwargs)
+
 
 
 class Question(models.Model):

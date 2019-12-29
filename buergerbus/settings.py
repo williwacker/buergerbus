@@ -197,6 +197,7 @@ LOCAL_APPS = [
 	'Basis',
 	'Einsatzmittel',
 	'Einsatztage',
+	'Faq',
 	'Klienten',
 	'Team',
 	'Tour'
@@ -246,6 +247,10 @@ LOGGING = {
 	}
 }
 LOGGING['loggers'].update({app: copy.deepcopy(local_logger_conf) for app in LOCAL_APPS})
+
+ADMINS = [
+	(config('ADMIN_NAME', default='Admin'), config('ADMIN_EMAIL', default=''))
+]
 
 MEDIA_URL 			= '/uploads/'
 MEDIA_ROOT 			= os.path.join(BASE_DIR, 'uploads')

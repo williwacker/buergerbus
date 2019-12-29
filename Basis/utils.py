@@ -18,15 +18,6 @@ from xhtml2pdf import pisa
 from Einsatzmittel.models import Buero, Bus
 
 
-def render_to_pdf(template_src, context_dict={}):
-	template = loader.get_template(template_src)
-	html  = template.render(context_dict)
-	result = BytesIO()
-	pdf = pisa.pisaDocument(BytesIO(html.encode("ISO-8859-1")), result)
-	if not pdf.err:
-		return HttpResponse(result.getvalue(), content_type='application/pdf')
-	return None
-
 def get_user_permissions(user):
 	if user.is_superuser:
 		return Permission.objects.all()
@@ -84,6 +75,7 @@ def get_sidebar(user):
 	value = []
 	if user.is_superuser:
 		value.append({'name':'Themen','value':'/Faq/topics/admin/'})
+	if user.has_perm('Faq.change_question'):
 		value.append({'name':'Fragen','value':'/Faq/questions/admin/'})
 	if value:
 		sidebar.append({'name':'FAQ', 'value':value})

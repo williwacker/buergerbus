@@ -13,6 +13,7 @@ from ..filters import TopicFilter
 from ..forms import QuestionChangeForm, SubmitFAQForm, TopicAddForm
 from ..models import Question, Topic
 from ..tables import QuestionAdminTable, QuestionTable, QuestionTopicTable
+from ..utils import get_topic_list
 
 
 class QuestionTopicView(MyListView):
@@ -100,7 +101,7 @@ class QuestionAdminListView(MyListView):
 	permission_required = 'Faq.view_question'
 
 	def get_queryset(self):
-		qs = Question.objects.all().order_by('status','-created_on')
+		qs = Question.objects.all().order_by('status','-created_on').filter(topic__in=get_topic_list(self.request))
 		return QuestionAdminTable(qs)
 
 	def get_context_data(self, **kwargs):

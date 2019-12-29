@@ -9,7 +9,7 @@ from fuzzywuzzy import fuzz, process
 from jet.filters import RelatedFieldAjaxListFilter
 
 from Basis.telefonbuch_suche import Telefonbuch
-from Basis.utils import get_sidebar, render_to_pdf, url_args
+from Basis.utils import get_sidebar, url_args
 from Basis.views import (MyDeleteView, MyCreateView, MyListView,
                          MyMultiFormsView, MyUpdateView)
 from Einsatzmittel.models import Bus

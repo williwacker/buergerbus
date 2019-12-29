@@ -9,6 +9,7 @@ from Basis.utils import get_relation_dict, get_sidebar, url_args
 from Basis.views import (MyDeleteView, MyCreateView, MyListView, MyUpdateView,
                          MyView)
 
+from .utils import get_bus_list, get_buero_list
 from .forms import BueroChgForm, BusChgForm
 from .models import Buero, Bus
 from .tables import BueroTable, BusTable
@@ -19,7 +20,7 @@ class BusView(MyListView):
 	permission_required = 'Einsatzmittel.view_bus'
 
 	def get_queryset(self):
-		return(BusTable(Bus.objects.order_by('bus')))
+		return(BusTable(Bus.objects.order_by('bus').filter(id__in=get_bus_list(self.request))))
 
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
@@ -89,7 +90,7 @@ class BueroView(MyListView):
 	permission_required = 'Einsatzmittel.view_buero'
 
 	def get_queryset(self):
-		return(BueroTable(Buero.objects.order_by('buero')))
+		return(BueroTable(Buero.objects.order_by('buero').filter(id__in=get_buero_list(self.request))))
 
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)

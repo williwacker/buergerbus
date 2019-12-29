@@ -8,7 +8,7 @@ from django.http import (FileResponse, Http404, HttpResponse,
 from django.shortcuts import get_object_or_404, render
 from jet.filters import RelatedFieldAjaxListFilter
 
-from Basis.utils import get_sidebar, render_to_pdf, url_args
+from Basis.utils import get_sidebar, url_args
 from Basis.views import (MyCreateView, MyDeleteView, MyCreateView, MyListView,
                          MyUpdateView, MyView, MyDetailView)
 from Einsatzmittel.models import Bus
