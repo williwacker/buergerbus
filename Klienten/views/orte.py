@@ -94,7 +94,7 @@ class OrtChangeView(MyUpdateView):
 
 	def get(self, request, *args, **kwargs):
 		context = self.get_context_data(**kwargs)
-		instance=Orte.objects.get(pk=kwargs['pk'])
+		instance=get_object_or_404(Orte, pk=kwargs['pk'])
 		form = self.form_class(instance=instance)
 		# bus darf nur vom superuser geändert werden
 		if not request.user.is_superuser:

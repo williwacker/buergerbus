@@ -120,7 +120,7 @@ class FahrgastChangeView(MyUpdateView):
 	
 	def get(self, request, *args, **kwargs):
 		context = self.get_context_data(**kwargs)
-		form = self.form_class(instance=Klienten.objects.get(pk=kwargs['pk']))
+		form = self.form_class(instance=get_object_or_404(Klienten, pk=kwargs['pk']))
 		# nur managed orte anzeigen
 		if settings.ALLOW_OUTSIDE_CLIENTS:
 			form.fields['ort'].queryset = Orte.objects.order_by('ort').filter(bus__in=get_bus_list(request)) | Orte.objects.order_by('ort').filter(bus__isnull=True)
@@ -181,7 +181,7 @@ class DSGVOasPDFView(MyView):
 	success_url = '/Klienten/fahrgaeste/'
 
 	def get(self, request, id):
-		klient = Klienten.objects.get(pk=id)
+		klient = get_object_or_404(Klienten, pk=id)
 		context = {'klient':klient}
 		filename = "DSGVO_{}_{}.pdf".format(klient.nachname, klient.vorname)
 		pdf = FahrplanAsPDF().pdf_render_to_response('Klienten/dsgvo.rml', context, filename)

@@ -6,6 +6,7 @@ from django.core.files.storage import FileSystemStorage
 from django.http import FileResponse, HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.contrib.auth.models import User
+from django.core.mail import EmailMessage
 
 from Basis.forms import DocumentAddForm, DocumentChangeForm, FeedbackForm
 from Basis.models import Document
@@ -85,7 +86,7 @@ class DocumentChangeView(MyUpdateView):
 
 	def get(self, request, *args, **kwargs):
 		context = self.get_context_data()
-		instance=Document.objects.get(pk=kwargs['pk'])
+		instance=get_object_or_404(Document, pk=kwargs['pk'])
 		form = self.form_class(instance=instance)
 		form.fields["dokument"].initial = instance.document.name
 		context['form'] = form
@@ -127,28 +128,31 @@ class FeedbackView(MyDetailView):
 	form_class = FeedbackForm
 	permission_required = 'Tour.view_tour'
 	success_url = '/'
-	context = {}
+	
 
 	def get_context_data(self):
-		self.context['sidebar_liste'] = get_sidebar(self.request.user)
-		self.context['title'] = 'Feedback senden'
-		self.context['submit_button'] = "Senden"
-		self.context['back_button'] = ["Abbrechen",self.success_url+url_args(self.request)]
-		self.context['url_args'] = url_args(self.request)
+		context = {}
+		context['sidebar_liste'] = get_sidebar(self.request.user)
+		context['title'] = 'Feedback senden'
+		context['submit_button'] = "Senden"
+		context['back_button'] = ["Abbrechen",self.success_url+url_args(self.request)]
+		context['url_args'] = url_args(self.request)
+		return context
 
 	def get(self, request, *args, **kwargs):
 		admin_email = list(User.objects.filter(is_superuser=True).values_list('email', flat=True))
-		self.get_context_data()
-		self.initial['von'] = settings.EMAIL_HOST_USER
-		self.initial['an'] = ';'.join(admin_email)
-		self.initial['betreff'] = '[Bürgerbus] Feedback '
-		form = self.form_class(initial=self.initial)
-		self.context['form'] = form
-		return render(request, self.template_name, self.context)
+		context = self.get_context_data()
+		form = self.form_class()
+		form.fields['von'].initial = settings.EMAIL_HOST_USER
+		form.fields['an'].initial = ';'.join(admin_email)
+		form.fields['betreff'].initial = '[Bürgerbus] Feedback '
+		context['form'] = form
+		return render(request, self.template_name, context)
 
 	def post(self, request, *args, **kwargs):
 		form = self.form_class(request.POST)
-		self.context['form'] = form
+		context = self.get_context_data()
+		context['form'] = form
 		if form.is_valid():
 			post = form.cleaned_data
 			email = EmailMessage(
@@ -163,4 +167,4 @@ class FeedbackView(MyDetailView):
 			return HttpResponseRedirect(self.success_url+url_args(request))
 		else:
 			messages.error(request, form.errors)			
-		return render(request, self.template_name, self.context)	    
+		return render(request, self.template_name, context)	    

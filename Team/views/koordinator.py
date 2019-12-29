@@ -83,7 +83,7 @@ class KoordinatorChangeView(MyUpdateView):
 	
 	def get(self, request, *args, **kwargs):
 		context = self.get_context_data(**kwargs)
-		instance = Koordinator.objects.get(pk=kwargs['pk'])
+		instance = get_object_or_404(Koordinator, pk=kwargs['pk'])
 		form = self.form_class(instance=instance)
 		form.fields['name'].initial = ", ".join([instance.benutzer.last_name, instance.benutzer.first_name])
 		context['form'] = form

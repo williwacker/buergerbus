@@ -53,7 +53,7 @@ class FahrplanAsPDF(MyView):
 		return trml2pdf.parseString(rml)
 		
 	def get(self, request, id):
-		fahrtag_liste = Fahrtag.objects.get(pk=id)
+		fahrtag_liste = get_object_or_404(Fahrtag, pk=id)
 		tour_liste = Tour.objects.order_by('uhrzeit').filter(datum=id)
 		context = {'fahrtag_liste':fahrtag_liste,'tour_liste':tour_liste}
 		filename = 'Buergerbus_Fahrplan_{}_{}.pdf'.format(str(fahrtag_liste.team).replace(' ','_'), fahrtag_liste.datum)
@@ -98,7 +98,7 @@ class FahrplanEmailView(MyDetailView):
 
 	def get_context_data(self):
 		self.context['sidebar_liste'] = get_sidebar(self.request.user)
-		ft = Fahrtag.objects.get(pk=self.kwargs['id'])
+		ft = get_object_or_404(Fahrtag, pk=self.kwargs['id'])
 		self.context['fahrtag_liste'] = ft
 		self.context['tour_liste'] = Tour.objects.order_by('uhrzeit').filter(datum=self.kwargs['id'])
 		self.context['title'] = 'Fahrplan {} am {} versenden'.format(ft.team,ft.datum)

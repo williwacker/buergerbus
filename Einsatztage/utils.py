@@ -11,6 +11,7 @@ from django.contrib.auth.models import Permission
 from django.core.mail import EmailMessage, get_connection
 from django.http import HttpResponse
 from django.template.loader import get_template
+from django.shortcuts import get_object_or_404
 
 ### Fahrtage und Bürotage schreiben
 from Basis.berechnung_feiertage import Holidays
@@ -48,7 +49,7 @@ class FahrtageSchreiben():
 		array = [row for row in rows]
 		for item in array:
 			id, fahrtag = item
-			bus = Bus.objects.get(pk=id)
+			bus = get_object_or_404(Bus, pk=id)
 			rows = Fahrtag.objects.filter(team=bus, archiv=False).values_list('datum',flat=True)
 			existierende_tage = [row for row in rows]
 
@@ -69,7 +70,7 @@ class FahrtageSchreiben():
 		if existierende_tage:
 			for tag, id in existierende_tage:
 				if tag < datetime.date.today():
-					t = Fahrtag.objects.get(pk=id)
+					t = get_object_or_404(Fahrtag, pk=id)
 					t.archiv=True
 					t.save()
 
@@ -87,7 +88,7 @@ class BuerotageSchreiben():
 		array = [row for row in rows]
 		for item in array:
 			id, buerotag = item
-			b = Buero.objects.get(pk=id)
+			b = get_object_or_404(Buero, pk=id)
 			rows = Buerotag.objects.filter(team=b, archiv=False).values_list('datum',flat=True)
 			existierende_tage = [row for row in rows]
 
@@ -108,7 +109,7 @@ class BuerotageSchreiben():
 		if existierende_tage:
 			for tag, id in existierende_tage:
 				if tag < datetime.date.today():
-					t = Buerotag.objects.get(pk=id)
+					t = get_object_or_404(Buerotag, pk=id)
 					t.archiv=True
 					t.save()
 
@@ -149,7 +150,7 @@ class FahrplanBackup():
 			message.send()
 
 	def export_as_csv(self, id):
-		fahrtag   = Fahrtag.objects.get(pk=id)
+		fahrtag   = get_object_or_404(Fahrtag, pk=id)
 		tour_list = Tour.objects.order_by('uhrzeit').filter(datum=id)
 		filename = 'Buergerbus_Fahrplan_{}_{}.csv'.format(str(fahrtag.team).replace(' ','_'), fahrtag.datum)
 		response = HttpResponse(content_type='text/csv')

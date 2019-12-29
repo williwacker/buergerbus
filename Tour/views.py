@@ -108,7 +108,7 @@ class TourAddView2(MyCreateView, GoogleMixin):
 
 	def get(self, request, *args, **kwargs):
 		context = self.get_context_data(**kwargs)
-		klient = Klienten.objects.get(pk=kwargs['pk'])
+		klient = get_object_or_404(Klienten, pk=kwargs['pk'])
 		self.initial['klient'] = klient
 		self.initial['fahrgast'] = klient
 		self.initial['bus'] = klient.bus
@@ -168,7 +168,7 @@ class TourChangeView(MyUpdateView, GoogleMixin):
 	
 	def get(self, request, *args, **kwargs):
 		context = self.get_context_data(**kwargs)
-		instance=Tour.objects.get(pk=kwargs['pk'])
+		instance=get_object_or_404(Tour, pk=kwargs['pk'])
 		form = self.form_class(instance=instance)
 		form.fields["fahrgast"].initial = instance.klient.name
 		form.fields["id"].initial = instance.id

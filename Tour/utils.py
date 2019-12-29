@@ -3,6 +3,7 @@ from datetime import date, datetime, time, timedelta
 
 import googlemaps
 from django.conf import settings
+from django.shortcuts import get_object_or_404
 
 from Einsatzmittel.models import Bus
 from Einsatztage.models import Fahrtag
@@ -132,6 +133,6 @@ class TourArchive():
 		for tag, id in existierende_tage:
 			fahrtag = Fahrtag.objects.get(pk=tag)
 			if fahrtag.datum < date.today():
-				t = Tour.objects.get(pk=id)
+				t = get_object_or_404(Tour, pk=id)
 				t.archiv=True
 				t.save()		
