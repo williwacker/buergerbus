@@ -60,6 +60,7 @@ h1 {
 .sidebar-section {
   padding-bottom: 0;
   border-bottom-right-radius: 0.8rem;
+  box-shadow: 0px 5px 10px #2b3647;
 }
 .sidebar-title {
     color: #dbe0e7;
@@ -183,13 +184,14 @@ ul.pagination li {
     float: left;
     background-color: #59677e;
     margin-top: -15px;
-    border-radius: 0.28571rem;
+    border-top-right-radius: 0.28571rem;
+    border-top-left-radius: 0.28571rem;
+    border-bottom-right-radius: 0.8rem;
     position: absolute;
-    min-height: 96%;
     max-width: 230px;
 }
 .flow .sidebar-section {
-    margin-top: -20px;
+    padding-top: 11px;
 }
 .flow .sidebar-title {
     margin-top: 10px;

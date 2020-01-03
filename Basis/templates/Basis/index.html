@@ -9,28 +9,50 @@
             <div class="results">
                 <div class="flow">
                     <div class="sidebar-section">
-                        <span class="sidebar-title">Touren bearbeiten</span>
-                        <a class="sidebar-link" href="Klienten/fahrgaeste/">Fahrgast für Tour auswählen&nbsp;<img src="{% static "project/img/fahrplan.png" %}" alt="Tour hinzuf&uuml;gen" title="Tour hinzuf&uuml;gen"></a>
-                        <a class="sidebar-link" href="Tour/tour/">Touren ansehen</a>
+                        <div class="sidebar-title">
+                            <span class="sidebar-title-link">Touren bearbeiten</span>
+                        </div>
+                        <a class="sidebar-link" href="Klienten/fahrgaeste/">
+                            Fahrgast für Tour auswählen&nbsp;
+                                <img src="{% static "project/img/fahrplan.png" %}" alt="Tour hinzuf&uuml;gen" title="Tour hinzuf&uuml;gen">
+                        </a>
+                        <a class="sidebar-link" href="Tour/tour/">
+                            Touren ansehen
+                        </a>
                     </div>
                     <div class="sidebar-section">
-                        <span class="sidebar-title">Fahrgäste bearbeiten</span>
-                        <a class="sidebar-link" href="Klienten/fahrgaeste/">Fahrgäste ansehen</a>
-                        <a class="sidebar-link" href="Klienten/fahrgaeste/add/">Fahrgast anlegen</a>
+                        <div class="sidebar-title">
+                            <span class="sidebar-title-link">Fahrgäste bearbeiten</span>
+                        </div>
+                        <a class="sidebar-link" href="Klienten/fahrgaeste/">
+                            <span class="sidebar-link-label">Fahrgäste ansehen</span>
+                        </a>
+                        <a class="sidebar-link" href="Klienten/fahrgaeste/add/">
+                            <span class="sidebar-link-label">Fahrgast anlegen</span>
+                        </a>
                     </div>
                     <div class="sidebar-section">
-                        <span class="sidebar-title">Dienstleister bearbeiten</span>
-                        <a class="sidebar-link" href="Klienten/dienstleister/">Dienstleister ansehen</a>
-                        <a class="sidebar-link" href="Klienten/dienstleister/add/">Dienstleister anlegen</a>
+                        <div class="sidebar-title">
+                            <span class="sidebar-title-link">Dienstleister bearbeiten</span>
+                        </div>
+                        <a class="sidebar-link" href="Klienten/dienstleister/">
+                            <span class="sidebar-link-label">Dienstleister ansehen</span>
+                        </a>
+                        <a class="sidebar-link" href="Klienten/dienstleister/add/">
+                            Dienstleister anlegen
+                        </a>
                     </div>
                     <div class="sidebar-section">
-                        <span class="sidebar-title">Fahrpläne anzeigen</span>
-                            <a class="sidebar-link" href="Einsatztage/fahrer/">Fahrtage ansehen und als Email verschicken</a>
+                        <div class="sidebar-title">
+                            <span class="sidebar-title-link">Fahrpläne anzeigen</span>
+                        </div>
+                        <a class="sidebar-link" href="Einsatztage/fahrer/">
+                            Fahrtage ansehen und als Email verschicken
+                        </a>
                     </div>                
                 </div>
                 <div class="image">
-                    <p style="text-align: center; padding-left: 250px;"><bold>{% settings_value "WELCOME" %}</bold></p>
-                    <p style="text-align: center; padding-top: 50px; padding-left: 250px;"><img src="{% static "project/img/Buergerbus-Projektgruppen.jpg" %}"></p>
+                    <p style="text-align: center; padding-top: 50px; padding-bottom: 50px; padding-left: 250px;"><img src="{% static "project/img/Buergerbus-Projektgruppen.jpg" %}"></p>
                 </div>
             </div>
         </form>
