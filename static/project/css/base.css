@@ -10,6 +10,7 @@ body {
 }
 #container {
     min-width: unset;
+    width: unset;
 }
 #header a, #header a:hover, #header a:visited {
     text-decoration: none;
@@ -55,10 +56,10 @@ h1 {
   background: #59677e;
   color: #fff;
   transition: background-color .3s, transform .3s;
-  overflow-y: scroll;
 }
 .sidebar-section {
   padding-bottom: 0;
+  border-bottom-right-radius: 0.8rem;
 }
 .sidebar-title {
     color: #dbe0e7;
@@ -78,15 +79,15 @@ h1 {
     color: #dbe0e7;
 }
 #branding {
-    background-color: #639af5;
+    background-color: #417690;
     color: #dbe0e7;
     padding: 14px 32px 14px 36px;
     padding: 1rem 2.28571rem 1rem 2.57143rem;
     text-align: center;
     position: relative;
     height: auto !important;
-    min-height: 52px;
-    min-height: 3.71429rem;
+    min-height: 45px;
+    min-height: 2.813rem;
     box-sizing: border-box;
     width: 100%;
 }
@@ -127,13 +128,16 @@ h1 {
 }
 #title {
     text-align: center;
+    padding-top: 3px;
 }
 #header {
-	display: block;
+    display: block;
+    /*border-top-left-radius: 0.28571rem;*/
+    height: 25px;
 }
 .logo {
 	background-color: white;
-	padding-left: 15px;
+	padding-left: 5px;
 }
 .object-tools a.addlink {
     background-image: none;
@@ -182,7 +186,7 @@ ul.pagination li {
     border-radius: 0.28571rem;
     position: absolute;
     min-height: 96%;
-    max-width: 250px;
+    max-width: 230px;
 }
 .flow .sidebar-section {
     margin-top: -20px;

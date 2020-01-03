@@ -55,10 +55,6 @@ INSTALLED_APPS = [
 	'django_tables2',
 	'django_cron',
 	'qr_code',
-#    'crispy_forms',
-#    'test_app',
-#    'bootstrap_modal_forms',
-#    'bootstrap',
 ]
 
 # Use nose to run all tests
@@ -282,6 +278,8 @@ TRANSFER_TIME 		= config('TRANSFER_TIME', default=3, cast=int)
 # DSGVO mit dem Fahrplan versenden
 SEND_DSGVO 			= config('SEND_DSGVO', default=True, cast=bool)
 
+if DEBUG:
+	EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 DSGVO_PATH          =   config('DSGVO_PATH', default='tour\\')
 EMAIL_HOST          =   config('EMAIL_HOST', default='localhost')

@@ -52,10 +52,12 @@
             <!-- Suppress header -->
             <!-- Header -->
             <div id="header">
-                <div id="title"><a href="/" title="Startseite">{% settings_value "PORTAL" %}</a></div>
-
+                <div id="title">
+                    <a href="/" title="Startseite">{% settings_value "PORTAL" %}</a>
+                </div>
                 <div id="branding">
-                    {% block branding %}{% endblock %}
+                    <span id="branding-menu" class="sidebar-header-menu-icon icon-menu sidebar-toggle"></span>
+                    <span id="branding-pin" class="sidebar-link-icon icon-pin sidebar-pin"></span>
                 </div>
                 {% if sidebar_liste %}
                     {% block usertools %}
@@ -108,40 +110,43 @@
                 {% block object-tools %}{% endblock %}
                 {{ content }}
                 {% endblock %}
-                <!-- Sidebar -->
-                {% block sidebar %}
-                    <div class="sidebar scrollable">
-                        <div class="sidebar-section logo">
-                            <a href="/"><img src="{% static "project/img/buergerbus.jpg" %}" alt="Start" title="Start"></a>
-                        </div>
-                        {% if sidebar_liste %}
-                            {% for sidebar in sidebar_liste %}
-                            <div class="sidebar-section">
-                                <div class="sidebar-title">
-                                    <span class="sidebar-title-link">
-                                        {{ sidebar.name }}
-                                    </span>
-                                </div>
-                                {% for sidebarlink in sidebar.value %}
-                                <a class="sidebar-link" href="{{ sidebarlink.value }}">
-                                    <span class="sidebar-right">
-                                            <span class="sidebar-right-arrow icon-arrow-right"></span>
-                                    </span>
-                                    <span class="sidebar-link-label">{{ sidebarlink.name }}</span>
-                                </a>
-                                {% endfor %}
-                            </div>
-                            {% endfor %}
-                        {% endif %}
-                    </div>
-                {% endblock %}
-                <!-- END Sidebar -->
-                <br class="clear" />
             </div>
             <!-- END Content -->
+            <footer> </footer>
+            <!-- Sidebar -->
+            {% block sidebar %}
+
+            <div class="sidebar sidebar-dependent">
+                <div class="sidebar-wrapper scrollable">
+                    <div class="sidebar-section logo">
+                        <a href="/"><img src="{% static "project/img/buergerbus.jpg" %}" alt="Start" title="Start"></a>
+                    </div>
+                    {% if sidebar_liste %}
+                        {% for sidebar in sidebar_liste %}
+                        <div class="sidebar-section">
+                            <div class="sidebar-title">
+                                <span class="sidebar-title-link">
+                                    {{ sidebar.name }}
+                                </span>
+                            </div>
+                            {% for sidebarlink in sidebar.value %}
+                            <a class="sidebar-link" href="{{ sidebarlink.value }}">
+                                <span class="sidebar-right">
+                                        <span class="sidebar-right-arrow icon-arrow-right"></span>
+                                </span>
+                                <span class="sidebar-link-label">{{ sidebarlink.name }}</span>
+                            </a>
+                            {% endfor %}
+                        </div>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            </div>
+            {% endblock %}
+            <!-- END Sidebar -->
+            <br class="clear" />
         </div>
-        <!-- END Container -->
-        <footer> </footer>
+        <!-- END Container -->            
     </body>
 </html>
 {% endblock %}
