@@ -278,14 +278,13 @@ TRANSFER_TIME 		= config('TRANSFER_TIME', default=3, cast=int)
 # DSGVO mit dem Fahrplan versenden
 SEND_DSGVO 			= config('SEND_DSGVO', default=True, cast=bool)
 
-if DEBUG:
-	EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+DSGVO_PATH          = config('DSGVO_PATH', default='tour\\')
+EMAIL_HOST          = config('EMAIL_HOST', default='localhost')
+EMAIL_PORT          = config('EMAIL_PORT', default=25, cast=int)
+EMAIL_HOST_USER     = config('EMAIL_HOST_USER', default='')
+EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='')
+EMAIL_USE_TLS       = config('EMAIL_USE_TLS', default=False, cast=bool)
+DEFAULT_FROM_EMAIL  = config('DEFAULT_FROM_EMAIL', default='Bürgerbus Team <noreply@example.com>')
 
-DSGVO_PATH          =   config('DSGVO_PATH', default='tour\\')
-EMAIL_HOST          =   config('EMAIL_HOST', default='localhost')
-EMAIL_PORT          =   config('EMAIL_PORT', default=25, cast=int)
-EMAIL_HOST_USER     =   config('EMAIL_HOST_USER', default='')
-EMAIL_HOST_PASSWORD =   config('EMAIL_HOST_PASSWORD', default='')
-EMAIL_USE_TLS       =   config('EMAIL_USE_TLS', default=False, cast=bool)
-PORTAL              =   config('PORTAL', default='Bürgerbus Portal')
-WELCOME 			=   config('PORTAL', default='Willkommen auf dem Bürgerbus Portal')
+PORTAL              = config('PORTAL', default='Bürgerbus Portal')
+WELCOME 			= config('PORTAL', default='Willkommen auf dem Bürgerbus Portal')
