@@ -186,7 +186,7 @@ JET_CHANGE_FORM_SIBLING_LINKS = True
 INTERNAL_IPS = config('INTERNAL_IPS', default='127.0.0.1', cast=Csv())
 
 LOGIN_URL           = '/accounts/login/'
-LOGIN_REDIRECT_URL  = '/Basis/'
+LOGIN_REDIRECT_URL  = '/'
 LOGOUT_REDIRECT_URL = '/accounts/logout_success/'
 
 LOCAL_APPS = [

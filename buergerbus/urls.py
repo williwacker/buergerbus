@@ -17,20 +17,21 @@ import debug_toolbar
 from django.conf.urls import url
 from django.contrib import admin
 from django.contrib.auth.views import PasswordChangeView
-from django.urls import include, path, reverse_lazy
+from django.urls import include, path
 from django.views.generic import TemplateView
 from smart_selects import urls as smart_selects_urls
 
 from Basis.views import (BasisView, MyPasswordChangeDoneView,
-                         MyPasswordChangeView)
+                         MyPasswordChangeView, MyLoginView)
 
 urlpatterns = [
     path('', BasisView.as_view()),
     path('Basis/', include('Basis.urls')),
-    path('accounts/', include('django.contrib.auth.urls')),
+    url(r'^accounts/login/$', MyLoginView.as_view(), name='login'),
     url(r'^accounts/password/change/$', MyPasswordChangeView.as_view(), name='password_change'),
     path('accounts/password/change/done/', MyPasswordChangeDoneView.as_view(), name='password_change_done'),
     path('accounts/logout_success/', TemplateView.as_view(template_name='registration/logout_success.html')),
+    path('accounts/', include('django.contrib.auth.urls')),
     path('Einsatzmittel/', include('Einsatzmittel.urls')),
     path('Tour/', include('Tour.urls')),
     path('Einsatztage/', include('Einsatztage.urls')),

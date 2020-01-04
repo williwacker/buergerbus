@@ -1,7 +1,6 @@
-from django.contrib import messages
+﻿from django.contrib import messages
 from django.db.models import Max
 from django.shortcuts import get_object_or_404, render
-from django.urls import reverse
 from django.utils.translation import ugettext as _
 from django.views.generic import TemplateView
 
@@ -80,12 +79,12 @@ class TopicChangeView(MyUpdateView):
 	form_class = TopicAddForm
 	success_url = '/Faq/topics/admin/'
 	model=Topic
-	
+
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
 		context['sidebar_liste'] = get_sidebar(self.request.user)
 		context['title'] = self.model._meta.verbose_name_raw+" ändern"
-		if self.request.user.has_perm('Faq.delete_topic'): context['delete_button'] = "Löschen" 
+		if self.request.user.has_perm('Faq.delete_topic'): context['delete_button'] = "Löschen"
 		context['submit_button'] = "Sichern"
 		context['back_button'] = ["Abbrechen",self.success_url+url_args(self.request)]
 		context['url_args'] = url_args(self.request)
@@ -94,9 +93,9 @@ class TopicChangeView(MyUpdateView):
 	def form_valid(self, form):
 		instance = form.save(commit=False)
 		instance.save(force_update=True)
-		self.success_url += url_args(self.request)		
+		self.success_url += url_args(self.request)
 		messages.success(self.request, self.model._meta.verbose_name_raw+' "<a href="'+self.success_url+str(instance.id)+'">'+str(instance)+'</a>" wurde erfolgreich geändert.')
-		return super(TopicChangeView, self).form_valid(form) 
+		return super(TopicChangeView, self).form_valid(form)
 
 class TopicDeleteView(MyDeleteView):
 	permission_required = 'Faq.delete_topic'

@@ -1,18 +1,36 @@
 from django.contrib import messages
-from django.contrib.auth.forms import UserCreationForm
+from django.conf import settings
+from django.urls import reverse_lazy
+from django.core.mail import EmailMessage
+from django.contrib.auth import login as auth_login
+from django.contrib.sites.shortcuts import get_current_site
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import Group, User
-from django.contrib.auth.views import PasswordChangeView
+from django.contrib.auth.views import PasswordChangeView, LoginView
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
+from django.template import loader
 from django.views.generic import TemplateView
-
-from Basis.forms import MyGroupChangeForm, MyUserChangeForm
+from Basis.forms import MyGroupChangeForm, MyUserCreationForm, MyUserChangeForm
 from Basis.tables import GroupTable, UserTable
 from Basis.utils import get_sidebar, url_args
 from Basis.views import (MyDeleteView, MyCreateView, MyDetailView, MyListView, MyUpdateView,
-                         MyView)
+						 MyView)
 
+class MyLoginView(LoginView):
+	"""
+	Display the login form and handle the login action.
+	"""
 
+	def form_valid(self, form):
+		"""Security check complete. Log the user in."""
+		last_login = User.objects.get(username=form.get_user()).last_login
+		auth_login(self.request, form.get_user())
+		if not last_login:
+			return HttpResponseRedirect(reverse_lazy('password_change'))
+		return HttpResponseRedirect(self.get_success_url())
+
+# User Views
 class UserView(MyListView):
 	permission_required = 'auth.view_user'
 	
@@ -33,7 +51,7 @@ class UserView(MyListView):
 
 class UserAddView(MyCreateView):
 	permission_required = 'auth.add_user'
-	form_class = UserCreationForm
+	form_class = MyUserCreationForm
 	success_url = '/Basis/benutzer/'
 	model = User
 
@@ -46,11 +64,29 @@ class UserAddView(MyCreateView):
 		return context
 
 	def form_valid(self, form):
-		instance = form.save(commit=False)
-		instance.created_by = self.request.user
-		instance.save()
+		user = form.save(commit=False)
+		password = User.objects.make_random_password()
+		user.set_password(password)
+		user.created_by = self.request.user
+		current_site = get_current_site(self.request)
+		site_name = current_site.name
+		domain = current_site.domain
+		context = {
+			'username': user.username,
+			'password': user._password,
+			'protocol': 'https' if self.request.is_secure() else 'http',
+			'domain'  : domain
+		}
+		email = EmailMessage(
+			'[Bürgerbus] Ihr Benutzername',
+			loader.render_to_string('registration/password_new_email.html', context),
+			settings.DEFAULT_FROM_EMAIL,
+			(user.email,),
+		)
+		email.send(fail_silently=False)
+		user.save()		
 		self.success_url += url_args(self.request)
-		self.success_message = self.model._meta.verbose_name.title()+' "<a href="'+self.success_url+str(instance.id)+'">'+instance.username+'</a>" wurde erfolgreich angelegt.'
+		self.success_message = self.model._meta.verbose_name.title()+' "<a href="'+self.success_url+str(user.id)+'">'+user.username+'</a>" wurde erfolgreich angelegt.'
 		return super(UserAddView, self).form_valid(form)
 
 
