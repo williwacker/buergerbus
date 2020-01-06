@@ -8,48 +8,22 @@
         <form id="changelist-form">
             <div class="results">
                 <div class="flow">
-                    <div class="sidebar-section">
-                        <div class="sidebar-title">
-                            <span class="sidebar-title-link">Touren bearbeiten</span>
-                        </div>
-                        <a class="sidebar-link" href="Klienten/fahrgaeste/">
-                            Fahrgast für Tour auswählen&nbsp;
-                                <img src="{% static "project/img/fahrplan.png" %}" alt="Tour hinzuf&uuml;gen" title="Tour hinzuf&uuml;gen">
-                        </a>
-                        <a class="sidebar-link" href="Tour/tour/">
-                            Touren ansehen
-                        </a>
-                    </div>
-                    <div class="sidebar-section">
-                        <div class="sidebar-title">
-                            <span class="sidebar-title-link">Fahrgäste bearbeiten</span>
-                        </div>
-                        <a class="sidebar-link" href="Klienten/fahrgaeste/">
-                            <span class="sidebar-link-label">Fahrgäste ansehen</span>
-                        </a>
-                        <a class="sidebar-link" href="Klienten/fahrgaeste/add/">
-                            <span class="sidebar-link-label">Fahrgast anlegen</span>
-                        </a>
-                    </div>
-                    <div class="sidebar-section">
-                        <div class="sidebar-title">
-                            <span class="sidebar-title-link">Dienstleister bearbeiten</span>
-                        </div>
-                        <a class="sidebar-link" href="Klienten/dienstleister/">
-                            <span class="sidebar-link-label">Dienstleister ansehen</span>
-                        </a>
-                        <a class="sidebar-link" href="Klienten/dienstleister/add/">
-                            Dienstleister anlegen
-                        </a>
-                    </div>
-                    <div class="sidebar-section">
-                        <div class="sidebar-title">
-                            <span class="sidebar-title-link">Fahrpläne anzeigen</span>
-                        </div>
-                        <a class="sidebar-link" href="Einsatztage/fahrer/">
-                            Fahrtage ansehen und als Email verschicken
-                        </a>
-                    </div>                
+                    {% if indexbar_liste %}
+                        {% for sidebar in indexbar_liste %}
+                            <div class="sidebar-section">
+                                <div class="sidebar-title">
+                                    <span class="sidebar-title-link">
+                                        {{ sidebar.name }}
+                                    </span>
+                                </div>
+                                {% for sidebarlink in sidebar.value %}
+                                <a class="sidebar-link" href="{{ sidebarlink.value }}">
+                                    {{ sidebarlink.name|safe }}
+                                </a>
+                                {% endfor %}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
                 </div>
                 <div class="image">
                     <p style="text-align: center; padding-top: 50px; padding-bottom: 50px; padding-left: 250px;"><img src="{% static "project/img/Buergerbus-Projektgruppen.jpg" %}"></p>

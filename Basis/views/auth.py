@@ -6,7 +6,7 @@ from django.contrib.auth import login as auth_login
 from django.contrib.sites.shortcuts import get_current_site
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import Group, User
-from django.contrib.auth.views import PasswordChangeView, LoginView
+from django.contrib.auth.views import PasswordChangeView
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.template import loader
@@ -16,19 +16,6 @@ from Basis.tables import GroupTable, UserTable
 from Basis.utils import get_sidebar, url_args
 from Basis.views import (MyDeleteView, MyCreateView, MyDetailView, MyListView, MyUpdateView,
 						 MyView)
-
-class MyLoginView(LoginView):
-	"""
-	Display the login form and handle the login action.
-	"""
-
-	def form_valid(self, form):
-		"""Security check complete. Log the user in."""
-		last_login = User.objects.get(username=form.get_user()).last_login
-		auth_login(self.request, form.get_user())
-		if not last_login:
-			return HttpResponseRedirect(reverse_lazy('password_change'))
-		return HttpResponseRedirect(self.get_success_url())
 
 # User Views
 class UserView(MyListView):
@@ -74,6 +61,8 @@ class UserAddView(MyCreateView):
 		context = {
 			'username': user.username,
 			'password': user._password,
+			'first_name': user.first_name,
+			'last_name': user.last_name,
 			'protocol': 'https' if self.request.is_secure() else 'http',
 			'domain'  : domain
 		}

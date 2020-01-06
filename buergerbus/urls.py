@@ -22,13 +22,12 @@ from django.views.generic import TemplateView
 from smart_selects import urls as smart_selects_urls
 
 from Basis.views import (BasisView, MyPasswordChangeDoneView,
-                         MyPasswordChangeView, MyLoginView)
+                         MyPasswordChangeView)
 
 urlpatterns = [
     path('', BasisView.as_view()),
     path('Basis/', include('Basis.urls')),
-    url(r'^accounts/login/$', MyLoginView.as_view(), name='login'),
-    url(r'^accounts/password/change/$', MyPasswordChangeView.as_view(), name='password_change'),
+    path('accounts/password/change/', MyPasswordChangeView.as_view(), name='password_change'),
     path('accounts/password/change/done/', MyPasswordChangeDoneView.as_view(), name='password_change_done'),
     path('accounts/logout_success/', TemplateView.as_view(template_name='registration/logout_success.html')),
     path('accounts/', include('django.contrib.auth.urls')),

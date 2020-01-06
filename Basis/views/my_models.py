@@ -14,7 +14,7 @@ from django.views.generic import (
 from django.views.generic.detail import BaseDetailView
 
 from Basis.multiform import MultiFormsView
-from Basis.utils import get_relation_dict, get_sidebar, url_args
+from Basis.utils import get_relation_dict, get_sidebar, url_args, get_index_bar
 
 
 def my_custom_bad_request_view(request, exception):  #400
@@ -100,6 +100,7 @@ class BasisView(LoginRequiredMixin, ListView):
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
 		context['sidebar_liste'] = get_sidebar(self.request.user)
+		context['indexbar_liste'] = get_index_bar(self.request.user)
 		return context
 
 class MyBaseDetailView(LoginRequiredMixin, PermissionRequiredMixin, BaseDetailView):

@@ -23,6 +23,41 @@ def get_user_permissions(user):
 		return Permission.objects.all()
 	return user.user_permissions.all().values_list('codename', flat=True) | Permission.objects.filter(group__user=user).values_list('codename', flat=True)
 
+def get_index_bar(user):
+	index_bar = []
+	
+	value = []
+	if user.has_perm('Klienten.view_klienten'):
+		value.append({'name':'Fahrgast für Tour auswählen <img src="/static/project/img/fahrplan.png">','value':'/Klienten/fahrgaeste/'})
+	if user.has_perm('Tour.view_tour'):
+		value.append({'name':'Touren ansehen', 'value':'/Tour/tour/'})
+	if value:
+		index_bar.append({'name':'Touren bearbeiten', 'value':value})
+
+	value = []
+	if user.has_perm('Klienten.view_klienten'):
+		value.append({'name':'Fahrgäste ansehen','value':'/Klienten/fahrgaeste/'})
+	if user.has_perm('Klienten.add_klienten'):
+		value.append({'name':'Fahrgast anlegen', 'value':'/Klienten/fahrgaeste/add/'})
+	if value:
+		index_bar.append({'name':'Fahrgäste bearbeiten', 'value':value})
+
+	value = []
+	if user.has_perm('Klienten.view_klienten'):
+		value.append({'name':'Dienstleister ansehen','value':'/Klienten/dienstleister/'})
+	if user.has_perm('Klienten.add_klienten'):
+		value.append({'name':'Dienstleister anlegen', 'value':'/Klienten/dienstleister/add/'})
+	if value:
+		index_bar.append({'name':'Dienstleister bearbeiten', 'value':value})	
+
+	value = []
+	if user.has_perm('Einsatztage.view_fahrtag'):
+		value.append({'name':'Fahrtage ansehen und als Email verschicken','value':'/Einsatztage/fahrer/'})
+	if value:
+		index_bar.append({'name':'Fahrpläne anzeigen', 'value':value})						
+
+	return index_bar
+
 def get_sidebar(user):
 	sidebar = []
 

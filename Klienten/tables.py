@@ -23,7 +23,7 @@ class FahrgaesteTable(tables.Table):
     dsgvo = tables.TemplateColumn('''
         {% load static %}
         {% if record.dsgvo == '01' %}
-            <a href="{{ record.id }}/dsgvo/"><img src="{% static "project/img/dsgvo.png" %}" alt="DSGVO anzeigen" title="DSGVO anzeigen"></a>
+            <img src="{% static "project/img/dsgvo.png" %}" alt="DSGVO erstellt" title="DSGVO erstellt">
             <a href="{{ record.id }}/dsgvoAsPDF/" target="_blank"><img src="{% static "project/img/icon_pdf.png" %}" alt="DSGVO als PDF anzeigen" title="DSGVO als PDF anzeigen/herunterladen"></a>
         {% else %}
             {% if record.dsgvo == '02' %}
