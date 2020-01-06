@@ -148,6 +148,7 @@ h1 {
 .changeform-navigation-button.selected {
     background-color: #59677e;
     color: #fff;
+    border-radius: 4px;
 }
 .submit-row a.addlink {
     display: inline-block;
@@ -274,4 +275,14 @@ fieldset.module, #changelist {
 }
 .submit-row {
     box-shadow: 5px 5px 10px;
+}
+#toolbar {
+    min-height: 35px;
+}
+#toolbar a {
+    border-radius: 4px;
+    margin-right: 1px;
+}
+body.change-list .object-tools .addlink {
+    margin: 10px 10px;
 }
