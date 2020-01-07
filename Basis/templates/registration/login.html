@@ -10,9 +10,11 @@
             {{ hidden_field.errors }}
             {{ hidden_field }}
         {% endfor %}
-        <div class="form-row">
-            {{ form.as_p }}
-            <label></label><a href="{% url 'password_reset' %}">Passwort vergessen</a>
+        <div id="changelist" class="module">
+            <div class="form-row">
+                {{ form.as_p }}
+                <p><label></label><a href="{% url 'password_reset' %}">Passwort vergessen</a></p>
+            </div>
         </div>
         <div class="submit-row">
             <input class="default" type="submit" value="Login">

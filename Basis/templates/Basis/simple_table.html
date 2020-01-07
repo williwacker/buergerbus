@@ -14,35 +14,35 @@
         {% render_table pre_table %}
     {% endif %}
     {% if table %}
-    <div id="changelist" class="module filtered">
-        <div id="toolbar">
-            {% if nav_bar %}
-                {{ nav_bar }}
-            {% endif %}
-            {% if filter %}
-            <form id="filter-form" action="" method="get">
-                <p>{{ filter.form }}
-            </form>
-            {% endif %}
-        </div>
-        {% if table_header %}
-            {{ table_header| safe }}
-        {% endif %}
-        <form id="changelist-form">
-            <div class="results">
-                {% render_table table %}
+        <div id="changelist" class="module filtered">
+            <div id="toolbar">
+                {% if nav_bar %}
+                    {{ nav_bar }}
+                {% endif %}
+                {% if filter %}
+                <form id="filter-form" action="" method="get">
+                    <p>{{ filter.form }}
+                </form>
+                {% endif %}
             </div>
-        </form>
-    </div>
-    <div class="submit-row">
+            {% if table_header %}
+                {{ table_header| safe }}
+            {% endif %}
+            <form id="changelist-form">
+                <div class="results">
+                    {% render_table table %}
+                </div>
+            </form>
+        </div>
         {% if back_button %}
+        <div class="submit-row">
             {% if popup %}
                 <a href="javascript:opener.location.reload(false);window.close();" class="closelink">{{ back_button.0|upper }}</a>
             {% else %}
                 <a href="{{ back_button.1 }}" class="closelink">{{ back_button.0|upper }}</a>
             {% endif %}
+        </div>
         {% endif %}
-    </div>
     {% else %}
         <p>Keine {{ title }} eingetragen.</p>
     {% endif %}
