@@ -288,3 +288,15 @@ fieldset.module, #changelist {
 body.change-list .object-tools .addlink {
     margin: 10px 10px;
 }
+
+
+@media (min-width: 1024px) and (max-width: 1280px) {
+    .index-image {
+        min-height: 500px;
+    }
+    .index-image img {
+        max-height: 450px;
+        max-width: 500px;
+        padding-left: 103px;
+    }
+}

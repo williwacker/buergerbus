@@ -13,7 +13,7 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-import debug_toolbar
+#import debug_toolbar
 from django.conf.urls import url
 from django.contrib import admin
 from django.contrib.auth.views import PasswordChangeView
@@ -41,7 +41,7 @@ urlpatterns = [
     url(r'^chaining/', include('smart_selects.urls')),
     url(r'^jet/', include('jet.urls', 'jet')),
     url(r'^jet/dashboard/', include('jet.dashboard.urls', 'jet-dashboard')), #??Django JET dashboard URLS
-    path('__debug__/', include(debug_toolbar.urls)),
+#    path('__debug__/', include(debug_toolbar.urls)),
 ]
 
 handler400 = 'Basis.views.my_custom_bad_request_view'
