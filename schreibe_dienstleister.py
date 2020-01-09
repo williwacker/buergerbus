@@ -15,14 +15,11 @@ import os
 import re
 
 import django
+os.environ.setdefault('DJANGO_SETTINGS_MODULE','buergerbus.settings')
+django.setup()
 
 from Klienten.models import Klienten, Orte, Strassen
 from Klienten.utils import GeoLocation
-
-os.environ.setdefault('DJANGO_SETTINGS_MODULE','buergerbus.settings')
-
-django.setup()
-
 
 class AddKlienten():
 

@@ -73,10 +73,10 @@ class Buero(models.Model):
 
 class Bus(models.Model):
 	bus         = models.CharField(max_length=25, unique=True, verbose_name="Bus")
-	sitzplaetze = models.IntegerField(default=8, verbose_name="Anzahl Sitzplätze") 
+	sitzplaetze = models.IntegerField(default=8, verbose_name="Sitzplätze") 
 	fahrtage    = models.ManyToManyField(Wochentage, default='', verbose_name = "Fahrtage")
 	email 		= models.EmailField(max_length=254, blank=True)
-	plantage    = models.IntegerField(default=settings.COUNT_TOUR_DAYS, verbose_name="Anzahl planbarer Kalendertage")
+	plantage    = models.IntegerField(default=settings.COUNT_TOUR_DAYS, verbose_name="Planbare Kalendertage")
 	created_on  = models.DateTimeField(auto_now_add=True, null=True)
 	created_by  = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, related_name="+", on_delete=models.SET_NULL)
 	updated_on  = models.DateTimeField(auto_now=True, blank=True, null=True)
