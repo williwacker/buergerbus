@@ -247,6 +247,7 @@ LOGGING['loggers'].update({app: copy.deepcopy(local_logger_conf) for app in LOCA
 ADMINS = [
 	(config('ADMIN_NAME', default='Admin'), config('ADMIN_EMAIL', default=''))
 ]
+SERVER_EMAIL = config('SERVER_EMAIL', default=None)
 
 MEDIA_URL 			= '/uploads/'
 MEDIA_ROOT 			= os.path.join(BASE_DIR, 'uploads')
