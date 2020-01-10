@@ -202,7 +202,7 @@ LOCAL_APPS = [
 local_logger_conf = {
 	'handlers':['file'],
 	'propagate': True,
-	'level':'INFO',
+	'level': config('LOG_LEVEL', default='INFO'),
 }
 
 LOGGING = {
@@ -233,7 +233,7 @@ LOGGING = {
 		'django': {
 			'handlers':['file'],
 			'propagate': True,
-			'level':'INFO',
+			'level': config('LOG_LEVEL', default='INFO'),
 		},
 		'django.request': {
 			'handlers': ['file','mail_admins'],
