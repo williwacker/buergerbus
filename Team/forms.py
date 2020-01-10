@@ -25,6 +25,9 @@ class FahrerChgForm(KlientenForm):
 		model = Fahrer
 		fields = ['name', 'team', 'telefon', 'mobil', 'aktiv']
 
+	def __init__(self, *args, **kwargs):
+		super(FahrerChgForm, self).__init__(*args, **kwargs)
+
 
 class KoordinatorAddForm(KlientenForm):
 
@@ -45,3 +48,6 @@ class KoordinatorChgForm(KlientenForm):
 	class Meta:
 		model = Koordinator
 		fields = ['name', 'team', 'telefon', 'mobil', 'aktiv']
+
+	def __init__(self, *args, **kwargs):
+		super(KoordinatorChgForm, self).__init__(*args, **kwargs)

@@ -30,7 +30,6 @@ class QuestionTopicView(MyListView):
 		context = super(QuestionTopicView, self).get_context_data(**kwargs)
 		context['sidebar_liste'] = get_sidebar(self.request.user)
 		context['title'] = self.model._meta.verbose_name_raw+' - Themen'
-		if self.request.user.is_superuser: context['add'] = "Themen"
 		context['url_args'] = url_args(self.request)
 		return context
 

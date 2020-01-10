@@ -11,8 +11,8 @@ class BusChgForm(ModelForm):
 		model = Bus
 		fields = ['bus', 'plantage', 'sitzplaetze', 'fahrtage', 'email']
 		
-#	def __init__(self, *args, **kwargs):
-#		super(BusChgForm, self).__init__(*args, **kwargs)
+	def __init__(self, *args, **kwargs):
+		super(BusChgForm, self).__init__(*args, **kwargs)
 
 
 
@@ -22,5 +22,5 @@ class BueroChgForm(ModelForm):
 		model = Buero
 		fields = ['buero','buerotage']
 
-#	def __init__(self, *args, **kwargs):
-#		super(BueroChgForm, self).__init__(*args, **kwargs)		
+	def __init__(self, *args, **kwargs):
+		super(BueroChgForm, self).__init__(*args, **kwargs)		

@@ -90,9 +90,6 @@ class TourChgForm(MyModelForm):
 	konflikt_ignorieren = forms.BooleanField(required=False,
 		help_text="Tour erst mal speichern und zu einem späteren Zeitpunkt ändern.")
 	id		 = forms.IntegerField(required=False, widget=forms.HiddenInput())
-
-#	def __init__(self, *args, **kwargs):
-#		super(TourChgForm, self).__init__(*args, **kwargs)
 	
 	class Meta:
 		model = Tour
@@ -100,3 +97,6 @@ class TourChgForm(MyModelForm):
 		widgets = {'klient': forms.HiddenInput(), 'bus': forms.HiddenInput(), 'entfernung': forms.HiddenInput(), 'ankunft': forms.HiddenInput(),
 				   'uhrzeit': forms.TimeInput(attrs={'class':'vTimeField'}), 'bemerkung': forms.Textarea(attrs={'rows':'5'}),
 				  }
+
+	def __init__(self, *args, **kwargs):
+		super(TourChgForm, self).__init__(*args, **kwargs)

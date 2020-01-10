@@ -75,6 +75,9 @@ class FahrgastChgForm(KlientenForm):
 		fields = ['name','telefon','mobil','ort','strasse','hausnr','bemerkung','dsgvo','bus']
 		widgets = {'bemerkung': forms.Textarea(attrs={'rows':'5'})}
 
+	def __init__(self, *args, **kwargs):
+		super(FahrgastChgForm, self).__init__(*args, **kwargs)
+
 class DienstleisterAddForm(DienstleisterForm):
 	class Meta:
 		model = Klienten
@@ -86,6 +89,9 @@ class DienstleisterChgForm(DienstleisterForm):
 		model = Klienten
 		fields = ['name','telefon','mobil','ort','strasse','hausnr','kategorie','bemerkung']
 		widgets = {'bemerkung': forms.Textarea(attrs={'rows':'5'})}
+
+	def __init__(self, *args, **kwargs):
+		super(DienstleisterChgForm, self).__init__(*args, **kwargs)		
 
 class OrtAddForm(ModelForm):
 	class Meta:
