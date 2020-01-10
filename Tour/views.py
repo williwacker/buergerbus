@@ -204,6 +204,58 @@ class TourChangeView(MyUpdateView, GoogleMixin):
 			messages.error(self.request, instance.konflikt)
 		return super(TourChangeView, self).form_valid(form)	
 
+class TourCopyView(MyUpdateView, GoogleMixin):
+	form_class = TourChgForm
+	permission_required = 'Tour.change_tour'
+	success_url = '/Tour/tour/'
+	model = Tour
+	
+	def get_context_data(self, **kwargs):
+		context = {}
+		context['sidebar_liste'] = get_sidebar(self.request.user)
+		context['title'] = "Tour ändern"
+		if self.request.user.has_perm('Tour.delete_tour'): context['delete_button'] = "Löschen"
+		context['submit_button'] = "Sichern"
+		context['back_button'] = ["Abbrechen",self.success_url+url_args(self.request)]
+		context['url_args'] = url_args(self.request)
+		return context
+	
+	def get(self, request, *args, **kwargs):
+		context = self.get_context_data(**kwargs)
+		instance=get_object_or_404(Tour, pk=kwargs['pk'])
+		form = self.form_class(instance=instance)
+		form.fields["fahrgast"].initial = instance.klient.name
+		form.fields["id"].initial = instance.id
+		form.fields['datum'].queryset = Fahrtag.objects.order_by('datum').filter(archiv=False, urlaub=False, team=instance.fahrgast.bus, datum__gt=datetime.now(), datum__lte=datetime.now()+timedelta(instance.bus.plantage))
+		qs = Tour.objects.filter(klient__id=instance.klient.id).values_list('abholklient',flat=True).distinct()
+		form.fields['abholfavorit'].queryset = Klienten.objects.filter(id__in=qs).order_by('name') 	| Klienten.objects.filter(id=instance.klient.id)
+		form.fields['abholklient'].queryset  = Klienten.objects.filter(typ='D').order_by('name') 	| Klienten.objects.filter(id=instance.klient.id)
+		qs = Tour.objects.filter(klient__id=instance.klient.id).values_list('zielklient',flat=True).distinct()
+		form.fields['zielfavorit'].queryset  = Klienten.objects.filter(id__in=qs).order_by('name') 	| Klienten.objects.filter(id=instance.klient.id)
+		form.fields['zielklient'].queryset   = Klienten.objects.filter(typ='D').order_by('name') 	| Klienten.objects.filter(id=instance.klient.id)
+		form.fields['bus_2'].initial = instance.bus
+		if instance.konflikt:
+			messages.error(request, instance.konflikt)
+		else:
+			form.fields['konflikt_ignorieren'].widget = forms.HiddenInput()
+		context['form'] = form
+		return render(request, self.template_name, context)
+
+	def form_valid(self, form):
+		instance = form.save(commit=False)
+		instance.updated_by = self.request.user
+		instance.pk = None
+		googleDict = self.get_google(form)
+		if googleDict:
+			instance.entfernung = googleDict['distance']
+			instance.ankunft    = googleDict['arrivaltime']
+		instance.save()
+		self.success_url += '?datum='+str(instance.datum_id)
+		self.success_message = self.model._meta.verbose_name.title()+' "<a href="'+self.success_url+str(instance.id)+'">'+instance.klient.name+' am '+str(instance.datum)+' um '+str(instance.uhrzeit) +'</a>" wurde erfolgreich hinzugefügt.'
+		if instance.konflikt != '':
+			messages.error(self.request, instance.konflikt)
+		return super(TourCopyView, self).form_valid(form)			
+
 class TourDeleteView(MyDeleteView):
 	permission_required = 'Tour.delete_tour'
 	success_url = '/Tour/tour/'

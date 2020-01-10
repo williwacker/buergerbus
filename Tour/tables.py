@@ -42,7 +42,16 @@ class TourTable(tables.Table):
 		template_code ='''{{ record.klient.bemerkung  |safe|default_if_none:""  }}<br/>{{ record.bemerkung|default_if_none:""  }} ''',
 		orderable=False
 	)
+	aktion = tables.TemplateColumn(
+		template_code='''
+		{% load static %}
+			<a href="{{ record.id }}/copy/">
+				<img src="{% static "project/img/icon_duplicate_32.png" %}" alt="Tour kopieren" title="Tour kopieren">
+			</a>
+		''',
+		orderable=False
+	) 	
 	
 	class Meta:
 		model = Tour
-		fields = ('fahrgast','bus','datum','uhrzeit','zustieg','personenzahl','abholort','zielort','entfernung','ankunft','bemerkung')
+		fields = ('fahrgast','bus','datum','uhrzeit','zustieg','personenzahl','abholort','zielort','entfernung','ankunft','bemerkung','aktion')

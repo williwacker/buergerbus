@@ -23,10 +23,18 @@ class FahrerChgForm(KlientenForm):
 
 	class Meta:
 		model = Fahrer
-		fields = ['name', 'team', 'telefon', 'mobil', 'aktiv']
+		fields = ['benutzer', 'name', 'team', 'telefon', 'mobil', 'aktiv']
+		widgets = {'benutzer': forms.HiddenInput()}
 
 	def __init__(self, *args, **kwargs):
 		super(FahrerChgForm, self).__init__(*args, **kwargs)
+
+	def clean(self):
+		cleaned_data = super(FahrerChgForm, self).clean()
+		benutzer = cleaned_data.get('benutzer')
+		team     = cleaned_data.get('team')
+		if Fahrer.objects.filter(benutzer=benutzer, team=team).exists():
+			raise forms.ValidationError('Fahrer ist bereits für diesen Bus angelegt')
 
 
 class KoordinatorAddForm(KlientenForm):

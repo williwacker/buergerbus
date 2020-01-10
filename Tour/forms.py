@@ -80,6 +80,14 @@ class TourAddForm2(MyModelForm):
 				   'uhrzeit': forms.TimeInput(attrs={'class':'vTimeField'}), 'bemerkung': forms.Textarea(attrs={'rows':'5'}),
 				  }
 
+	def clean(self):
+		cleaned_data = super(TourAddForm2, self).clean()
+		bus     = cleaned_data.get('bus')
+		datum   = cleaned_data.get('datum')
+		uhrzeit = cleaned_data.get('uhrzeit')
+		if Tour.objects.filter(bus=bus, datum=datum, uhrzeit=uhrzeit).exists():
+			raise forms.ValidationError('Tour zur gleicher Abholzeit ist bereits gebucht')
+
 class TourChgForm(MyModelForm):
 	fahrgast = forms.CharField(required=False, widget=forms.TextInput(attrs={'readonly':'readonly'}), label='Fahrgast')
 	bus_2    = forms.CharField(required=False, widget=forms.TextInput(attrs={'readonly':'readonly'}), label='Bus')
@@ -100,3 +108,11 @@ class TourChgForm(MyModelForm):
 
 	def __init__(self, *args, **kwargs):
 		super(TourChgForm, self).__init__(*args, **kwargs)
+
+	def clean(self):
+		cleaned_data = super(TourChgForm, self).clean()
+		bus     = cleaned_data.get('bus')
+		datum   = cleaned_data.get('datum')
+		uhrzeit = cleaned_data.get('uhrzeit')
+		if Tour.objects.filter(bus=bus, datum=datum, uhrzeit=uhrzeit).exists():
+			raise forms.ValidationError('Tour zur gleicher Abholzeit ist bereits gebucht')
