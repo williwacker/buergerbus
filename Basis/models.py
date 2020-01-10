@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 class Document(models.Model):
 	document = models.FileField(upload_to='', verbose_name='Dokument')
-	description = models.CharField(max_length=255, blank=True, verbose_name='Beschreibung')
+	description = models.CharField(max_length=255, verbose_name='Beschreibung')
 	uploaded_on = models.DateTimeField(auto_now_add=True, verbose_name='hochgeladen am')
 	uploaded_by = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name='hochgeladen von',
 		null=True, related_name="+", on_delete=models.SET_NULL)
