@@ -66,8 +66,8 @@ class DienstleisterForm(ModelForm):
 class FahrgastAddForm(KlientenForm):
 	class Meta:
 		model = Klienten
-		fields = ['name','telefon','mobil','ort','strasse','hausnr','bemerkung','dsgvo','bus','typ']
-		widgets = {'dsgvo': forms.HiddenInput(), 'bus': forms.HiddenInput(), 'typ': forms.HiddenInput(), 'bemerkung': forms.Textarea(attrs={'rows':'5'})}
+		fields = ['name','telefon','mobil','ort','strasse','hausnr','bemerkung','dsgvo','typ']
+		widgets = {'dsgvo': forms.HiddenInput(), 'typ': forms.HiddenInput(), 'bemerkung': forms.Textarea(attrs={'rows':'5'})}
 
 class FahrgastChgForm(KlientenForm):
 	class Meta:
