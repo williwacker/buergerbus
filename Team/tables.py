@@ -23,12 +23,13 @@ class FahrerTable(tables.Table):
 	)
 	aktion = tables.TemplateColumn(
 		template_code='''
-		{% load static %}
-			<a href="{{ record.id }}/copy/">
-				<img src="{% static "project/img/icon_duplicate_32.png" %}" alt="Fahrer kopieren" title="Fahrer kopieren">
-			</a>
-		''',
-		orderable=False
+			{% load static %}
+			{% if perms.Team.add_fahrer %}
+				<a href="{{ record.id }}/copy/">
+					<img src="{% static "project/img/icon_duplicate_32.png" %}" alt="Fahrer kopieren" title="Fahrer kopieren">
+				</a>
+			{% endif %}
+		''', orderable=False
 	)    
 
 	class Meta:

@@ -44,12 +44,13 @@ class TourTable(tables.Table):
 	)
 	aktion = tables.TemplateColumn(
 		template_code='''
-		{% load static %}
-			<a href="{{ record.id }}/copy/">
-				<img src="{% static "project/img/icon_duplicate_32.png" %}" alt="Tour kopieren" title="Tour kopieren">
-			</a>
-		''',
-		orderable=False
+			{% if perms.Tour.add_tour %}
+				{% load static %}
+					<a href="{{ record.id }}/copy/">
+						<img src="{% static "project/img/icon_duplicate_32.png" %}" alt="Tour kopieren" title="Tour kopieren">
+					</a>
+			{% endif %}
+		''',orderable=False
 	) 	
 	
 	class Meta:
