@@ -143,7 +143,6 @@ class FeedbackView(MyDetailView):
 		admin_email = list(User.objects.filter(is_superuser=True).values_list('email', flat=True))
 		context = self.get_context_data()
 		form = self.form_class()
-		form.fields['von'].initial = settings.EMAIL_HOST_USER
 		form.fields['an'].initial = ';'.join(admin_email)
 		form.fields['betreff'].initial = '[Bürgerbus] Feedback '
 		context['form'] = form
@@ -158,9 +157,8 @@ class FeedbackView(MyDetailView):
 			email = EmailMessage(
 				post['betreff'],
 				post['text'],
-				post['von'],
+				' '.join([request.user.first_name, request.user.last_name])+' <'+settings.EMAIL_HOST_USER+'>',
 				post['an'].split(";"),
-				reply_to=post['von'].split(";"),
 			)
 			email.send(fail_silently=False)	
 			messages.success(request, post['betreff']+' wurde erfolgreich versandt.')
