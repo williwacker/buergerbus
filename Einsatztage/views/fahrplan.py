@@ -153,16 +153,16 @@ class FahrplanEmailView(MyDetailView):
 		self.get_context_data()
 		self.context['filepath']+=self.writeDSGVO()
 		self.context['filepath']+=self.writeFahrplan()
-		form = self.form_class(initial=self.initial)
-		self.initial['von'] = settings.EMAIL_HOST_USER
+		form = self.form_class()
+		form.fields['von'].initial = settings.EMAIL_HOST_USER
 		ft = self.context['fahrtag_liste']
 		email_to = []
-		if ft.fahrer_vormittag: email_to.append(ft.fahrer_vormittag.email)
-		if ft.fahrer_nachmittag: email_to.append(ft.fahrer_nachmittag.email)
+		if ft.fahrer_vormittag: email_to.append(ft.fahrer_vormittag.benutzer.email)
+		if ft.fahrer_nachmittag: email_to.append(ft.fahrer_nachmittag.benutzer.email)
 		if ft.team.email: email_to.append(ft.team.email)	
-		self.initial['an'] = "; ".join(email_to)
-		self.initial['betreff'] = '[Bürgerbus] Fahrplan {} am {}'.format(ft.team,ft.datum)
-		self.initial['datei'] = '\n'.join(self.context['filepath'])
+		form.fields['an'].initial = "; ".join(email_to)
+		form.fields['betreff'].initial = '[Bürgerbus] Fahrplan {} am {}'.format(ft.team,ft.datum)
+		form.fields['datei'].initial = '\n'.join(self.context['filepath'])
 		self.context['form'] = form
 		return render(request, self.template_name, self.context)
 

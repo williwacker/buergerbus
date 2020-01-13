@@ -68,6 +68,7 @@ class FahrgastAddView(MyCreateView):
 	
 	def get(self, request, *args, **kwargs):
 		context = self.get_context_data(**kwargs)
+		self.initial['typ'] = 'F'
 		form = self.form_class(initial=self.initial)
 		# nur managed orte anzeigen
 		if settings.ALLOW_OUTSIDE_CLIENTS:
@@ -84,8 +85,6 @@ class FahrgastAddView(MyCreateView):
 			form.fields['ort'].queryset = Orte.objects.order_by('ort').filter(bus__in=get_bus_list(self.request)) | Orte.objects.order_by('ort').filter(bus__isnull=True)
 		else:
 			form.fields['ort'].queryset = Orte.objects.order_by('ort').filter(bus__in=get_bus_list(self.request))
-		if form.instance.ort.bus != None:
-			form.fields['bus'].widget = forms.HiddenInput()		
 		context['form'] = form
 		messages.error(self.request, form.errors)			
 		return render(self.request, self.template_name, context)

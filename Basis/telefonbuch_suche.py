@@ -52,7 +52,7 @@ class Telefonbuch():
 					data_dict['ph'] = phone
 				if data_dict['st'] == '0':
 					self.dasoertliche_gewerbe(line, data_dict)
-				if data_dict['pc'] and data_dict['st'] and data_dict['hn']:
+				if data_dict['pc'] and data_dict['ci'] and data_dict['st'] and data_dict['hn']:
 					result.append(data_dict)
 		except:
 			pass
@@ -112,5 +112,5 @@ class Telefonbuch():
 			data_dict['mph'] = entry_dict.get('mph','').replace('+','-',1).replace('+','')
 			data_dict['hn']  = entry_dict.get('hn','').replace('+','')
 			# ignore entries without street name or zip
-			if data_dict['pc'] and data_dict['st'] and data_dict['hn']:
+			if data_dict['pc'] and data_dict['ci'] and data_dict['st'] and data_dict['hn']:
 				return data_dict
