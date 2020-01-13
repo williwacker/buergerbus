@@ -36,7 +36,8 @@ class KlientenForm(ModelForm):
 		return data
 
 class KlientenSearchForm(forms.Form):
-	suchname = forms.CharField(required=True, label='Suchbegriff', help_text='z.B. Name, Gewerbe oder Telefonnummer')
+	suchname = forms.CharField(required=True, label='Suchbegriff', help_text='z.B. Name, Gewerbe oder Telefonnummer', \
+		widget=forms.TextInput(attrs={'autofocus': True}))
 	suchort  = forms.CharField(required=True, label='Ort')
 
 class KlientenSearchResultForm(forms.Form):
@@ -67,7 +68,7 @@ class FahrgastAddForm(KlientenForm):
 	class Meta:
 		model = Klienten
 		fields = ['name','telefon','mobil','ort','strasse','hausnr','bemerkung','dsgvo','typ']
-		widgets = {'dsgvo': forms.HiddenInput(), 'typ': forms.HiddenInput(), 'bemerkung': forms.Textarea(attrs={'rows':'5'})}
+		widgets = {'dsgvo': forms.HiddenInput(), 'typ': forms.HiddenInput(), 'bemerkung': forms.Textarea(attrs={'rows':'5'}), 'name': forms.TextInput(attrs={'autofocus': True})}
 
 class FahrgastChgForm(KlientenForm):
 	class Meta:
@@ -82,7 +83,7 @@ class DienstleisterAddForm(DienstleisterForm):
 	class Meta:
 		model = Klienten
 		fields = ['name','telefon','mobil','ort','strasse','hausnr','kategorie','bemerkung','typ']
-		widgets = {'bemerkung': forms.Textarea(attrs={'rows':'5'}),'typ': forms.HiddenInput()}
+		widgets = {'bemerkung': forms.Textarea(attrs={'rows':'5'}),'typ': forms.HiddenInput(), 'name': forms.TextInput(attrs={'autofocus': True})}
 
 class DienstleisterChgForm(DienstleisterForm):	
 	class Meta:
@@ -97,6 +98,7 @@ class OrtAddForm(ModelForm):
 	class Meta:
 		model = Orte
 		fields = ['ort','plz','bus']
+		widgets = {'ort': forms.TextInput(attrs={'autofocus': True})}
 
 class OrtChgForm(ModelForm):
 	class Meta:

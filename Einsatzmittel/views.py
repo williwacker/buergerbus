@@ -10,7 +10,7 @@ from Basis.views import (MyDeleteView, MyCreateView, MyListView, MyUpdateView,
                          MyView)
 
 from .utils import get_bus_list, get_buero_list
-from .forms import BueroChgForm, BusChgForm
+from .forms import BueroAddForm, BueroChgForm, BusAddForm, BusChgForm
 from .models import Buero, Bus
 from .tables import BueroTable, BusTable
 
@@ -31,7 +31,7 @@ class BusView(MyListView):
 		return context
 
 class BusAddView(MyCreateView):
-	form_class = BusChgForm
+	form_class = BusAddForm
 	permission_required = 'Einsatzmittel.add_bus'
 	success_url = '/Einsatzmittel/busse/'
 	model = Bus
@@ -101,7 +101,7 @@ class BueroView(MyListView):
 		return context
 
 class BueroAddView(MyCreateView):
-	form_class = BueroChgForm
+	form_class = BueroAddForm
 	permission_required = 'Einsatzmittel.add_buero'
 	success_url = '/Einsatzmittel/bueros/'
 	model = Buero

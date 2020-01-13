@@ -7,11 +7,13 @@ class TopicAddForm(forms.ModelForm):
 	class Meta:
 		model = Topic
 		fields = ['name', 'sort_order']
+		widgets = {'name': forms.TextInput(attrs={'autofocus': True})}
 
 class SubmitFAQForm(forms.ModelForm):
 	class Meta:
 		model = Question
 		fields = ['topic', 'text', 'answer']
+		widgets = {'text': forms.TextInput(attrs={'autofocus': True})}
 
 class QuestionChangeForm(forms.ModelForm):
 	class Meta:
