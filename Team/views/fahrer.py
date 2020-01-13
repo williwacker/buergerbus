@@ -62,9 +62,15 @@ class FahrerAddView(MyCreateView):
 		instance = form.save(commit=False)
 		instance.created_by = self.request.user
 		instance.save()
-		self.success_message = self.model._meta.verbose_name_raw+' "<a href="'+self.success_url+str(instance.id)+'/'+url_args(self.request)+'">'+str(instance)+'</a>" wurde erfolgreich hinzugefügt.'
+		self.success_message = self.model._meta.verbose_name_raw+' "<a href="'+self.success_url+str(instance.id)+'/'+url_args(self.request)+'">'+str(instance)+' '+str(instance.team)+'</a>" wurde erfolgreich hinzugefügt.'
 		self.success_url += url_args(self.request)
-		return super(FahrerAddView, self).form_valid(form)	
+		return super(FahrerAddView, self).form_valid(form)
+
+	def form_invalid(self, form):
+		context = self.get_context_data()
+		context['form'] = form
+		messages.error(self.request, form.errors)			
+		return render(self.request, self.template_name, context)		
 
 class FahrerChangeView(MyUpdateView):
 	form_class = FahrerChgForm
@@ -94,7 +100,7 @@ class FahrerChangeView(MyUpdateView):
 		instance = form.save(commit=False)
 		instance.updated_by = self.request.user
 		instance.save(force_update=True)
-		self.success_message = self.model._meta.verbose_name_raw+' "<a href="'+self.success_url+str(instance.id)+'">'+str(instance)+'</a>" wurde erfolgreich geändert.'
+		self.success_message = self.model._meta.verbose_name_raw+' "<a href="'+self.success_url+str(instance.id)+'">'+str(instance)+' '+str(instance.team)+'</a>" wurde erfolgreich geändert.'
 		return super(FahrerChangeView, self).form_valid(form) 
 
 class FahrerCopyView(MyUpdateView):
@@ -124,10 +130,17 @@ class FahrerCopyView(MyUpdateView):
 	def form_valid(self, form):
 		instance = form.save(commit=False)
 		instance.updated_by = self.request.user
-		instance.pk = None
-		instance.save()
-		self.success_message = self.model._meta.verbose_name_raw+' "<a href="'+self.success_url+str(instance.id)+'">'+str(instance)+'</a>" wurde erfolgreich hinzugefügt.'
+		if 'team' in form.changed_data:
+			instance.pk = None
+			instance.save()
+			self.success_message = self.model._meta.verbose_name_raw+' "<a href="'+self.success_url+str(instance.id)+'">'+str(instance)+' '+str(instance.team)+'</a>" wurde erfolgreich hinzugefügt.'
 		return super(FahrerCopyView, self).form_valid(form)
+
+	def form_invalid(self, form):
+		context = self.get_context_data()
+		context['form'] = form
+		messages.error(self.request, form.errors)			
+		return render(self.request, self.template_name, context)
 
 class FahrerDeleteView(MyDeleteView):
 	permission_required = 'Team.delete_fahrer'

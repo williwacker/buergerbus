@@ -23,7 +23,7 @@ class Fahrer(models.Model):
 		constraints = [models.UniqueConstraint(fields=['benutzer','team'], name='unique_fahrer')]
 
 	def __str__(self):
-		return ", ".join([str(self.benutzer.last_name),str(self.benutzer.first_name),str(self.team)])
+		return ", ".join([str(self.benutzer.last_name),str(self.benutzer.first_name)])
 
 class Koordinator(models.Model):
 	benutzer = models.ForeignKey(User, related_name='+', on_delete=models.CASCADE)

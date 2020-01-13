@@ -64,6 +64,12 @@ class KoordinatorAddView(MyCreateView):
 		self.success_url += url_args(self.request)
 		return super(KoordinatorAddView, self).form_valid(form)	
 
+	def form_invalid(self, form):
+		context = self.get_context_data()
+		context['form'] = form
+		messages.error(self.request, form.errors)			
+		return render(self.request, self.template_name, context)		
+
 class KoordinatorChangeView(MyUpdateView):
 	form_class = KoordinatorChgForm
 	permission_required = 'Team.change_koordinator'
@@ -93,8 +99,14 @@ class KoordinatorChangeView(MyUpdateView):
 		instance = form.save(commit=False)
 		instance.updated_by = self.request.user
 		instance.save(force_update=True)
-		self.success_message = self.model._meta.verbose_name_raw+' "<a href="'+self.success_url+str(instance.id)+'">'+str(", ".join([instance.benutzer.last_name,instance.benutzer.first_name]))+'</a>" wurde erfolgreich geändert.'
-		return super(KoordinatorChangeView, self).form_valid(form)	
+		self.success_message = self.model._meta.verbose_name_raw+' "<a href="'+self.success_url+str(instance.id)+'">'+str(", ".join([instance.benutzer.last_name,instance.benutzer.first_name]))+' '+str(instance.team)+'</a>" wurde erfolgreich geändert.'
+		return super(KoordinatorChangeView, self).form_valid(form)
+
+	def form_invalid(self, form):
+		context = self.get_context_data()
+		context['form'] = form
+		messages.error(self.request, form.errors)			
+		return render(self.request, self.template_name, context)		
 
 class KoordinatorDeleteView(MyDeleteView):
 	permission_required = 'Team.delete_koordinator'
