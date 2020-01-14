@@ -10,7 +10,7 @@ class FahrerTable(tables.Table):
 			{% if perms.Team.change_fahrer %}
 				<a href="{{ record.id }}/{{ url_args }}">{{ record.benutzer.last_name }},&nbsp;{{ record.benutzer.first_name }}</a>
 			{% else %}
-				{{ record.name |safe }}
+				{{ record.benutzer.last_name }},&nbsp;{{ record.benutzer.first_name }}
 			{% endif %}
 		'''
 	)

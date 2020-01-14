@@ -277,7 +277,7 @@ GOOGLEMAPS_KEY 		= config('GOOGLEMAPS_KEY', default='')
 TRANSFER_TIME 		= config('TRANSFER_TIME', default=3, cast=int)
 
 # DSGVO mit dem Fahrplan versenden
-SEND_DSGVO 			= config('SEND_DSGVO', default=True, cast=bool)
+SEND_DSGVO 			= config('SEND_DSGVO', default=False, cast=bool)
 
 DSGVO_PATH          = config('DSGVO_PATH', default='tour\\')
 EMAIL_HOST          = config('EMAIL_HOST', default='localhost')
