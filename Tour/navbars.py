@@ -1,7 +1,6 @@
 from django import template
 from django.conf import settings
 from django.utils.safestring import mark_safe
-
 register = template.Library()
 
 @register.filter
@@ -16,7 +15,7 @@ def tour_navbar(nav_bar, datum):
 				if int(datum) == nav_bar[i].id:
 					selected = ' selected'
 					tag = 'span'
-			html += '<{4} href="?datum={0}" class="changeform-navigation-button segmented-button {3}"><span class="changeform-navigation-button-label">{1} {2}</span></{4}>'.format(nav_bar[i].id,nav_bar[i].datum,nav_bar[i].team,selected,tag)
+			html += '<{4} href="?datum={0}" class="changeform-navigation-button segmented-button {3}"><span class="changeform-navigation-button-label">{5} {1} {2}</span></{4}>'.format(nav_bar[i].id,nav_bar[i].datum,nav_bar[i].team,selected,tag,nav_bar[i].wochentag)
 	'''
 		else:
 			for i in range(len(nav_bar)):

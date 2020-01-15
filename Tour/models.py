@@ -77,7 +77,12 @@ class Tour(models.Model):
 	@property	
 	def datum_bus(self):
 		return ' '.join([str(self.datum.datum), str(self.klient.bus)])
-		
+
+	@property
+	def wochentag(self):
+		wochentage = ['Mo','Di','Mi','Do','Fr','Sa','So']
+		return wochentage[self.datum.weekday()]
+
 	def klienten_bus(self):
 		return str(self.klient.bus)
 
