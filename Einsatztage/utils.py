@@ -176,13 +176,13 @@ class FahrplanBackup():
 			list.append(tour.ankunft.strftime("%H:%M") if tour.ankunft else '')
 			list.append(tour.bemerkung + tour.klient.bemerkung)
 			writer.writerow(list)
-			try:
-				with open(filepath, 'wb') as f:
-					f.write(response.content)
-				with io.open(filepath, mode="r", encoding="utf8") as fd:
-					content = fd.read()
-				with io.open(filepath, mode="w", encoding="cp1252") as fd:
-					fd.write(content)		
-			except:
-				logger.info("{}: document={} could not be written".format(__name__, filepath))
-			return [filepath]					
+		try:
+			with open(filepath, 'wb') as f:
+				f.write(response.content)
+			with io.open(filepath, mode="r", encoding="utf8") as fd:
+				content = fd.read()
+			with io.open(filepath, mode="w", encoding="cp1252") as fd:
+				fd.write(content)		
+		except:
+			logger.info("{}: document={} could not be written".format(__name__, filepath))
+		return [filepath]					

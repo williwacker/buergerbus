@@ -111,8 +111,11 @@ class TourChgForm(MyModelForm):
 
 	def clean(self):
 		cleaned_data = super(TourChgForm, self).clean()
-		bus     = cleaned_data.get('bus')
-		datum   = cleaned_data.get('datum')
-		uhrzeit = cleaned_data.get('uhrzeit')
-		if Tour.objects.filter(bus=bus, datum=datum, uhrzeit=uhrzeit).exists():
-			raise forms.ValidationError('Tour zur gleicher Abholzeit ist bereits gebucht')
+		if set(['datum','uhrzeit','bus']).intersection(set(self.changed_data)):
+			id      = cleaned_data.get('id')
+			bus     = cleaned_data.get('bus')
+			datum   = cleaned_data.get('datum')
+			uhrzeit = cleaned_data.get('uhrzeit')
+			instance = Tour.objects.filter(bus=bus, datum=datum, uhrzeit=uhrzeit).first()
+			if instance and instance.id != id:
+				raise forms.ValidationError('Tour zur gleicher Abholzeit ist bereits gebucht')
