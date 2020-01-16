@@ -288,7 +288,19 @@ fieldset.module, #changelist {
 body.change-list .object-tools .addlink {
 	margin: 10px 10px;
 }
-
+.table-container .false {
+	display: none;
+}
+.submit-row a.closelink {
+    float: left;
+}
+.submit-row input.default {
+    float: left;
+}
+.submit-row p.deletelink-box {
+    float: right;
+}
+	
 
 @media only screen 
 and (min-device-width : 768px) 

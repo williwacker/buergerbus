@@ -124,7 +124,7 @@
                         {% if tour.zustieg %}
                             <td><para style="p1">✔</para></td>
                         {% else %} 
-                            <td><para style="p1">✘</para></td>
+                            <td><para style="p1"></para></td>
                         {% endif %}
                         <td><para style="p1">{{ tour.personenzahl }}</para></td>
                         <td>

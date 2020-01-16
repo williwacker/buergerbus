@@ -28,14 +28,6 @@ class MyModelForm(ModelForm):
 		self.cleaned_data['konflikt'] = ''
 		self.cleaned_data['konflikt_richtung'] = ''		
 
-		# Sind genügend Plätze verfügbar ?
-		bus = Bus.objects.get(bus=self.cleaned_data['bus'])
-		if GuestCount().get(self) > bus.sitzplaetze:
-			if self.cleaned_data['zustieg']:
-				raise forms.ValidationError("Maximale Anzahl Fahrgäste überschritten. Kein Zustieg möglich. Bitte Extrafahrt planen")
-			else:
-				raise forms.ValidationError("Maximale Anzahl Fahrgäste überschritten. Bitte Extrafahrt planen")
-
 		# Kann der Bus zum gewünschten Zeitpunkt am Anholort sein ?
 		frueheste_abfahrt = DepartureTime().time(self)
 		if frueheste_abfahrt == time(0,0,0):
@@ -54,6 +46,14 @@ class MyModelForm(ModelForm):
 			self.cleaned_data['konflikt_richtung'] += force_text('↓', encoding='utf-8', strings_only=False, errors='strict')
 			if not self.cleaned_data['konflikt_ignorieren']:
 				raise forms.ValidationError(self.cleaned_data['konflikt'])
+
+		# Sind genügend Plätze verfügbar ?
+		bus = Bus.objects.get(bus=self.cleaned_data['bus'])
+		if GuestCount().get(self) > bus.sitzplaetze:
+			if self.cleaned_data['zustieg']:
+				raise forms.ValidationError("Maximale Anzahl Fahrgäste überschritten. Kein Zustieg möglich. Bitte Extrafahrt planen")
+			else:
+				raise forms.ValidationError("Maximale Anzahl Fahrgäste überschritten. Bitte Extrafahrt planen")
 
 		self.instance.konflikt 			= self.cleaned_data['konflikt']
 		self.instance.konflikt_richtung = self.cleaned_data['konflikt_richtung']
