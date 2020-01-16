@@ -1,7 +1,7 @@
 from django.urls import path
 from django.views.generic import TemplateView
 
-from Einsatztage.views import (BuerotageChangeView, BuerotageListView,
+from Einsatztage.views import (BuerotageChangeView, BuerotageListView, BuerotageBookView, BuerotageCancelView,
                                FahrplanAsCSV, FahrplanAsPDF,
                                FahrplanBackupView, FahrplanEmailView,
                                FahrplanView, FahrtageChangeView,
@@ -20,4 +20,6 @@ urlpatterns = [
     path('fahrer/<int:id>/fahrplanAsCSV/', FahrplanAsCSV.as_view()),
     path('buero/', BuerotageListView.as_view()),
     path('buero/<int:pk>/', BuerotageChangeView.as_view()),
+    path('buero/<int:pk>/book/', BuerotageBookView.as_view()),
+    path('buero/<int:pk>/cancel/', BuerotageCancelView.as_view()),
 ]

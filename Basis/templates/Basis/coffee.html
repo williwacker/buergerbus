@@ -1,0 +1,19 @@
+{% extends 'Basis/base.html' %}
+{% load static %}
+{% load my_tags %}
+{% block content %}
+<div id="content-main">
+    <div id="changelist" class="module filtered">
+        <div id="toolbar"></div>
+        <form id="changelist-form">
+            <div class="results">
+                <h1>et voilà</h1>
+                <div class="index-image">
+                    <p style="text-align: center;"><img src="{% static "project/img/coffee.gif" %}" style="width: 500px;"></p>
+                    <p style="text-align: center;">Wem das nicht genug ist: <a href="https://giphy.com/gifs/heart-coffee-Vn6GVhNCYplba/fullscreen" target="_blank">Giphy Fullscreen</a></p>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -79,11 +79,29 @@ class BuerotagTable(tables.Table):
             {% endif %}
         '''
     )
+    aktion = tables.TemplateColumn(
+		template_code='''
+			{% load static %}
+			{% if perms.Einsatztage.change_buerotag and not record.urlaub %}
+                {% if record.bookable %}
+                    <a href="{{ record.id }}/book/{{ url_args }}">
+                        <img src="{% static "project/img/kalender-plus-32.png" %}" alt="Bürotag für mich buchen" title="Bürotag für mich buchen">
+                    </a>
+                {% else %}
+                    {% ifequal record.koordinator.benutzer user %}
+                        <a href="{{ record.id }}/cancel/{{ url_args }}">
+                            <img src="{% static "project/img/kalender-minus-32.png" %}" alt="Bürotag Buchung löschen" title="Bürotag Buchung löschen">
+                        </a>
+                    {% endifequal %}
+                {% endif %}
+			{% endif %}
+		''', orderable=False
+	)   
     wochentag = tables.Column(orderable=False)
 
     class Meta:
         model = Buerotag
-        fields = ('datum','wochentag','team','koordinator')
+        fields = ('datum','wochentag','team','koordinator','aktion')
 
 
 class TourTable(tables.Table):

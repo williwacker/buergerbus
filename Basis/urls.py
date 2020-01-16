@@ -8,7 +8,7 @@ from Basis.views import (
     DocumentAddView, DocumentChangeView, DocumentDeleteView, DocumentListView,
     DocumentPDFView, FeedbackView, GroupAddView, GroupChangeView,
     GroupDeleteView, GroupView, UserAddView, UserChangeView, UserDeleteView,
-    UserView, RestartApache)
+    UserView, RestartApache, CoffeeView)
 
 app_name = 'Basis'
 urlpatterns = [
@@ -28,4 +28,5 @@ urlpatterns = [
     path('documents/<int:pk>/', DocumentChangeView.as_view()),
     path('documents/<int:pk>/delete/', DocumentDeleteView.as_view()),
     path('documents/<int:pk>/view/<str:str>.pdf', DocumentPDFView.as_view()),
+    path('coffee/', CoffeeView.as_view()),
 ] 

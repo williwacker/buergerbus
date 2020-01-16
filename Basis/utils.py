@@ -119,6 +119,8 @@ def get_sidebar(user):
 
 	value = []
 	if user.has_perm('Basis.view_document'):
+		value.append({'name':'Einen Kaffee bitte','value':'/Basis/coffee/'})
+	if user.has_perm('Basis.view_document'):
 		value.append({'name':'Dokumente','value':'/Basis/documents/'})
 	if list(User.objects.filter(is_superuser=True).values_list('email', flat=True)):
 		value.append({'name':'Feedback','value':'/Basis/feedback/'})

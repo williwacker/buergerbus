@@ -106,6 +106,10 @@ class Buerotag(models.Model):
 		return str(self.datum)
 
 	@property
+	def bookable(self):
+		return not self.koordinator
+
+	@property
 	def wochentag(self):
 		wochentage = ['Mo','Di','Mi','Do','Fr','Sa','So']
 		return wochentage[self.datum.weekday()]

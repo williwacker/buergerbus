@@ -13,7 +13,7 @@ from Basis.models import Document
 from Basis.tables import DocumentTable
 from Basis.utils import get_sidebar, url_args, TriggerRestartApache
 from Basis.views import (MyBaseDetailView, MyDeleteView, MyDetailView,
-                         MyListView, MyUpdateView, MyView)
+                         MyListView, MyUpdateView, MyView, BasisView)
 
 # Documents View
 
@@ -178,3 +178,6 @@ class RestartApache(MyView):
 		TriggerRestartApache()
 		messages.success(request, 'Web Service wird innerhalb einer Minute neu gestartet.')
 		return HttpResponseRedirect(self.success_url+url_args(request))	
+
+class CoffeeView(BasisView):
+	template_name = 'Basis/coffee.html'
