@@ -1,9 +1,11 @@
 from collections import OrderedDict
 from io import BytesIO
+import os
 from pathlib import Path
 from fuzzywuzzy import fuzz, process
 
 from django.contrib import messages
+from django.conf import settings
 from django.contrib.auth.models import Permission, User
 from django.contrib.messages.api import get_messages
 from django.contrib.messages.constants import DEFAULT_LEVELS
@@ -122,6 +124,8 @@ def get_sidebar(user):
 		value.append({'name':'Feedback','value':'/Basis/feedback/'})
 	if user.has_perm('Faq.view_question') and user.has_perm('Faq.view_topic'):
 		value.append({'name':'FAQ','value':'/Faq/questions/'})
+	if user.has_perm('Faq.view_question'):
+		value.append({'name':'Web Service neu starten','value':'/Basis/restart_apache/'})			
 	if value:
 		sidebar.append({'name':'Hilfe', 'value':value})		
 	return sidebar
@@ -184,3 +188,15 @@ class MyPasswordValidator:
 
 	def get_help_text(self):
 		return _("Your password can't be a commonly used password.")
+
+class TriggerRestartApache():
+	def __init__(self):
+		self.touch(settings.MEDIA_ROOT, 'trigger_apache_restart')
+
+	def touch(self, fpath, fname):
+		fpathname = '/'.join([fpath,fname])
+		if os.path.exists(fpathname):
+			os.utime(fpathname, None)
+		else:
+			open(fpathname, 'a').close()
+

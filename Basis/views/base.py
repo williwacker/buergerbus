@@ -11,7 +11,7 @@ from django.core.mail import EmailMessage
 from Basis.forms import DocumentAddForm, DocumentChangeForm, FeedbackForm
 from Basis.models import Document
 from Basis.tables import DocumentTable
-from Basis.utils import get_sidebar, url_args
+from Basis.utils import get_sidebar, url_args, TriggerRestartApache
 from Basis.views import (MyBaseDetailView, MyDeleteView, MyDetailView,
                          MyListView, MyUpdateView, MyView)
 
@@ -166,3 +166,15 @@ class FeedbackView(MyDetailView):
 		else:
 			messages.error(request, form.errors)			
 		return render(request, self.template_name, context)	    
+
+# Manually trigger apache restart by creating a 'trigger_apache_restart'. A cron job running every minute will check for the existence of
+# this file and runs a 'systemctl restart apache2'
+
+class RestartApache(MyView):
+	permission_required = 'Tour.view_tour'
+	success_url = '/'
+
+	def get(self, request):
+		TriggerRestartApache()
+		messages.success(request, 'Web Service wird innerhalb einer Minute neu gestartet.')
+		return HttpResponseRedirect(self.success_url+url_args(request))	
