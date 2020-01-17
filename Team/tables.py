@@ -36,6 +36,12 @@ class FahrerTable(tables.Table):
 		model = Fahrer
 		fields = ('name','team','email','telefon','aktiv','aktion')
 
+	def before_render(self, request):
+		if request.user.has_perm('Team.change_fahrer'):
+			self.columns.show('aktion')
+		else:
+			self.columns.hide('aktion')		
+
 class KoordinatorTable(tables.Table):
 	name = tables.TemplateColumn(
 		template_code='''

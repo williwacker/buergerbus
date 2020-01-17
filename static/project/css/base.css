@@ -245,6 +245,9 @@ input[type="submit"]:hover {
 	line-height: 15px;
 	padding: 10px 15px;
 }
+.form-row {
+	padding: 5px 10px 1px 10px;
+}
 .form-row+.form-row-left {
 	float: left;
 	width: 50%;

@@ -1,4 +1,5 @@
 import django_tables2 as tables
+from django.conf import settings
 
 from .models import Klienten, Orte, Strassen
 
@@ -58,6 +59,11 @@ class FahrgaesteTable(tables.Table):
             self.columns.show('anzahl_fahrgast_touren')
         else:
             self.columns.hide('anzahl_fahrgast_touren')
+
+        if settings.SEND_DSGVO:
+            self.columns.show('dsgvo')
+        else:
+            self.columns.hide('dsgvo')
 
 class DienstleisterTable(tables.Table):
     name = tables.TemplateColumn(
