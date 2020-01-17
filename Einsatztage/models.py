@@ -63,6 +63,14 @@ class Fahrtag(models.Model):
 		return Tour.objects.filter(datum_id=self.id, uhrzeit__lt=datetime.time(12)).count()
 
 	@property
+	def bookable_vormittag(self):
+		return not self.fahrer_vormittag
+
+	@property
+	def bookable_nachmittag(self):
+		return not self.fahrer_nachmittag		
+
+	@property
 	def wochentag(self):
 		wochentage = ['Mo','Di','Mi','Do','Fr','Sa','So']
 		return wochentage[self.datum.weekday()]

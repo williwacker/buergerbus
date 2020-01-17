@@ -19,6 +19,11 @@ class TourTable(tables.Table):
 			{% endif %}
 		'''
 	)
+	datum = tables.TemplateColumn(
+		template_code='''
+		{{ record.datum }}
+		'''
+	)	
 	uhrzeit = tables.TemplateColumn(
 		template_code='''
 			{% if record.has_conflict %}
@@ -56,3 +61,9 @@ class TourTable(tables.Table):
 	class Meta:
 		model = Tour
 		fields = ('fahrgast','bus','datum','uhrzeit','zustieg','personenzahl','abholort','zielort','entfernung','ankunft','bemerkung','aktion')
+
+	def before_render(self, request):
+		if request.user.has_perm('Tour.change_tour'):
+			self.columns.show('aktion')
+		else:
+			self.columns.hide('aktion')		

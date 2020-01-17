@@ -65,8 +65,83 @@ class FahrtageChangeView(MyUpdateView):
 
 	def form_valid(self, form):
 		instance = form.save(commit=False)
+		fahrer = Fahrer.objects.filter(benutzer=self.request.user, aktiv=True, team=instance.team).first()
+		if not fahrer and instance.fahrer_vormittag != None:
+			messages.error(self.request, self.model._meta.verbose_name.title()+' am '+str(instance.datum)+' '+str(instance.team)+' kann nicht von '+str(instance.fahrer_vormittag)+' gebucht werden.')
+			return HttpResponseRedirect(self.success_url+url_args(self.request))	
+		if not fahrer and instance.fahrer_nachmittag != None:
+			messages.error(self.request, self.model._meta.verbose_name.title()+' am '+str(instance.datum)+' '+str(instance.team)+' kann nicht von '+str(instance.fahrer_nachmittag)+' gebucht werden.')
+			return HttpResponseRedirect(self.success_url+url_args(self.request))	
 		instance.updated_by = self.request.user
 		instance.save(force_update=True)
 		self.success_url += url_args(self.request)
 		self.success_message = self.model._meta.verbose_name.title()+' "<a href="'+self.success_url+str(instance.id)+'">'+str(instance.datum)+' '+str(instance.team)+'</a>" wurde erfolgreich geändert.'
 		return super(FahrtageChangeView, self).form_valid(form)	
+
+class FahrtageBookvView(MyView):
+	permission_required = 'Einsatztage.change_fahrtag'
+	success_url = '/Einsatztage/fahrer/'
+	model = Fahrtag	
+
+	def get(self, request, pk):
+		instance = get_object_or_404(Fahrtag, pk=pk)
+		fahrer = Fahrer.objects.filter(benutzer=request.user, aktiv=True, team=instance.team).first()
+		if not fahrer:
+			messages.error(request, self.model._meta.verbose_name.title()+' am '+str(instance.datum)+' '+str(instance.team)+' kann nicht von Ihnen gebucht werden.')
+		elif instance.fahrer_vormittag != None:
+			messages.error(request, self.model._meta.verbose_name.title()+' am '+str(instance.datum)+' '+str(instance.team)+' ist bereits gebucht.')
+		else:
+			instance.fahrer_vormittag = fahrer
+			instance.save()
+			messages.success(request, self.model._meta.verbose_name.title()+' "<a href="'+self.success_url+str(instance.id)+'">'+str(instance.datum)+' '+str(instance.team)+'</a>" wurde erfolgreich geändert.')
+		return HttpResponseRedirect(self.success_url+url_args(request))
+
+class FahrtageBooknView(MyView):
+	permission_required = 'Einsatztage.change_fahrtag'
+	success_url = '/Einsatztage/fahrer/'
+	model = Fahrtag	
+
+	def get(self, request, pk):
+		instance = get_object_or_404(Fahrtag, pk=pk)
+		fahrer = Fahrer.objects.filter(benutzer=request.user, aktiv=True, team=instance.team).first()
+		if not fahrer:
+			messages.error(request, self.model._meta.verbose_name.title()+' am '+str(instance.datum)+' '+str(instance.team)+' kann nicht von Ihnen gebucht werden.')
+		elif instance.fahrer_nachmittag != None:
+			messages.error(request, self.model._meta.verbose_name.title()+' am '+str(instance.datum)+' '+str(instance.team)+' ist bereits gebucht.')
+		else:
+			instance.fahrer_nachmittag = fahrer
+			instance.save()
+			messages.success(request, self.model._meta.verbose_name.title()+' "<a href="'+self.success_url+str(instance.id)+'">'+str(instance.datum)+' '+str(instance.team)+'</a>" wurde erfolgreich geändert.')
+		return HttpResponseRedirect(self.success_url+url_args(request))
+
+class FahrtageCancelvView(MyUpdateView):
+	permission_required = 'Einsatztage.change_fahrtag'
+	success_url = '/Einsatztage/fahrer/'
+	model = Fahrtag	
+
+	def get(self, request, pk):
+		instance = get_object_or_404(Fahrtag, pk=pk)
+		fahrer = Fahrer.objects.filter(benutzer=request.user, team=instance.team).first()
+		if instance.fahrer_vormittag != fahrer:
+			messages.error(request, self.model._meta.verbose_name.title()+' am '+str(instance.datum)+' '+str(instance.team)+' ist nicht auf Sie gebucht.')
+		else:
+			instance.fahrer_vormittag = None
+			instance.save()
+			messages.success(request, self.model._meta.verbose_name.title()+' "<a href="'+self.success_url+str(instance.id)+'">'+str(instance.datum)+' '+str(instance.team)+'</a>" wurde erfolgreich geändert.')
+		return HttpResponseRedirect(self.success_url+url_args(request))	
+
+class FahrtageCancelnView(MyUpdateView):
+	permission_required = 'Einsatztage.change_fahrtag'
+	success_url = '/Einsatztage/fahrer/'
+	model = Fahrtag	
+
+	def get(self, request, pk):
+		instance = get_object_or_404(Fahrtag, pk=pk)
+		fahrer = Fahrer.objects.filter(benutzer=request.user, team=instance.team).first()
+		if instance.fahrer_nachmittag != fahrer:
+			messages.error(request, self.model._meta.verbose_name.title()+' am '+str(instance.datum)+' '+str(instance.team)+' ist nicht auf Sie gebucht.')
+		else:
+			instance.fahrer_nachmittag = None
+			instance.save()
+			messages.success(request, self.model._meta.verbose_name.title()+' "<a href="'+self.success_url+str(instance.id)+'">'+str(instance.datum)+' '+str(instance.team)+'</a>" wurde erfolgreich geändert.')
+		return HttpResponseRedirect(self.success_url+url_args(request))						

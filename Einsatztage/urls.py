@@ -5,7 +5,8 @@ from Einsatztage.views import (BuerotageChangeView, BuerotageListView, Buerotage
                                FahrplanAsCSV, FahrplanAsPDF,
                                FahrplanBackupView, FahrplanEmailView,
                                FahrplanView, FahrtageChangeView,
-                               FahrtageListView)
+                               FahrtageListView,
+                               FahrtageBookvView, FahrtageBooknView, FahrtageCancelvView, FahrtageCancelnView)
 
 from . import views
 
@@ -14,6 +15,10 @@ urlpatterns = [
     path('fahrer/', FahrtageListView.as_view()),
     path('fahrer/fahrplanBackup/', FahrplanBackupView.as_view()),
     path('fahrer/<int:pk>/', FahrtageChangeView.as_view()),
+    path('fahrer/<int:pk>/bookv/', FahrtageBookvView.as_view()),
+    path('fahrer/<int:pk>/bookn/', FahrtageBooknView.as_view()),
+    path('fahrer/<int:pk>/cancelv/', FahrtageCancelvView.as_view()),
+    path('fahrer/<int:pk>/canceln/', FahrtageCancelnView.as_view()),
     path('fahrer/<int:id>/fahrplan/', FahrplanView.as_view()),
     path('fahrer/<int:id>/fahrplanAsPDF/', FahrplanAsPDF.as_view()),
     path('fahrer/<int:id>/fahrplanAsEmail/', FahrplanEmailView.as_view()),

@@ -5,7 +5,7 @@ from django.contrib.auth.models import Group
 from django.core.exceptions import PermissionDenied
 from django.core.mail import EmailMessage
 from django.http import (FileResponse, Http404, HttpResponse,
-                         HttpResponseForbidden, HttpResponseRedirect)
+						 HttpResponseForbidden, HttpResponseRedirect)
 from django.shortcuts import get_object_or_404, render
 from django.template.loader import get_template
 from django.utils.safestring import mark_safe
@@ -63,7 +63,7 @@ class BuerotageChangeView(MyUpdateView):
 	def form_valid(self, form):
 		instance = form.save(commit=False)
 		koordinator = Koordinator.objects.filter(benutzer=self.request.user, aktiv=True, team=instance.team).first()
-		if not koordinator:
+		if not koordinator and instance.koordinator != None:
 			messages.error(self.request, self.model._meta.verbose_name.title()+' am '+str(instance.datum)+' in '+str(instance.team)+' kann nicht von '+str(instance.koordinator)+' gebucht werden.')
 			return HttpResponseRedirect(self.success_url+url_args(self.request))	
 		instance.updated_by = self.request.user
@@ -97,7 +97,7 @@ class BuerotageCancelView(MyUpdateView):
 
 	def get(self, request, pk):
 		instance = get_object_or_404(Buerotag, pk=pk)
-		koordinator = get_object_or_404(Koordinator, benutzer=request.user)
+		koordinator = Koordinator.objects.filter(benutzer=request.user, team=instance.team).first()
 		if instance.koordinator != koordinator:
 			messages.error(request, self.model._meta.verbose_name.title()+' am '+str(instance.datum)+' in '+str(instance.team)+' ist nicht auf Sie gebucht.')
 		else:
