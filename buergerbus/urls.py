@@ -23,6 +23,7 @@ from smart_selects import urls as smart_selects_urls
 
 from Basis.views import (BasisView, MyPasswordChangeDoneView,
                          MyPasswordChangeView)
+from Basis.signals import *                    
 
 urlpatterns = [
     path('', BasisView.as_view()),
