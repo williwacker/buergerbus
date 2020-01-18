@@ -1,4 +1,6 @@
-﻿from django.db import models
+﻿from datetime import datetime, time, timedelta
+
+from django.db import models
 from django.conf import settings
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
@@ -89,6 +91,10 @@ class Bus(models.Model):
 
 	def __str__(self):
 		return str(self.bus)
+
+	@property
+	def plan_ende(self):
+		return (datetime.now()+timedelta(self.plantage)).strftime('%Y-%m-%d')
 
 	def _permission_codename(self):
 		# gibt den codenamen der entsprechenden Berechtigung zurück
