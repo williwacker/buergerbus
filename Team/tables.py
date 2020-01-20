@@ -38,7 +38,7 @@ class FahrerTable(tables.Table):
 
 	def before_render(self, request):
 		if request.user.has_perm('Team.change_fahrer'):
-			self.columns.hide('aktion')		# change to show
+			self.columns.show('aktion')
 		else:
 			self.columns.hide('aktion')		
 
@@ -59,7 +59,23 @@ class KoordinatorTable(tables.Table):
 		template_code='''<a href="mailto:{{ record.benutzer.email }}">{{ record.benutzer.email }}</a>''',
 		orderable=False
 	)
+	aktion = tables.TemplateColumn(
+		template_code='''
+			{% load static %}
+			{% if perms.Team.add_koordinator %}
+				<a href="{{ record.id }}/copy/">
+					<img src="{% static "project/img/icon_duplicate_32.png" %}" alt="Koordinator kopieren" title="Koordinator kopieren">
+				</a>
+			{% endif %}
+		''', orderable=False
+	) 	
 	   
 	class Meta:
 		model = Koordinator
-		fields = ('name','team','email','telefon','aktiv')
+		fields = ('name','team','email','telefon','aktiv','aktion')
+
+	def before_render(self, request):
+		if request.user.has_perm('Team.change_koordinator'):
+			self.columns.show('aktion')
+		else:
+			self.columns.hide('aktion')			
