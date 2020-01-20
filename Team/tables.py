@@ -38,7 +38,7 @@ class FahrerTable(tables.Table):
 
 	def before_render(self, request):
 		if request.user.has_perm('Team.change_fahrer'):
-			self.columns.show('aktion')
+			self.columns.hide('aktion')		# change to show
 		else:
 			self.columns.hide('aktion')		
 

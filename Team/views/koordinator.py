@@ -1,7 +1,7 @@
 from django import template
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 
@@ -58,6 +58,8 @@ class KoordinatorAddView(MyCreateView):
 	
 	def form_valid(self, form):
 		instance = form.save(commit=False)
+		group = Group.objects.filter(name=instance.team).first()
+		if group: instance.benutzer.groups.add(group)
 		instance.created_by = self.request.user
 		instance.save()
 		self.success_message = self.model._meta.verbose_name_raw+' "<a href="'+self.success_url+str(instance.id)+'/'+url_args(self.request)+'">'+str(", ".join([instance.benutzer.last_name,instance.benutzer.first_name]))+' '+str(instance.team)+'</a>" wurde erfolgreich hinzugefügt.'
@@ -97,6 +99,11 @@ class KoordinatorChangeView(MyUpdateView):
 	
 	def form_valid(self, form):
 		instance = form.save(commit=False)
+		if 'team' in form.changed_data:
+			old_group = Group.objects.filter(name=Bus.objects.get(pk=form.initial['team'])).first()
+			if old_group: instance.benutzer.groups.remove(old_group)
+			group = Group.objects.filter(name=instance.team).first()
+			if group: instance.benutzer.groups.add(group)		
 		instance.updated_by = self.request.user
 		instance.save(force_update=True)
 		self.success_message = self.model._meta.verbose_name_raw+' "<a href="'+self.success_url+str(instance.id)+'">'+str(", ".join([instance.benutzer.last_name,instance.benutzer.first_name]))+' '+str(instance.team)+'</a>" wurde erfolgreich geändert.'
@@ -112,4 +119,10 @@ class KoordinatorDeleteView(MyDeleteView):
 	permission_required = 'Team.delete_koordinator'
 	success_url = '/Team/koordinator/'
 	model = Koordinator
-	pass
+
+	def post(self, request, *args, **kwargs):
+		instance = get_object_or_404(self.model, pk=kwargs['pk'])
+		group = Group.objects.filter(name=instance.team).first()
+		if group: instance.benutzer.groups.remove(group)
+		messages.success(request, self.model._meta.verbose_name_raw+' "'+str(instance)+'" wurde gelöscht.')
+		return self.delete(request, *args, **kwargs)
