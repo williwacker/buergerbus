@@ -155,7 +155,7 @@ class BuerotagTable(tables.Table):
 
 	def before_render(self, request):
 		if Koordinator.objects.filter(benutzer=request.user, aktiv=True).exists() \
-		and request.user.has_perm('Einsatztage.change_fahrtag'):
+		and request.user.has_perm('Einsatztage.change_buerotag'):
 			self.columns.show('aktion')
 		else:
 			self.columns.hide('aktion')
