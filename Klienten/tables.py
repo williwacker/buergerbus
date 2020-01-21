@@ -52,7 +52,7 @@ class FahrgaesteTable(tables.Table):
 
     class Meta:
         model = Klienten
-        fields = ('name','telefon','adresse','bus','bemerkung','tour','dsgvo','anzahl_fahrgast_touren')
+        fields = ('tour','name','telefon','adresse','bus','bemerkung','dsgvo','anzahl_fahrgast_touren')
 
     def before_render(self, request):
         if request.user.is_superuser:
