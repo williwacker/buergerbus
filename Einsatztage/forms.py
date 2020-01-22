@@ -22,12 +22,12 @@ class BuerotagChgForm(ModelForm):
 	class Meta:
 		model = Buerotag
 		fields = ['datum', 'team', 'koordinator', 'urlaub']
-		widgets = {'datum' : forms.TextInput(attrs={'readonly':'readonly'})}
+#		widgets = {'datum' : forms.TextInput(attrs={'readonly':'readonly'})}
 
 	def __init__(self, *args, **kwargs):
 		super(BuerotagChgForm, self).__init__(*args, **kwargs)
 		self.fields['team'].disabled = True
-		self.fields['team'].required = False
+#		self.fields['team'].required = False
 
 
 class FahrplanEmailForm(forms.Form):

@@ -22,6 +22,8 @@ from ..models import Buerotag
 from ..tables import BuerotagTable
 from ..utils import BuerotageSchreiben
 
+import logging
+logger = logging.getLogger(__name__)
 
 class BuerotageListView(MyListView):
 	permission_required = 'Einsatztage.view_buerotag'
@@ -62,6 +64,7 @@ class BuerotageChangeView(MyUpdateView):
 
 	def form_valid(self, form):
 		instance = form.save(commit=False)
+		logger.info("Initial Datum {}, Returned Datum {}, Changed Fields {}".format(form.initial['datum'], instance.datum, form.changed_data))
 		koordinator = Koordinator.objects.filter(benutzer=self.request.user, aktiv=True, team=instance.team).first()
 		if not koordinator and instance.koordinator != None:
 			messages.error(self.request, self.model._meta.verbose_name.title()+' am '+str(instance.datum)+' in '+str(instance.team)+' kann nicht von '+str(instance.koordinator)+' gebucht werden.')
