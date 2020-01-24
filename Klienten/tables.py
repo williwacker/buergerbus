@@ -21,6 +21,10 @@ class FahrgaesteTable(tables.Table):
     telefon = tables.TemplateColumn(
         template_code='''{{ record.telefon |default_if_none:"-" }}<br/>{{ record.mobil |default_if_none:"" }}'''
     )
+    bemerkung = tables.TemplateColumn(
+        template_code='''{{ record.bemerkung }}''',
+        attrs={"td": {"class": "remark"}}
+    )    
     dsgvo = tables.TemplateColumn('''
         {% load static %}
         {% if record.dsgvo == '01' %}

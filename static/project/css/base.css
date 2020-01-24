@@ -170,6 +170,9 @@ h1 {
 .odd {
 	background: #f9f9f9;
 }
+table td.remark {
+	max-width: 160px;
+}
 ul.pagination li {
 	display: inline-block;
 	margin: -1px;
@@ -280,9 +283,6 @@ fieldset.module, #changelist {
 }
 .submit-row {
 	box-shadow: 5px 5px 10px;
-}
-#toolbar {
-	/*min-height: 35px;*/
 }
 #toolbar a {
 	border-radius: 4px;
