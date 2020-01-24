@@ -44,8 +44,9 @@ class TourTable(tables.Table):
 		'''
 	)	
 	bemerkung = tables.TemplateColumn(
-		template_code ='''{{ record.klient.bemerkung  |safe|default_if_none:""  }}<br/>{{ record.bemerkung|default_if_none:""  }} ''',
-		orderable=False
+		template_code ='''{{ record.klient.bemerkung|default_if_none:""  }}<br/>{{ record.bemerkung|default_if_none:""  }} ''',
+		orderable=False,
+        attrs={"td": {"class": "remark"}}
 	)
 	aktion = tables.TemplateColumn(
 		template_code='''
