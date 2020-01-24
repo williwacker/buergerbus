@@ -53,7 +53,7 @@
             <!-- Header -->
             <div id="header">
                 <div id="title">
-                    <a href="/" title="Startseite">{% settings_value "PORTAL" %}</a>
+                    <a href="{% url 'home' %}" title="Startseite">{% settings_value "PORTAL" %}</a>
                 </div>
                 <div id="branding">
                     <span id="branding-menu" class="sidebar-header-menu-icon icon-menu sidebar-toggle"></span>
@@ -81,8 +81,8 @@
             <!-- END Header -->
             {% block breadcrumbs %}
             <div class="breadcrumbs">
-            <!--a href="{% url 'admin:index' %}">{% trans 'Home' %}</a-->
-            {% if title %} &rsaquo; {{ title }}{% endif %}
+                <a href="{% url 'home' %}">{% trans 'Home' %}</a>
+                {% if title %} &rsaquo; {{ title }}{% endif %}
             </div>
             {% endblock breadcrumbs %}
             {% block messages %}
@@ -119,7 +119,7 @@
             <div class="sidebar sidebar-dependent">
                 <div class="sidebar-wrapper scrollable">
                     <div class="sidebar-section logo">
-                        <a href="/"><img src="{% static "project/img/buergerbus.jpg" %}" alt="Start" title="Start"></a>
+                        <a href="{% url 'home' %}"><img src="{% static "project/img/buergerbus.jpg" %}" alt="Startseite" title="Startseite"></a>
                     </div>
                     {% if sidebar_liste %}
                         {% for sidebar in sidebar_liste %}

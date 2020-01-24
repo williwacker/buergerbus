@@ -3,6 +3,7 @@ from django.forms import ModelForm
 from django.shortcuts import render
 
 from .models import Buerotag, Fahrtag
+from Team.models import Fahrer, Koordinator
 
 
 class FahrtagChgForm(ModelForm):
@@ -10,12 +11,12 @@ class FahrtagChgForm(ModelForm):
 	class Meta:
 		model = Fahrtag
 		fields = ['datum', 'team', 'fahrer_vormittag', 'fahrer_nachmittag', 'urlaub']
-		widgets = {'datum' : forms.TextInput(attrs={'readonly':'readonly'})}
+#		widgets = {'datum' : forms.TextInput(attrs={'readonly':'readonly'})}
 
 	def __init__(self, *args, **kwargs):
 		super(FahrtagChgForm, self).__init__(*args, **kwargs)
 		self.fields['team'].disabled = True
-		self.fields['team'].required = False
+#		self.fields['team'].required = False
 
 class BuerotagChgForm(ModelForm):
 

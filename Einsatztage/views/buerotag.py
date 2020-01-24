@@ -54,7 +54,7 @@ class BuerotageChangeView(MyUpdateView):
 	model = Buerotag
 
 	def get_context_data(self, **kwargs):
-		context = super().get_context_data(**kwargs)
+		context = {}
 		context['sidebar_liste'] = get_sidebar(self.request.user)
 		context['title'] = "Bürotag ändern"
 		context['submit_button'] = "Sichern"
@@ -62,13 +62,28 @@ class BuerotageChangeView(MyUpdateView):
 		context['url_args'] = url_args(self.request)
 		return context
 
+	def get(self, request, *args, **kwargs):
+		context = self.get_context_data(**kwargs)
+		instance=get_object_or_404(self.model, pk=kwargs['pk'])
+		form = self.form_class(instance=instance)
+		logger.info("Form Datum {}, Instance Datum {}".format(form.initial['datum'], instance.datum))
+		context['form'] = form
+		return render(request, self.template_name, context)
+
+	def form_invalid(self, form):
+		context = self.get_context_data()	
+		context['form'] = form
+		messages.error(self.request, form.errors)			
+		return render(self.request, self.template_name, context)
+
 	def form_valid(self, form):
 		instance = form.save(commit=False)
 		logger.info("Initial Datum {}, Returned Datum {}, Changed Fields {}".format(form.initial['datum'], instance.datum, form.changed_data))
-		koordinator = Koordinator.objects.filter(benutzer=self.request.user, aktiv=True, team=instance.team).first()
-		if not koordinator and instance.koordinator != None:
-			messages.error(self.request, self.model._meta.verbose_name.title()+' am '+str(instance.datum)+' in '+str(instance.team)+' kann nicht von '+str(instance.koordinator)+' gebucht werden.')
-			return HttpResponseRedirect(self.success_url+url_args(self.request))	
+		if instance.koordinator:
+			koordinator = Koordinator.objects.filter(benutzer=instance.koordinator.benutzer, aktiv=True, team=instance.team).first()
+			if not koordinator and instance.koordinator != None:
+				messages.error(self.request, self.model._meta.verbose_name.title()+' am '+str(instance.datum)+' in '+str(instance.team)+' kann nicht von '+str(instance.koordinator)+' gebucht werden. Ist nicht als aktiver Koordinator eingetragen')
+				return HttpResponseRedirect(self.success_url+url_args(self.request))	
 		instance.updated_by = self.request.user
 		instance.save(force_update=True)
 		self.success_url += url_args(self.request)

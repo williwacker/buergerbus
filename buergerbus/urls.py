@@ -26,7 +26,7 @@ from Basis.views import (BasisView, MyPasswordChangeDoneView,
 from Basis.signals import *                    
 
 urlpatterns = [
-    path('', BasisView.as_view()),
+    path('', BasisView.as_view(), name='home'),
     path('Basis/', include('Basis.urls')),
     path('accounts/password/change/', MyPasswordChangeView.as_view(), name='password_change'),
     path('accounts/password/change/done/', MyPasswordChangeDoneView.as_view(), name='password_change_done'),
@@ -42,7 +42,6 @@ urlpatterns = [
     url(r'^chaining/', include('smart_selects.urls')),
     url(r'^jet/', include('jet.urls', 'jet')),
     url(r'^jet/dashboard/', include('jet.dashboard.urls', 'jet-dashboard')), #??Django JET dashboard URLS
-#    path('__debug__/', include(debug_toolbar.urls)),
 ]
 
 handler400 = 'Basis.views.my_custom_bad_request_view'

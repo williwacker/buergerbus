@@ -25,6 +25,8 @@ from ..models import Fahrtag
 from ..tables import FahrerTable, FahrtagTable, TourTable
 from ..utils import FahrtageSchreiben
 
+import logging
+logger = logging.getLogger(__name__)
 
 class FahrtageListView(MyListView):
 	permission_required = 'Einsatztage.view_fahrtag'
@@ -55,7 +57,7 @@ class FahrtageChangeView(MyUpdateView):
 	model = Fahrtag
 	
 	def get_context_data(self, **kwargs):
-		context = super().get_context_data(**kwargs)
+		context = {}
 		context['sidebar_liste'] = get_sidebar(self.request.user)
 		context['title'] = "Fahrereinsatz ändern"
 		context['submit_button'] = "Sichern"
@@ -63,15 +65,34 @@ class FahrtageChangeView(MyUpdateView):
 		context['url_args'] = url_args(self.request)
 		return context
 
+	def get(self, request, *args, **kwargs):
+		context = self.get_context_data(**kwargs)
+		instance=get_object_or_404(self.model, pk=kwargs['pk'])
+		form = self.form_class(instance=instance)
+		logger.info("Form Datum {}, Instance Datum {}".format(form.initial['datum'], instance.datum))
+		context['form'] = form
+		return render(request, self.template_name, context)
+
+	def form_invalid(self, form):
+		context = self.get_context_data()	
+		context['form'] = form
+		messages.error(self.request, form.errors)			
+		return render(self.request, self.template_name, context)
+
 	def form_valid(self, form):
 		instance = form.save(commit=False)
-		fahrer = Fahrer.objects.filter(benutzer=self.request.user, aktiv=True, team=instance.team).first()
-		if not fahrer and instance.fahrer_vormittag != None:
-			messages.error(self.request, self.model._meta.verbose_name.title()+' am '+str(instance.datum)+' '+str(instance.team)+' kann nicht von '+str(instance.fahrer_vormittag)+' gebucht werden.')
-			return HttpResponseRedirect(self.success_url+url_args(self.request))	
-		if not fahrer and instance.fahrer_nachmittag != None:
-			messages.error(self.request, self.model._meta.verbose_name.title()+' am '+str(instance.datum)+' '+str(instance.team)+' kann nicht von '+str(instance.fahrer_nachmittag)+' gebucht werden.')
-			return HttpResponseRedirect(self.success_url+url_args(self.request))	
+		logger.info("Initial Datum {}, Returned Datum {}, Changed Fields {}".format(form.initial['datum'], instance.datum, form.changed_data))
+		# nur aktive Fahrer können gebucht werden
+		if instance.fahrer_vormittag:
+			fahrer_vormittag = Fahrer.objects.filter(benutzer=instance.fahrer_vormittag.benutzer, aktiv=True, team=instance.team).first()
+			if not fahrer_vormittag and instance.fahrer_vormittag != None:
+				messages.error(self.request, self.model._meta.verbose_name.title()+' am '+str(instance.datum)+' '+str(instance.team)+' kann nicht von '+str(instance.fahrer_vormittag)+' gebucht werden. Ist nicht als aktiver Fahrer eingetragen')
+				return HttpResponseRedirect(self.success_url+url_args(self.request))
+		if instance.fahrer_nachmittag:
+			fahrer_nachmittag = Fahrer.objects.filter(benutzer=instance.fahrer_nachmittag.benutzer, aktiv=True, team=instance.team).first()
+			if not fahrer_nachmittag and instance.fahrer_nachmittag != None:
+				messages.error(self.request, self.model._meta.verbose_name.title()+' am '+str(instance.datum)+' '+str(instance.team)+' kann nicht von '+str(instance.fahrer_nachmittag)+' gebucht werden. Ist nicht als aktiver Fahrer eingetragen')
+				return HttpResponseRedirect(self.success_url+url_args(self.request))	
 		instance.updated_by = self.request.user
 		instance.save(force_update=True)
 		self.success_url += url_args(self.request)
@@ -84,7 +105,7 @@ class FahrtageBookvView(MyView):
 	model = Fahrtag	
 
 	def get(self, request, pk):
-		instance = get_object_or_404(Fahrtag, pk=pk)
+		instance = get_object_or_404(self.model, pk=pk)
 		fahrer = Fahrer.objects.filter(benutzer=request.user, aktiv=True, team=instance.team).first()
 		if not fahrer:
 			messages.error(request, self.model._meta.verbose_name.title()+' am '+str(instance.datum)+' '+str(instance.team)+' kann nicht von Ihnen gebucht werden.')
