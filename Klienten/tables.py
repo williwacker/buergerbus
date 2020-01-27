@@ -86,6 +86,10 @@ class DienstleisterTable(tables.Table):
     telefon = tables.TemplateColumn(
         template_code='''{{ record.telefon |default_if_none:"-" }}<br/>{{ record.mobil |default_if_none:"" }}'''
     )
+    bemerkung = tables.TemplateColumn(
+        template_code='''{{ record.bemerkung|default_if_none:"-" }}''',
+        attrs={"td": {"class": "remark"}}
+    )     
     anzahl_dienstleister_touren = tables.TemplateColumn(
         template_code='''{{ record.anzahl_dienstleister_touren }}''',
         orderable=False,

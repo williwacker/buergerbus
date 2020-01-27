@@ -30,7 +30,7 @@ def get_index_bar(user):
 	
 	value = []
 	if user.has_perm('Klienten.view_klienten'):
-		value.append({'name':'Fahrgast für Tour auswählen <img src="/static/project/img/fahrplan.png">','value':'/Klienten/fahrgaeste/'})
+		value.append({'name':'Fahrgast auswählen <img src="/static/project/img/fahrplan.png" style="height: 24px; vertical-align: bottom; padding-left: 10px;">','value':'/Klienten/fahrgaeste/'})
 	if user.has_perm('Tour.view_tour'):
 		value.append({'name':'Touren ansehen', 'value':'/Tour/tour/'})
 	if value:
@@ -58,7 +58,15 @@ def get_index_bar(user):
 	if value:
 		index_bar.append({'name':'Fahrpläne anzeigen', 'value':value})						
 
-	return index_bar
+	value = []
+	if user.has_perm('Einsatztage.change_fahrtag'):
+		value.append({'name':'Fahrdienst eintragen <img src="/static/project/img/kalender-plus-32-trans.png" style="height: 24px; vertical-align: bottom; padding-left: 10px;">','value':'/Einsatztage/fahrer/'})
+	if user.has_perm('Einsatztage.change_buerotag'):
+		value.append({'name':'Bürodienst eintragen <img src="/static/project/img/kalender-plus-32-trans.png" style="height: 24px; vertical-align: bottom; padding-left: 10px;">','value':'/Einsatztage/buero/'})
+	if value:
+		index_bar.append({'name':'Dienst buchen', 'value':value})						
+
+	return index_bar	
 
 def get_sidebar(user):
 	sidebar = []
@@ -122,14 +130,20 @@ def get_sidebar(user):
 		value.append({'name':'Einen Kaffee bitte','value':'/Basis/coffee/'})
 	if user.has_perm('Basis.view_document'):
 		value.append({'name':'Dokumente','value':'/Basis/documents/'})
-	if list(User.objects.filter(is_superuser=True).values_list('email', flat=True)):
-		value.append({'name':'Feedback','value':'/Basis/feedback/'})
 	if user.has_perm('Faq.view_question') and user.has_perm('Faq.view_topic'):
 		value.append({'name':'FAQ','value':'/Faq/questions/'})
-	if user.has_perm('Faq.view_question'):
-		value.append({'name':'Web Service neu starten','value':'/Basis/restart_apache/'})			
+	if list(User.objects.filter(is_superuser=True).values_list('email', flat=True)):
+		value.append({'name':'Feedback','value':'/Basis/feedback/'})		
 	if value:
-		sidebar.append({'name':'Hilfe', 'value':value})		
+		sidebar.append({'name':'Hilfe', 'value':value})
+
+	value = []
+	if user.is_superuser:
+		value.append({'name':'Log Viewer','value':'/admin/logtailer/'})
+		value.append({'name':'Web Service neu starten','value':'/Basis/restart_apache/'})
+	if value:
+		sidebar.append({'name':'Admin', 'value':value})
+
 	return sidebar
 
 def url_args(request):

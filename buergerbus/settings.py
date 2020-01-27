@@ -55,6 +55,7 @@ INSTALLED_APPS = [
 	'django_tables2',
 	'django_cron',
 	'qr_code',
+	'logtailer',
 ]
 
 # Use nose to run all tests
@@ -310,3 +311,5 @@ DEFAULT_FROM_EMAIL  = config('DEFAULT_FROM_EMAIL', default='Bürgerbus Team <nor
 
 PORTAL              = config('PORTAL', default='Bürgerbus Portal')
 WELCOME 			= config('PORTAL', default='Willkommen auf dem Bürgerbus Portal')
+
+LOGTAILER_HISTORY_LINES = 100

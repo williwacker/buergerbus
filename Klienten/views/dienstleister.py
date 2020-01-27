@@ -96,7 +96,7 @@ class DienstleisterChangeView(MyUpdateView):
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
 		context['sidebar_liste'] = get_sidebar(self.request.user)
-		context['title'] = "Fahrgast ändern"
+		context['title'] = "Dienstleister ändern"
 		if self.request.user.has_perm('Klienten.delete_klienten'): context['delete_button'] = "Löschen"
 		context['submit_button'] = "Sichern"
 		context['back_button'] = ["Abbrechen",self.success_url+url_args(self.request)]

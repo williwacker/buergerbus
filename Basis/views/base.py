@@ -159,6 +159,7 @@ class FeedbackView(MyDetailView):
 				post['text'],
 				' '.join([request.user.first_name, request.user.last_name])+' <'+settings.EMAIL_HOST_USER+'>',
 				post['an'].split(";"),
+				reply_to=[User.objects.get(username=request.user).email],
 			)
 			email.send(fail_silently=False)	
 			messages.success(request, post['betreff']+' wurde erfolgreich versandt.')

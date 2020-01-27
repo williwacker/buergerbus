@@ -1,7 +1,7 @@
 from django import forms
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.auth.models import Group
+from django.contrib.auth.models import User, Group
 from django.core.exceptions import PermissionDenied
 from django.core.mail import EmailMessage
 from django.http import (FileResponse, Http404, HttpResponse,
@@ -176,7 +176,7 @@ class FahrplanEmailView(MyDetailView):
 				post['text'],
 				post['von'],
 				post['an'].split(";"),
-				reply_to=post['von'].split(";"),
+				reply_to=[User.objects.get(username=request.user).email],
 			)
 			if post['cc']: email.cc = post['cc'].split(";")
 			for filepath in post['datei'].split('\n'):

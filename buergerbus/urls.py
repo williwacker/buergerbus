@@ -42,6 +42,7 @@ urlpatterns = [
     url(r'^chaining/', include('smart_selects.urls')),
     url(r'^jet/', include('jet.urls', 'jet')),
     url(r'^jet/dashboard/', include('jet.dashboard.urls', 'jet-dashboard')), #??Django JET dashboard URLS
+    url(r'^logs/', include('logtailer.urls')),
 ]
 
 handler400 = 'Basis.views.my_custom_bad_request_view'
