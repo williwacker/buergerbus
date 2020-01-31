@@ -11,7 +11,7 @@ class FahrtagChgForm(ModelForm):
 	class Meta:
 		model = Fahrtag
 		fields = ['datum', 'team', 'fahrer_vormittag', 'fahrer_nachmittag', 'urlaub']
-#		widgets = {'datum' : forms.TextInput(attrs={'readonly':'readonly'})}
+		widgets = {'datum' : forms.TextInput(attrs={'readonly':'readonly'})}
 
 	def __init__(self, *args, **kwargs):
 		super(FahrtagChgForm, self).__init__(*args, **kwargs)
@@ -23,7 +23,7 @@ class BuerotagChgForm(ModelForm):
 	class Meta:
 		model = Buerotag
 		fields = ['datum', 'team', 'koordinator', 'urlaub']
-#		widgets = {'datum' : forms.TextInput(attrs={'readonly':'readonly'})}
+		widgets = {'datum' : forms.TextInput(attrs={'readonly':'readonly'})}
 
 	def __init__(self, *args, **kwargs):
 		super(BuerotagChgForm, self).__init__(*args, **kwargs)

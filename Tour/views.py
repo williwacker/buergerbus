@@ -138,7 +138,7 @@ class TourAddView2(MyCreateView, GoogleMixin):
 		try:
 			googleDict = self.get_google(form)
 		except:
-			logger.error("{}: Error in get_google".format(__name__))
+			logger.error("Error in get_google")
 			googleDict = None
 		if googleDict:
 			instance.entfernung = googleDict['distance']
@@ -146,6 +146,7 @@ class TourAddView2(MyCreateView, GoogleMixin):
 		instance.save()
 		self.success_url += '?datum='+str(instance.datum_id)
 		self.success_message = self.model._meta.verbose_name.title()+' "<a href="'+self.success_url+str(instance.id)+'">'+instance.klient.name+' am '+str(instance.datum)+' um '+str(instance.uhrzeit) +'</a>" wurde erfolgreich hinzugefügt.'
+		logger.info("Koordinator={} Fahrgast={} Start={} {} Abholklient={} Zielklient={}".format(self.request.user, instance.klient.name, str(instance.datum), str(instance.uhrzeit), instance.abholklient, instance.zielklient))
 		if instance.konflikt != '':
 			messages.error(self.request, instance.konflikt)
 		return super(TourAddView2, self).form_valid(form)
@@ -200,6 +201,7 @@ class TourChangeView(MyUpdateView, GoogleMixin):
 #		else:
 		self.success_url += '?datum='+str(instance.datum_id)
 		self.success_message = self.model._meta.verbose_name.title()+' "<a href="'+self.success_url+str(instance.id)+'">'+instance.klient.name+' am '+str(instance.datum)+' um '+str(instance.uhrzeit) +'</a>" wurde erfolgreich geändert.'
+		logger.info("Koordinator={} Fahrgast={} Start={} {} Abholklient={} Zielklient={}".format(self.request.user, instance.klient.name, str(instance.datum), str(instance.uhrzeit), instance.abholklient, instance.zielklient))
 		if instance.konflikt != '':
 			messages.error(self.request, instance.konflikt)
 		return super(TourChangeView, self).form_valid(form)	
@@ -252,6 +254,7 @@ class TourCopyView(MyUpdateView, GoogleMixin):
 		instance.save()
 		self.success_url += '?datum='+str(instance.datum_id)
 		self.success_message = self.model._meta.verbose_name.title()+' "<a href="'+self.success_url+str(instance.id)+'">'+instance.klient.name+' am '+str(instance.datum)+' um '+str(instance.uhrzeit) +'</a>" wurde erfolgreich hinzugefügt.'
+		logger.info("Koordinator={} Fahrgast={} Start={} {} Abholklient={} Zielklient={}".format(self.request.user, instance.klient.name, str(instance.datum), str(instance.uhrzeit), instance.abholklient, instance.zielklient))
 		if instance.konflikt != '':
 			messages.error(self.request, instance.konflikt)
 		return super(TourCopyView, self).form_valid(form)			
