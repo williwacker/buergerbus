@@ -28,7 +28,16 @@ class MyModelForm(ModelForm):
 		self.cleaned_data['konflikt'] = ''
 		self.cleaned_data['konflikt_richtung'] = ''		
 
-		# Kann der Bus zum gewünschten Zeitpunkt am Anholort sein ?
+		logger.info('calculate time to destination')
+		googleDict = DistanceMatrix().get_form_data(self)
+		if googleDict:
+			self.cleaned_data['entfernung'] = googleDict['distance']
+			self.cleaned_data['ankunft']    = googleDict['arrivaltime']
+			self.instance.entfernung 		= googleDict['distance']
+			self.instance.ankunft 			= googleDict['arrivaltime']
+			self.changed_data.append('entfernung')
+			self.changed_data.append('ankunft')
+		# Kann der Bus zum gewünschten Zeitpunkt am Abholort sein ?
 		frueheste_abfahrt = DepartureTime().time(self)
 		if frueheste_abfahrt == time(0,0,0):
 			self.cleaned_data['zustieg'] = False
@@ -38,11 +47,15 @@ class MyModelForm(ModelForm):
 			if not self.cleaned_data['konflikt_ignorieren']:	
 				raise forms.ValidationError(self.cleaned_data['konflikt'])
 
-		# Kann der nächste Fahrgast zum geplanten Zeitpunkt abgeholt werden?
+		# Kann der nächste Fahrgast zum geplanten Zeitpunkt abgeholt werden? Oder der Fahrer pünktlich Feierabend machen?
 		spaeteste_abfahrt = Latest_DepartureTime().time(self)
 		if spaeteste_abfahrt != time(0,0,0) and spaeteste_abfahrt < self.cleaned_data['uhrzeit']:
 			self.cleaned_data['konflikt'] += "<br>" if len(self.cleaned_data['konflikt']) > 0 else ''
-			self.cleaned_data['konflikt'] += "Abfahrtszeit des nächsten Fahrgastes kann nicht eingehalten werden. Empfohlene Abfahrt um {}".format(str(spaeteste_abfahrt))
+			tourende = Latest_DepartureTime().get_timeslot_end(self.cleaned_data['bus'], self.cleaned_data['uhrzeit'])
+			if tourende < self.cleaned_data['ankunft']:
+				self.cleaned_data['konflikt'] += "Tour Ende um {} kann nicht eingehalten werden. Empfohlene Abfahrt um {}".format(str(tourende),str(spaeteste_abfahrt))
+			else:
+				self.cleaned_data['konflikt'] += "Abfahrtszeit des nächsten Fahrgastes kann nicht eingehalten werden. Empfohlene Abfahrt um {}".format(str(spaeteste_abfahrt))
 			self.cleaned_data['konflikt_richtung'] += force_text('↓', encoding='utf-8', strings_only=False, errors='strict')
 			if not self.cleaned_data['konflikt_ignorieren']:
 				raise forms.ValidationError(self.cleaned_data['konflikt'])

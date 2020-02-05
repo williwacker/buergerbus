@@ -16,7 +16,7 @@ class BusTable(tables.Table):
 
     class Meta:
         model = Bus
-        fields = ('bus', 'plantage', 'plan_ende', 'sitzplaetze', 'fahrtage', 'email')
+        fields = ('bus', 'plantage', 'plan_ende', 'sitzplaetze', 'fahrtage', 'email', 'planzeiten', 'standort')
 
 class BueroTable(tables.Table):
     buero = tables.TemplateColumn(
@@ -31,4 +31,4 @@ class BueroTable(tables.Table):
     
     class Meta:
         model = Buero
-        fields = ('buero','buerotage')      
+        fields = ('buero','buerotage', 'email')      

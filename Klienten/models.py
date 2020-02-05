@@ -20,7 +20,8 @@ DSGVO_AUSWAHL = [
 
 TYP_AUSWAHL = [
 	('F', 'Fahrgast'),
-	('D', 'Dienstleister')
+	('D', 'Dienstleister'),
+	('S', 'Standort')
 ]
 
 DIENSTLEISTER_AUSWAHL = [
@@ -82,7 +83,7 @@ class Klienten(models.Model):
 	)
 	hausnr  = models.CharField(max_length=10)
 	dsgvo   = models.CharField(choices=DSGVO_AUSWAHL, max_length=2, blank=True, default='01', verbose_name='DSGVO Status')
-	typ     = models.CharField(choices=TYP_AUSWAHL, max_length=1, default='F') # F=Fahrgast, D=Dienstleister
+	typ     = models.CharField(choices=TYP_AUSWAHL, max_length=1, default='F') # F=Fahrgast, D=Dienstleister, S=Bus Standort
 	bemerkung = models.TextField(max_length=200, blank=True, null=True)
 	kategorie = models.CharField(choices=DIENSTLEISTER_AUSWAHL,max_length=100, blank=True, null=True)
 	latitude = models.DecimalField(max_digits=7, decimal_places=4, default=0)
@@ -105,7 +106,7 @@ class Klienten(models.Model):
 
 	def save(self, *args, **kwargs):
 		if self.ort.bus != None and self.typ == 'F': self.bus=self.ort.bus
-		if self.typ == 'D': self.dsgvo = '99'
+		if self.typ in ['D','S']: self.dsgvo = '99'
 		if self.latitude == 0: GeoLocation().getLocation(self)
 		if not settings.ALLOW_OUTSIDE_CLIENTS \
 		   	and not self.ort.bus \

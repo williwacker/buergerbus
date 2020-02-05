@@ -7,7 +7,7 @@ import time
 from os import environ, getcwd
 
 from django.conf import settings
-from django.contrib.auth.models import Permission
+from django.contrib.auth.models import Permission, Group
 from django.core.mail import EmailMessage, get_connection
 from django.http import HttpResponse
 from django.template.loader import get_template
@@ -114,32 +114,48 @@ class BuerotageSchreiben():
 					t.save()
 
 # write fahrplan to csv file for backup purposes
-
 class FahrplanBackup():
 	
 	def __init__(self):
 		self.send_backup()
 
+	def _permission_name(self, bus):
+		# gibt den beschreibenden Namen der entsprechenden Berechtigung zurück
+		return "{} verwalten".format(bus)		
+
+	def get_office_emails(self, bus):
+		email_list = []
+		team_list = Buero.objects.all()
+		for team in team_list:
+			group_id = Group.objects.filter(name=team.buero).first()
+			if group_id: 
+				permission = Permission.objects.filter(group__id=group_id.id, name=self._permission_name(bus))
+				if permission: email_list.append(team.email)
+		return email_list
+
 	def send_backup(self):
 		mail_backend = get_connection()
-		bus_list = list(Bus.objects.values_list('id','bus','email'))
-		for [bus_id, bus, email] in bus_list:
-			filelist = []
+		bus_list = list(Bus.objects.values_list('id','bus'))
+		email_list = []
+		for [bus_id, bus] in bus_list:
+			file_list = []
 			id_list = list(Tour.objects.filter(archiv=False, bus_id=bus_id).values_list('datum', flat=True).distinct())
 			for id in id_list:
-				filelist += self.export_as_csv(id)
-			if not email or not filelist:
+				file_list += self.export_as_csv(id)
+			if file_list:
+				email_list = self.get_office_emails(bus)
+			if not email_list or not file_list:
 				continue
 			mail_text = 'Liebe Koordinatoren,\nAnbei die bisherigen Fahrpläne. Diese sind nur zu verwenden im Fall daß der Web-Server des Bürgerbus Portals ausfällt.' 
 			message = EmailMessage(
 						from_email=settings.EMAIL_HOST_USER,
-						to=[email,],
+						to=email_list,
 						connection=mail_backend,
-						subject="Fahrplan Backup {} vom {}".format(bus, datetime.date.today()), 
+						subject="[Bürgerbus] Fahrplan Backup {} vom {}".format(bus, datetime.date.today()), 
 						body=mail_text,
 					)
 			attachments = []  # start with an empty list
-			for filename in filelist:
+			for filename in file_list:
 				# create the attachment triple for this filename
 				content = open(filename, 'rb').read()
 				import os

@@ -105,7 +105,26 @@ class DienstleisterTable(tables.Table):
             self.columns.show('anzahl_dienstleister_touren')
         else:
             self.columns.hide('anzahl_dienstleister_touren')
-        
+
+class StandorteTable(tables.Table):
+    name = tables.TemplateColumn(
+        template_code='''
+            {% if perms.Klienten.change_klienten %}
+                <a href="{{ record.id }}/{{ url_args }}">{{ record.name |safe }}</a>
+            {% else %}
+                {{ record.name |safe }}
+            {% endif %}            
+        '''
+    )
+    adresse = tables.TemplateColumn(
+        template_code='''{{ record.ort }}<br/>{{ record.strasse }} {{ record.hausnr }}''',
+        orderable=False
+    )
+
+    class Meta:
+        model = Klienten
+        fields = ('name','telefon','adresse')
+
 class OrteTable(tables.Table):
     ort = tables.TemplateColumn(
         template_code='''

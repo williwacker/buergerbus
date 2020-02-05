@@ -24,20 +24,6 @@ from .utils import DistanceMatrix, GuestCount, TourArchive
 
 logger = logging.getLogger(__name__)
 
-class GoogleMixin():
-	def get_google(self, form):
-		googleDict = {}
-		if settings.USE_GOOGLE:
-			if 'entfernung' not in form.cleaned_data \
-			or form.cleaned_data['entfernung'] == '' \
-			or set(['abholklient','zielklient','datum','uhrzeit']).intersection(set(form.changed_data)):
-				googleDict = DistanceMatrix().getMatrix(
-					form.cleaned_data['abholklient'], 
-					form.cleaned_data['zielklient'], 
-					form.cleaned_data['datum'].datum, 
-					form.cleaned_data['uhrzeit'])
-		return googleDict
-
 class TourView(MyListView):
 	permission_required = 'Tour.view_tour'
 	
@@ -92,7 +78,7 @@ class TourAddView(MyCreateView):
 			messages.error(request, form.errors)
 		return render(request, self.template_name, context)
 
-class TourAddView2(MyCreateView, GoogleMixin):
+class TourAddView2(MyCreateView):
 	form_class = TourAddForm2
 	permission_required = 'Tour.add_tour'
 	success_url = '/Tour/tour/'
@@ -135,14 +121,6 @@ class TourAddView2(MyCreateView, GoogleMixin):
 	def form_valid(self, form):
 		instance = form.save(commit=False)
 		instance.created_by = self.request.user
-		try:
-			googleDict = self.get_google(form)
-		except:
-			logger.error("Error in get_google")
-			googleDict = None
-		if googleDict:
-			instance.entfernung = googleDict['distance']
-			instance.ankunft    = googleDict['arrivaltime']
 		instance.save()
 		self.success_url += '?datum='+str(instance.datum_id)
 		self.success_message = self.model._meta.verbose_name.title()+' "<a href="'+self.success_url+str(instance.id)+'">'+instance.klient.name+' am '+str(instance.datum)+' um '+str(instance.uhrzeit) +'</a>" wurde erfolgreich hinzugefügt.'
@@ -151,7 +129,7 @@ class TourAddView2(MyCreateView, GoogleMixin):
 			messages.error(self.request, instance.konflikt)
 		return super(TourAddView2, self).form_valid(form)
 
-class TourChangeView(MyUpdateView, GoogleMixin):
+class TourChangeView(MyUpdateView):
 	form_class = TourChgForm
 	permission_required = 'Tour.change_tour'
 	success_url = '/Tour/tour/'
@@ -191,14 +169,7 @@ class TourChangeView(MyUpdateView, GoogleMixin):
 	def form_valid(self, form):
 		instance = form.save(commit=False)
 		instance.updated_by = self.request.user
-		googleDict = self.get_google(form)
-		if googleDict:
-			instance.entfernung = googleDict['distance']
-			instance.ankunft    = googleDict['arrivaltime']
 		instance.save(force_update=True)
-#		if url_args(self.request):
-#			self.success_url += url_args(self.request)+'&datum='+str(instance.datum_id)
-#		else:
 		self.success_url += '?datum='+str(instance.datum_id)
 		self.success_message = self.model._meta.verbose_name.title()+' "<a href="'+self.success_url+str(instance.id)+'">'+instance.klient.name+' am '+str(instance.datum)+' um '+str(instance.uhrzeit) +'</a>" wurde erfolgreich geändert.'
 		logger.info("Koordinator={} Fahrgast={} Start={} {} Abholklient={} Zielklient={}".format(self.request.user, instance.klient.name, str(instance.datum), str(instance.uhrzeit), instance.abholklient, instance.zielklient))
@@ -206,7 +177,7 @@ class TourChangeView(MyUpdateView, GoogleMixin):
 			messages.error(self.request, instance.konflikt)
 		return super(TourChangeView, self).form_valid(form)	
 
-class TourCopyView(MyUpdateView, GoogleMixin):
+class TourCopyView(MyUpdateView):
 	form_class = TourChgForm
 	permission_required = 'Tour.change_tour'
 	success_url = '/Tour/tour/'
@@ -247,10 +218,6 @@ class TourCopyView(MyUpdateView, GoogleMixin):
 		instance = form.save(commit=False)
 		instance.updated_by = self.request.user
 		instance.pk = None
-		googleDict = self.get_google(form)
-		if googleDict:
-			instance.entfernung = googleDict['distance']
-			instance.ankunft    = googleDict['arrivaltime']
 		instance.save()
 		self.success_url += '?datum='+str(instance.datum_id)
 		self.success_message = self.model._meta.verbose_name.title()+' "<a href="'+self.success_url+str(instance.id)+'">'+instance.klient.name+' am '+str(instance.datum)+' um '+str(instance.uhrzeit) +'</a>" wurde erfolgreich hinzugefügt.'

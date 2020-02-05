@@ -114,6 +114,8 @@ def get_sidebar(user):
 		value.append({'name':'Busse','value':'/Einsatzmittel/busse/'})
 	if user.has_perm('Einsatzmittel.view_buero'):
 		value.append({'name':'Büros','value':'/Einsatzmittel/bueros/'})
+	if user.has_perm('Einsatzmittel.change_bus'):
+		value.append({'name':'Bus Standorte','value':'/Klienten/standorte/'})		
 	if value:
 		sidebar.append({'name':'Einsatzmittel', 'value':value})
 

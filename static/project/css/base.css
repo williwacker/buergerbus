@@ -149,6 +149,8 @@ h1 {
 	background-color: #59677e;
 	color: #fff;
 	border-radius: 4px;
+	margin-left: 1px;
+	margin-bottom: 1px;
 }
 .submit-row a.addlink {
 	display: inline-block;
@@ -286,7 +288,8 @@ fieldset.module, #changelist {
 }
 #toolbar a {
 	border-radius: 4px;
-	margin-right: 1px;
+	margin-left: 1px;
+	margin-bottom: 1px;
 }
 body.change-list .object-tools .addlink {
 	margin: 10px 10px;

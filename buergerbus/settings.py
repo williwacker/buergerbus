@@ -284,6 +284,8 @@ ALLOW_OUTSIDE_CLIENTS = config('ALLOW_OUTSIDE_CLIENTS', default=False, cast=bool
 # Anzahl planbarer Fahrtage (Fahrer) /Bürotage (Koordinatoren)
 COUNT_DRIVING_DAYS 	= config('COUNT_DRIVING_DAYS', default=30, cast=int)
 COUNT_OFFICE_DAYS  	= config('COUNT_OFFICE_DAYS', default=30, cast=int)
+# Tour Anfangs- und Endzeiten berücksichtigen
+USE_TOUR_HOURS		= config('USE_TOUR_HOURS', default=False, cast=bool)
 
 # Anzahl planbarer Tage für Touren
 COUNT_TOUR_DAYS 	= config('COUNT_TOUR_DAYS', default=13, cast=int)

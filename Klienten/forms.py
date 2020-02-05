@@ -70,6 +70,20 @@ class FahrgastAddForm(KlientenForm):
 		fields = ['name','telefon','mobil','ort','strasse','hausnr','bemerkung','dsgvo','typ']
 		widgets = {'dsgvo': forms.HiddenInput(), 'typ': forms.HiddenInput(), 'bemerkung': forms.Textarea(attrs={'rows':'5'}), 'name': forms.TextInput(attrs={'autofocus': True})}
 
+class StandortChgForm(DienstleisterForm):
+	class Meta:
+		model = Klienten
+		fields = ['name','mobil','ort','strasse','hausnr']
+
+	def __init__(self, *args, **kwargs):
+		super(StandortChgForm, self).__init__(*args, **kwargs)
+
+class StandortAddForm(DienstleisterForm):
+	class Meta:
+		model = Klienten
+		fields = ['name','mobil','ort','strasse','hausnr','typ']
+		widgets = {'typ': forms.HiddenInput(), 'name': forms.TextInput(attrs={'autofocus': True})}
+
 class FahrgastChgForm(KlientenForm):
 	class Meta:
 		model = Klienten
@@ -77,7 +91,7 @@ class FahrgastChgForm(KlientenForm):
 		widgets = {'bemerkung': forms.Textarea(attrs={'rows':'5'})}
 
 	def __init__(self, *args, **kwargs):
-		super(FahrgastChgForm, self).__init__(*args, **kwargs)
+		super(FahrgastChgForm, self).__init__(*args, **kwargs)		
 
 class DienstleisterAddForm(DienstleisterForm):
 	class Meta:

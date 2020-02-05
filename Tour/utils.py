@@ -22,6 +22,19 @@ class DistanceMatrix():
 		self.key = settings.GOOGLEMAPS_KEY
 		self.client = googlemaps.Client(self.key)
 
+	def get_form_data(self, form):
+		googleDict = {}
+		if settings.USE_GOOGLE:
+			if 'entfernung' not in form.cleaned_data \
+			or form.cleaned_data['entfernung'] == '' \
+			or set(['abholklient','zielklient','datum','uhrzeit']).intersection(set(form.changed_data)):
+				googleDict = self.getMatrix(
+					form.cleaned_data['abholklient'], 
+					form.cleaned_data['zielklient'], 
+					form.cleaned_data['datum'].datum, 
+					form.cleaned_data['uhrzeit'])
+		return googleDict		
+
 	def getMatrix(self, o, d, startdatum, startzeit):
 
 		origins      = [o.strasse.strasse+" "+o.hausnr+", "+o.ort.ort]
@@ -50,14 +63,25 @@ class DistanceMatrix():
 # calculate earliest departure time from last arrival time
 class DepartureTime():
 
+	# get the nearest tour timeslot start time
+	def get_timeslot_start(self, bus, abholzeit):
+		if settings.USE_TOUR_HOURS:
+			planzeiten = bus.planzeiten_list
+			for planzeit in planzeiten:
+				if abholzeit < planzeit[1]:
+					return planzeit[0]
+		return time(0,0)
+
 	def time(self, form):
 		uhrzeit = form.cleaned_data['uhrzeit']
 		datum   = form.cleaned_data['datum']
 		bus     = form.cleaned_data['bus']
 		bus_id  = Bus.objects.get(bus=bus)
 		abholklient = form.cleaned_data['abholklient']
-		instance = Tour.objects.order_by('uhrzeit').filter(bus=bus_id, datum=datum, uhrzeit__lt=uhrzeit).last()
+		instance = Tour.objects.order_by('uhrzeit').filter(
+			bus=bus_id, datum=datum, uhrzeit__lt=uhrzeit, uhrzeit__gte=self.get_timeslot_start(bus,uhrzeit)).last()
 		if instance and instance.ankunft and ('id' not in form.cleaned_data or instance.id != form.cleaned_data['id']):
+			logger.info('check driving time from last clients arrival time to this clients start time')
 			if form.cleaned_data['zustieg']:
 				googleDict = DistanceMatrix().getMatrix(
 					instance.abholklient, 
@@ -71,43 +95,88 @@ class DepartureTime():
 					instance.datum.datum, 
 					instance.ankunft)
 			return googleDict['arrivaltime']
+		# calculate earliest start time in the matching tour timeslot
+		elif settings.USE_TOUR_HOURS:
+			logger.info('check start of tour is within the tour timeslot')
+			googleDict = DistanceMatrix().getMatrix(
+				bus.standort, 
+				abholklient, 
+				datum.datum, 
+				self.get_timeslot_start(bus, uhrzeit))
+			return googleDict['arrivaltime']
 		return time(0,0,0)
 
 # calculate latest departure time based on planned departure time of next customer
 class Latest_DepartureTime():
 
+	# get the nearest tour timeslot end time
+	def get_timeslot_end(self, bus, abholzeit):
+		if settings.USE_TOUR_HOURS:
+			planzeiten = bus.planzeiten_list
+			for planzeit in planzeiten:
+				if abholzeit < planzeit[1]:
+					return planzeit[1]
+		return time(23,59)	
+
 	def time(self, form):
-		bus_id   = Bus.objects.get(bus=form.cleaned_data['bus'])
-		instance = Tour.objects.order_by('uhrzeit').filter(bus=bus_id, datum=form.cleaned_data['datum'], uhrzeit__gt=form.cleaned_data['uhrzeit']).first()
+		uhrzeit = form.cleaned_data['uhrzeit']
+		ankunft = form.cleaned_data['ankunft']
+		datum   = form.cleaned_data['datum']
+		bus     = form.cleaned_data['bus']
+		bus_id  = Bus.objects.get(bus=form.cleaned_data['bus'])
+		# calculate latest departure time in order to match the end of the tour timeslot
+		if settings.USE_TOUR_HOURS:
+			latest_arrivaltime = self.get_timeslot_end(bus, uhrzeit)
+			timediff = (datetime.combine(datum.datum, latest_arrivaltime) - datetime.combine(datum.datum, uhrzeit)).total_seconds()
+			if timediff < 3600:		# 1h
+				logger.info('check end of tour is within the tour timeslot')
+				googleDict = DistanceMatrix().getMatrix(
+					form.cleaned_data['zielklient'], 
+					bus.standort, 
+					datum.datum, 
+					ankunft)
+				if googleDict['arrivaltime'] > latest_arrivaltime:
+					overtime = (datetime.combine(datum.datum, googleDict['arrivaltime']) - datetime.combine(datum.datum, latest_arrivaltime)).total_seconds()
+					latest_departuretime = (datetime.combine(datum.datum, uhrzeit) - timedelta(seconds=overtime)).time()
+					return 	latest_departuretime
+		# calculate latest departure time for the next client
+		instance = Tour.objects.order_by('uhrzeit').filter(
+			bus=bus_id, datum=datum, uhrzeit__gt=uhrzeit).first()
 		if instance and ('id' not in form.cleaned_data or instance.id != form.cleaned_data['id']):
+			logger.info('check driving time from this clients arrival to start time of next client')
 			latest_departuretime = datetime.combine(instance.datum.datum, instance.uhrzeit)
 			if instance.zustieg:
 				# calculate time to next departure place
+				logger.info('calculate time to next departure place joining in')
 				googleDict = DistanceMatrix().getMatrix(
 						form.cleaned_data['abholklient'],
 						instance.abholklient,
-						form.cleaned_data['datum'].datum, 
-						form.cleaned_data['uhrzeit'])
-				latest_departuretime = (latest_departuretime - timedelta(seconds=googleDict['duration_value'])).time()	
+						datum.datum, 
+						uhrzeit)
+				latest_departuretime = (latest_departuretime - timedelta(seconds=googleDict['duration_value']))
 			else:
 				# calculate time to destination
 				if set(['abholklient','zielklient','datum','uhrzeit']).intersection(set(form.changed_data)):
+					logger.info('calculate time to destination')
 					googleDict = DistanceMatrix().getMatrix(
 							form.cleaned_data['abholklient'],
 							form.cleaned_data['zielklient'],
-							form.cleaned_data['datum'].datum, 
-							form.cleaned_data['uhrzeit'])
-					latest_departuretime = (latest_departuretime - timedelta(seconds=googleDict['duration_value']))
+							datum.datum, 
+							uhrzeit)
+					latest_departuretime = (latest_departuretime - timedelta(seconds=googleDict['duration_value']))	
 				else:
-					latest_departuretime = datetime.combine(instance.datum.datum, form.cleaned_data['ankunft'])
-				# calculate time back to next client departure place
-				googleDict = DistanceMatrix().getMatrix(
-						form.cleaned_data['zielklient'],
-						instance.abholklient,
-						instance.datum.datum, 
-						instance.uhrzeit)
-				latest_departuretime = (latest_departuretime - timedelta(seconds=googleDict['duration_value'])).time()
-			return 	latest_departuretime
+					latest_departuretime = datetime.combine(datum.datum, ankunft)
+				# calculate time to next client departure place
+				timediff = (datetime.combine(datum.datum, instance.uhrzeit) - datetime.combine(datum.datum, ankunft)).total_seconds()
+				if timediff < 3600:		# 1h
+					logger.info('calculate time to next client departure place')
+					googleDict = DistanceMatrix().getMatrix(
+							form.cleaned_data['zielklient'],
+							instance.abholklient,
+							instance.datum.datum, 
+							instance.uhrzeit)
+					latest_departuretime = (latest_departuretime - timedelta(seconds=googleDict['duration_value']))
+			return 	latest_departuretime.time()
 		return time(0,0,0)
 
 class GuestCount():

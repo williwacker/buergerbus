@@ -52,7 +52,7 @@ class Telefonbuch():
 					data_dict['ph'] = phone
 				if data_dict['st'] == '0':
 					self.dasoertliche_gewerbe(line, data_dict)
-				if data_dict['pc'] and data_dict['ci'] and data_dict['st'] and data_dict['hn']:
+				if data_dict['pc'] and re.match("[\d]5",data_dict['pc']) and data_dict['ci'] and data_dict['st'] and data_dict['hn']:
 					result.append(data_dict)
 		except:
 			pass
