@@ -37,8 +37,8 @@ class DistanceMatrix():
 
 	def getMatrix(self, o, d, startdatum, startzeit):
 
-		origins      = [o.strasse.strasse+" "+o.hausnr+", "+o.ort.ort]
-		destinations = [d.strasse.strasse+" "+d.hausnr+", "+d.ort.ort]
+		origins      = ["{} {}, {} {}".format(o.strasse.strasse,o.hausnr,o.ort.plz,o.ort.ort)]
+		destinations = ["{} {}, {} {}".format(d.strasse.strasse,d.hausnr,d.ort.plz,d.ort.ort)]
 		startuhrzeit = datetime.combine(startdatum, startzeit)
 		logger.info("{}: origin={} destination={} start={}".format(__name__, origins, destinations, str(startuhrzeit)))
 
