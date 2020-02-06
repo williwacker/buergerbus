@@ -20,8 +20,8 @@ class Topic(models.Model):
 		help_text=_('Reihenfolge der Themen.'))
 
 	class Meta:
-		verbose_name = _("FAQ Thema")
-		verbose_name_plural = _("FAQ Themen")
+		verbose_name = _("Fragen und Antworten Thema")
+		verbose_name_plural = _("Fragen und Antworten Themen")
 		ordering = ['sort_order', 'name']
 
 	def __str__(self):
@@ -94,8 +94,8 @@ class Question(models.Model):
 	objects = QuestionQuerySet.as_manager()
 
 	class Meta:
-		verbose_name = _("Häufig gestellte Frage")
-		verbose_name_plural = _("Häufig gestellte Fragen")
+		verbose_name = _("Fragen und Antworten ")
+		verbose_name_plural = _("Fragen und Antworten ")
 		ordering = ['sort_order', 'created_on']
 
 	def __str__(self):

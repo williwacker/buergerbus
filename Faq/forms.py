@@ -13,7 +13,7 @@ class SubmitFAQForm(forms.ModelForm):
 	class Meta:
 		model = Question
 		fields = ['topic', 'text', 'answer']
-		widgets = {'text': forms.TextInput(attrs={'autofocus': True})}
+		widgets = {'text': forms.Textarea(attrs={'autofocus': True})}
 
 class QuestionChangeForm(forms.ModelForm):
 	class Meta:

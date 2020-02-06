@@ -29,7 +29,7 @@ class QuestionTopicView(MyListView):
 	def get_context_data(self, **kwargs):
 		context = super(QuestionTopicView, self).get_context_data(**kwargs)
 		context['sidebar_liste'] = get_sidebar(self.request.user)
-		context['title'] = self.model._meta.verbose_name_raw+' - Themen'
+		context['title'] = self.model._meta.verbose_name_raw
 		context['url_args'] = url_args(self.request)
 		return context
 

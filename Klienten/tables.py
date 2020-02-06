@@ -120,6 +120,9 @@ class StandorteTable(tables.Table):
         template_code='''{{ record.ort }}<br/>{{ record.strasse }} {{ record.hausnr }}''',
         orderable=False
     )
+    telefon = tables.TemplateColumn(
+        template_code='''{{ record.mobil |default_if_none:"" }}'''
+    )
 
     class Meta:
         model = Klienten

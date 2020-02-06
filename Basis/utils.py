@@ -132,10 +132,10 @@ def get_sidebar(user):
 		value.append({'name':'Einen Kaffee bitte','value':'/Basis/coffee/'})
 	if user.has_perm('Basis.view_document'):
 		value.append({'name':'Dokumente','value':'/Basis/documents/'})
-	if user.has_perm('Faq.view_question') and user.has_perm('Faq.view_topic'):
-		value.append({'name':'FAQ','value':'/Faq/questions/'})
 	if list(User.objects.filter(is_superuser=True).values_list('email', flat=True)):
-		value.append({'name':'Feedback','value':'/Basis/feedback/'})		
+		value.append({'name':'Lob und Tadel','value':'/Basis/feedback/'})		
+	if user.has_perm('Faq.view_question') and user.has_perm('Faq.view_topic'):
+		value.append({'name':'Fragen und Antworten','value':'/Faq/questions/'})
 	if value:
 		sidebar.append({'name':'Hilfe', 'value':value})
 
