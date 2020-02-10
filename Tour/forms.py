@@ -78,17 +78,17 @@ class TourAddForm1(forms.Form):
 class TourAddForm2(MyModelForm):
 	fahrgast = forms.CharField(required=False, widget=forms.TextInput(attrs={'readonly':'readonly'}), label='Fahrgast')
 	bus_2    = forms.CharField(required=False, widget=forms.TextInput(attrs={'readonly':'readonly'}), label='Bus')
-	abholfavorit = forms.ModelChoiceField(queryset=Klienten.objects.order_by('name'), required=False, label="Wo",
-		help_text="Bei wem soll der Fahrgast abgeholt werden? Wählen Sie links aus den vergangenen Touren aus oder rechts der gesamten Liste.")
-	zielfavorit = forms.ModelChoiceField(queryset=Klienten.objects.order_by('name'), required=False, label="Wohin",
-		help_text="Zu wem soll der Fahrgast gebracht werden? Wählen Sie links aus den vergangenen Touren aus oder rechts der gesamten Liste.")
+#	abholfavorit = forms.ModelChoiceField(queryset=Klienten.objects.order_by('name'), required=False, label="Wo",
+#		help_text="Bei wem soll der Fahrgast abgeholt werden? Wählen Sie links aus den vergangenen Touren aus oder rechts der gesamten Liste.")
+#	zielfavorit = forms.ModelChoiceField(queryset=Klienten.objects.order_by('name'), required=False, label="Wohin",
+#		help_text="Zu wem soll der Fahrgast gebracht werden? Wählen Sie links aus den vergangenen Touren aus oder rechts der gesamten Liste.")
 	konflikt_ignorieren = forms.BooleanField(required=False,
 		help_text="Tour erst mal speichern und zu einem späteren Zeitpunkt ändern.")
 
 	class Meta:
 		model = Tour
 		fields = ['fahrgast','bus_2','klient','bus','datum','uhrzeit','zustieg','personenzahl',
-					'abholfavorit','abholklient','zielfavorit','zielklient','bemerkung','konflikt_ignorieren']
+					'abholklient','zielklient','bemerkung','konflikt_ignorieren']
 		widgets = {'klient': forms.HiddenInput(), 'bus': forms.HiddenInput(),
 				   'uhrzeit': forms.TimeInput(attrs={'class':'vTimeField'}), 'bemerkung': forms.Textarea(attrs={'rows':'5'}),
 				  }
@@ -104,17 +104,17 @@ class TourAddForm2(MyModelForm):
 class TourChgForm(MyModelForm):
 	fahrgast = forms.CharField(required=False, widget=forms.TextInput(attrs={'readonly':'readonly'}), label='Fahrgast')
 	bus_2    = forms.CharField(required=False, widget=forms.TextInput(attrs={'readonly':'readonly'}), label='Bus')
-	abholfavorit = forms.ModelChoiceField(queryset=Klienten.objects.order_by('name'), required=False, label="Wo",
-		help_text="Bei wem soll der Fahrgast abgeholt werden? Wählen Sie links aus den vergangenen Touren aus oder rechts der gesamten Liste.")
-	zielfavorit  = forms.ModelChoiceField(queryset=Klienten.objects.order_by('name'), required=False, label="Wohin",
-		help_text="Zu wem soll der Fahrgast gebracht werden? Wählen Sie links aus den vergangenen Touren aus oder rechts der gesamten Liste.")
+#	abholfavorit = forms.ModelChoiceField(queryset=Klienten.objects.order_by('name'), required=False, label="Wo",
+#		help_text="Bei wem soll der Fahrgast abgeholt werden? Wählen Sie links aus den vergangenen Touren aus oder rechts der gesamten Liste.")
+#	zielfavorit  = forms.ModelChoiceField(queryset=Klienten.objects.order_by('name'), required=False, label="Wohin",
+#		help_text="Zu wem soll der Fahrgast gebracht werden? Wählen Sie links aus den vergangenen Touren aus oder rechts der gesamten Liste.")
 	konflikt_ignorieren = forms.BooleanField(required=False,
 		help_text="Tour erst mal speichern und zu einem späteren Zeitpunkt ändern.")
 	id		 = forms.IntegerField(required=False, widget=forms.HiddenInput())
 	
 	class Meta:
 		model = Tour
-		fields = ['id','fahrgast','bus_2','klient','bus','datum','uhrzeit','zustieg','personenzahl','abholfavorit','abholklient','zielfavorit','zielklient','entfernung','ankunft','bemerkung','konflikt_ignorieren']
+		fields = ['id','fahrgast','bus_2','klient','bus','datum','uhrzeit','zustieg','personenzahl','abholklient','zielklient','entfernung','ankunft','bemerkung','konflikt_ignorieren']
 		widgets = {'klient': forms.HiddenInput(), 'bus': forms.HiddenInput(), 'entfernung': forms.HiddenInput(), 'ankunft': forms.HiddenInput(),
 				   'uhrzeit': forms.TimeInput(attrs={'class':'vTimeField'}), 'bemerkung': forms.Textarea(attrs={'rows':'5'}),
 				  }

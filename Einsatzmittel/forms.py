@@ -27,6 +27,10 @@ class BusAddForm(BusForm):
 		model = Bus
 		fields = ['bus', 'plantage', 'sitzplaetze', 'fahrtage', 'email', 'planzeiten', 'standort']
 		widgets = {'bus': forms.TextInput(attrs={'autofocus': True})}
+		
+	def __init__(self, *args, **kwargs):
+		super(BusAddForm, self).__init__(*args, **kwargs)
+		self.fields['standort'].queryset = Klienten.objects.filter(typ='S')
 
 class BusChgForm(BusForm):
 	class Meta:

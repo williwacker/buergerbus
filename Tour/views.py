@@ -105,11 +105,11 @@ class TourAddView2(MyCreateView):
 		self.initial['datum'] = Fahrtag.objects.filter(id=fahrtag, team_id=klient.bus_id).first() if fahrtag else None
 		form = self.form_class(initial=self.initial)
 		form.fields['datum'].queryset = Fahrtag.objects.order_by('datum').filter(archiv=False, urlaub=False, team_id=klient.bus_id, datum__gt=datetime.now(), datum__lte=datetime.now()+timedelta(klient.bus.plantage))
-		qs = Tour.objects.filter(klient__id=klient.id).values_list('abholklient',flat=True).distinct()
-		form.fields['abholfavorit'].queryset = Klienten.objects.filter(id__in=qs).order_by('name')	| Klienten.objects.filter(id=klient.id)
+#		qs = Tour.objects.filter(klient__id=klient.id).values_list('abholklient',flat=True).distinct()
+#		form.fields['abholfavorit'].queryset = Klienten.objects.filter(id__in=qs).order_by('name')	| Klienten.objects.filter(id=klient.id)
 		form.fields['abholklient'].queryset  = Klienten.objects.filter(typ='D').order_by('name')   	| Klienten.objects.filter(id=klient.id)
-		qs = Tour.objects.filter(klient__id=klient.id).values_list('zielklient',flat=True).distinct()
-		form.fields['zielfavorit'].queryset  = Klienten.objects.filter(id__in=qs).order_by('name') 	| Klienten.objects.filter(id=klient.id)
+#		qs = Tour.objects.filter(klient__id=klient.id).values_list('zielklient',flat=True).distinct()
+#		form.fields['zielfavorit'].queryset  = Klienten.objects.filter(id__in=qs).order_by('name') 	| Klienten.objects.filter(id=klient.id)
 		form.fields['zielklient'].queryset   = Klienten.objects.filter(typ='D').order_by('name')   	| Klienten.objects.filter(id=klient.id)
 		if 'instance' in locals() and instance.konflikt:
 			messages.error(request, instance.konflikt)
@@ -152,11 +152,11 @@ class TourChangeView(MyUpdateView):
 		form.fields["fahrgast"].initial = instance.klient.name
 		form.fields["id"].initial = instance.id
 		form.fields['datum'].queryset = Fahrtag.objects.order_by('datum').filter(archiv=False, urlaub=False, team=instance.fahrgast.bus, datum__gt=datetime.now(), datum__lte=datetime.now()+timedelta(instance.bus.plantage))
-		qs = Tour.objects.filter(klient__id=instance.klient.id).values_list('abholklient',flat=True).distinct()
-		form.fields['abholfavorit'].queryset = Klienten.objects.filter(id__in=qs).order_by('name') 	| Klienten.objects.filter(id=instance.klient.id)
+#		qs = Tour.objects.filter(klient__id=instance.klient.id).values_list('abholklient',flat=True).distinct()
+#		form.fields['abholfavorit'].queryset = Klienten.objects.filter(id__in=qs).order_by('name') 	| Klienten.objects.filter(id=instance.klient.id)
 		form.fields['abholklient'].queryset  = Klienten.objects.filter(typ='D').order_by('name') 	| Klienten.objects.filter(id=instance.klient.id)
-		qs = Tour.objects.filter(klient__id=instance.klient.id).values_list('zielklient',flat=True).distinct()
-		form.fields['zielfavorit'].queryset  = Klienten.objects.filter(id__in=qs).order_by('name') 	| Klienten.objects.filter(id=instance.klient.id)
+#		qs = Tour.objects.filter(klient__id=instance.klient.id).values_list('zielklient',flat=True).distinct()
+#		form.fields['zielfavorit'].queryset  = Klienten.objects.filter(id__in=qs).order_by('name') 	| Klienten.objects.filter(id=instance.klient.id)
 		form.fields['zielklient'].queryset   = Klienten.objects.filter(typ='D').order_by('name') 	| Klienten.objects.filter(id=instance.klient.id)
 		form.fields['bus_2'].initial = instance.bus
 		if instance.konflikt:
@@ -200,11 +200,11 @@ class TourCopyView(MyUpdateView):
 		form.fields["fahrgast"].initial = instance.klient.name
 		form.fields["id"].initial = instance.id
 		form.fields['datum'].queryset = Fahrtag.objects.order_by('datum').filter(archiv=False, urlaub=False, team=instance.fahrgast.bus, datum__gt=datetime.now(), datum__lte=datetime.now()+timedelta(instance.bus.plantage))
-		qs = Tour.objects.filter(klient__id=instance.klient.id).values_list('abholklient',flat=True).distinct()
-		form.fields['abholfavorit'].queryset = Klienten.objects.filter(id__in=qs).order_by('name') 	| Klienten.objects.filter(id=instance.klient.id)
+#		qs = Tour.objects.filter(klient__id=instance.klient.id).values_list('abholklient',flat=True).distinct()
+#		form.fields['abholfavorit'].queryset = Klienten.objects.filter(id__in=qs).order_by('name') 	| Klienten.objects.filter(id=instance.klient.id)
 		form.fields['abholklient'].queryset  = Klienten.objects.filter(typ='D').order_by('name') 	| Klienten.objects.filter(id=instance.klient.id)
-		qs = Tour.objects.filter(klient__id=instance.klient.id).values_list('zielklient',flat=True).distinct()
-		form.fields['zielfavorit'].queryset  = Klienten.objects.filter(id__in=qs).order_by('name') 	| Klienten.objects.filter(id=instance.klient.id)
+#		qs = Tour.objects.filter(klient__id=instance.klient.id).values_list('zielklient',flat=True).distinct()
+#		form.fields['zielfavorit'].queryset  = Klienten.objects.filter(id__in=qs).order_by('name') 	| Klienten.objects.filter(id=instance.klient.id)
 		form.fields['zielklient'].queryset   = Klienten.objects.filter(typ='D').order_by('name') 	| Klienten.objects.filter(id=instance.klient.id)
 		form.fields['bus_2'].initial = instance.bus
 		if instance.konflikt:
@@ -224,7 +224,7 @@ class TourCopyView(MyUpdateView):
 		logger.info("Koordinator={} Fahrgast={} Start={} {} Abholklient={} Zielklient={}".format(self.request.user, instance.klient.name, str(instance.datum), str(instance.uhrzeit), instance.abholklient, instance.zielklient))
 		if instance.konflikt != '':
 			messages.error(self.request, instance.konflikt)
-		return super(TourCopyView, self).form_valid(form)			
+		return super(TourCopyView, self).form_valid(form)
 
 class TourDeleteView(MyDeleteView):
 	permission_required = 'Tour.delete_tour'

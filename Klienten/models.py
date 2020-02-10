@@ -44,7 +44,7 @@ class Orte(models.Model):
 		verbose_name_plural = "Orte"
 		verbose_name = "Ort"
 		ordering = ["ort"]
-		constraints = [models.UniqueConstraint(fields=['ort'], name='unique_ort')]
+		constraints = [models.UniqueConstraint(fields=['ort','plz'], name='unique_ort')]
 
 	def __str__(self):
 		return self.ort	
