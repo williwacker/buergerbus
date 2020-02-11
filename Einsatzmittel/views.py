@@ -120,25 +120,12 @@ class BueroAddView(MyCreateView):
 	model = Buero
 
 	def get_context_data(self, **kwargs):
-		context = {}
+		context = super().get_context_data(**kwargs)
 		context['sidebar_liste'] = get_sidebar(self.request.user)
 		context['title'] = "Büro hinzufügen"
 		context['submit_button'] = "Sichern"
 		context['back_button'] = ["Abbrechen",self.success_url+url_args(self.request)]
 		return context
-
-	def get(self, request, *args, **kwargs):
-		context = self.get_context_data(**kwargs)
-		instance=get_object_or_404(self.model, pk=kwargs['pk'])
-		form = self.form_class(instance=instance)
-		context['form'] = form
-		return render(request, self.template_name, context)
-
-	def form_invalid(self, form):
-		context = self.get_context_data()	
-		context['form'] = form
-		messages.error(self.request, form.errors)			
-		return render(self.request, self.template_name, context)
 
 	def form_valid(self, form):
 		instance = form.save(commit=False)
@@ -156,7 +143,7 @@ class BueroChangeView(MyUpdateView):
 	success_url = '/Einsatzmittel/bueros/'
 	
 	def get_context_data(self, **kwargs):
-		context = super().get_context_data(**kwargs)
+		context = {}
 		context['sidebar_liste'] = get_sidebar(self.request.user)
 		context['title'] = "Büro ändern"
 		if self.request.user.has_perm('Einsatzmittel.delete_buero'): context['delete_button'] = "Löschen"
@@ -164,6 +151,19 @@ class BueroChangeView(MyUpdateView):
 		context['back_button'] = ["Abbrechen",self.success_url+url_args(self.request)]
 		context['url_args'] = url_args(self.request)
 		return context
+
+	def get(self, request, *args, **kwargs):
+		context = self.get_context_data(**kwargs)
+		instance=get_object_or_404(self.model, pk=kwargs['pk'])
+		form = self.form_class(instance=instance)
+		context['form'] = form
+		return render(request, self.template_name, context)
+
+	def form_invalid(self, form):
+		context = self.get_context_data()	
+		context['form'] = form
+		messages.error(self.request, form.errors)			
+		return render(self.request, self.template_name, context)
 
 	def form_valid(self, form):
 		instance = form.save(commit=False)
