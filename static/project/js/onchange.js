@@ -6,21 +6,22 @@ window.onload = function() {
         }
     }
 
+    
     // make ...favorit and ...klient one line
-    var float_list = [['id_abholfavorit',"form-row-left"],['id_abholklient',"form-row-right"],['id_zielfavorit',"form-row-left"],['id_zielklient',"form-row-right"],['id_bemerkung',"form-row-clear"]];
-    set_float(float_list);
+    //var float_list = [['id_abholfavorit',"form-row-left"],['id_abholklient',"form-row-right"],['id_zielfavorit',"form-row-left"],['id_zielklient',"form-row-right"],['id_bemerkung',"form-row-clear"]];
+    //set_float(float_list);
 
     // set on_change to abholfavorit
-    if (document.getElementById('id_abholfavorit') != null) {
-        var match = document.getElementById('id_abholfavorit');
-        match.setAttribute("onchange", "set_abholklient();");
-    }
+    //if (document.getElementById('id_abholfavorit') != null) {
+    //    var match = document.getElementById('id_abholfavorit');
+    //    match.setAttribute("onchange", "set_abholklient();");
+    //}
 
     // set on_change to zielfavorit
-    if (document.getElementById('id_zielfavorit') != null) {
-        var match = document.getElementById('id_zielfavorit');
-        match.setAttribute("onchange", "set_zielklient();")
-    }
+    //if (document.getElementById('id_zielfavorit') != null) {
+    //    var match = document.getElementById('id_zielfavorit');
+    //    match.setAttribute("onchange", "set_zielklient();")
+    //}
 
     // add link for ort/add to ort select box
     if (document.getElementById('id_ort') != null  && document.getElementById('id_ort').tagName == 'SELECT') {
@@ -51,6 +52,7 @@ window.onload = function() {
     }
 }
 
+/*
 function set_float(float_list) {
     for (var i=0; i<float_list.length; i++) {
         if (document.getElementById(float_list[i][0]) != null) {
@@ -73,7 +75,7 @@ function set_zielklient() {
     document.getElementById('id_zielklient').value = sel1;
     location.reload(false);
 }
-
+*/
 function getUrlVars() {
     var vars = {};
     var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) {
