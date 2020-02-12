@@ -166,7 +166,7 @@ class TourTable(tables.Table):
 		template_code='''{{ record.klient |safe }}'''
 	)
 	bemerkungen = tables.TemplateColumn(
-		template_code='''{{ record.alle_bemerkungen | linebreaks }}''',
+		template_code='''{{ record.alle_bemerkungen | linebreaks | default_if_none:"-"}}''',
         attrs={"td": {"class": "remark"}}
 	)
 	telefon = tables.TemplateColumn(
