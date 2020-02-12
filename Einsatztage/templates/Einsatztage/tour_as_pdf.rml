@@ -190,7 +190,7 @@
                         </td>
                         <td><para style="p1">{{ tour.entfernung|default_if_none:"-" }}</para></td>
                         <td><para style="p1">{{ tour.ankunft|default_if_none:"-" }}</para></td>
-                        <td><para style="p1">{{ tour.klient.bemerkung|default_if_none:"" }}<br/>{{ tour.bemerkung|default_if_none:"" }}</para></td>  
+                        <td><para style="p1">{{ tour.alle_bemerkungen|linebreaksrml }}</para></td>  
                     </tr>
                 {% endfor %}
                 </blockTable>

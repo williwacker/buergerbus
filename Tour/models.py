@@ -69,6 +69,15 @@ class Tour(models.Model):
 		if self.zielklient.longitude == 0: return False
 		return True						
 
+	@property
+	def alle_bemerkungen(self):
+		list = []
+		if self.klient.bemerkung: 			list.append(self.klient.bemerkung)
+		if self.bemerkung: 					list.append(self.bemerkung)
+		if self.klient != self.abholklient: list.append(self.abholklient.bemerkung)
+		if self.klient != self.zielklient: 	list.append(self.zielklient.bemerkung)
+		return '\n'.join(list)
+
 	def einsatz_bus(self):
 		rows = Fahrtag.objects.filter(datum=self.datum.datum).values_list('team',flat=True)
 		einsatz_bus = [row for row in rows]
