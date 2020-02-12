@@ -76,7 +76,8 @@ class Tour(models.Model):
 		if self.bemerkung: 					list.append(self.bemerkung)
 		if self.klient != self.abholklient: list.append(self.abholklient.bemerkung)
 		if self.klient != self.zielklient: 	list.append(self.zielklient.bemerkung)
-		if not list: list = ['']
+#		if not list: 
+		list.append('')
 		return '\n'.join(list)
 
 	def einsatz_bus(self):
