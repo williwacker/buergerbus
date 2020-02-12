@@ -136,7 +136,10 @@
                                         {{ tour.abholklient.name }}<br/>
                                     {% endif %}
                                     {{ tour.abholklient.ort }}<br/>{{ tour.abholklient.strasse }} {{ tour.abholklient.hausnr }}
-                                </para></td>
+                                    {% if tour.klient != tour.abholklient %}
+                                        <br/>{{ tour.abholklient.telefon }}
+                                    {% endif %}
+                                 </para></td>
                                 <td>
                                     {% load qr_code %}
                                     <image x="0" y="0" width="40" height="40" file="{% qr_for_google_maps latitude=tour.abholklient.latitude longitude=tour.abholklient.longitude image_format="png" %}"></image>
@@ -149,6 +152,9 @@
                                         {{ tour.abholklient.name }}<br/>
                                     {% endif %}
                                     {{ tour.abholklient.ort }}<br/>{{ tour.abholklient.strasse }} {{ tour.abholklient.hausnr }}
+                                    {% if tour.klient != tour.abholklient %}
+                                        <br/>{{ tour.abholklient.telefon }}
+                                    {% endif %}
                                 </para>
                             {% endif %}
                         </td>
@@ -161,6 +167,9 @@
                                         {{ tour.zielklient.name }}<br/>
                                     {% endif %}
                                     {{ tour.zielklient.ort }}<br/>{{ tour.zielklient.strasse }} {{ tour.zielklient.hausnr }}
+                                    {% if tour.klient != tour.zielklient %}
+                                        <br/>{{ tour.zielklient.telefon }}
+                                    {% endif %}
                                 </para></td>
                                 <td>
                                     <image x="0" y="0" width="40" height="40" file="{% qr_for_google_maps latitude=tour.zielklient.latitude longitude=tour.zielklient.longitude image_format="png" %}"></image>
@@ -173,6 +182,9 @@
                                         {{ tour.zielklient.name }}<br/>
                                     {% endif %}
                                     {{ tour.zielklient.ort }}<br/>{{ tour.zielklient.strasse }} {{ tour.zielklient.hausnr }}
+                                    {% if tour.klient != tour.zielklient %}
+                                        <br/>{{ tour.zielklient.telefon }}
+                                    {% endif %}
                                 </para>
                             {% endif %}
                         </td>

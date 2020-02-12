@@ -173,6 +173,12 @@ class TourTable(tables.Table):
 		template_code='''{{ record.klient.telefon |default_if_none:"-" }}<br/>{{ record.klient.mobil |default_if_none:"" }}
 		'''
 	)
+	abholort = tables.TemplateColumn(
+		template_code='''{{ record.abholort | linebreaks }}'''
+	)
+	zielort = tables.TemplateColumn(
+		template_code='''{{ record.zielort | linebreaks }}'''
+	)		
 	
 	class Meta:
 		model = Tour

@@ -34,16 +34,16 @@ class Tour(models.Model):
 	@property
 	def abholort(self):
 		if (self.klient == self.abholklient):
-			return ' '.join([self.abholklient.ort.ort+'\n', self.abholklient.strasse.strasse +" "+self.abholklient.hausnr])
+			return '\n'.join([self.abholklient.ort.ort, self.abholklient.strasse.strasse +" "+self.abholklient.hausnr])
 		else:
-			return ' '.join([self.abholklient.name+'\n', self.abholklient.ort.ort+'\n', self.abholklient.strasse.strasse +" "+self.abholklient.hausnr])
+			return '\n'.join([self.abholklient.name, self.abholklient.ort.ort, self.abholklient.strasse.strasse +" "+self.abholklient.hausnr, self.abholklient.telefon])
 
 	@property
 	def zielort(self):
 		if (self.klient == self.zielklient):
-			return ' '.join([self.zielklient.ort.ort+'\n', self.zielklient.strasse.strasse +" "+self.zielklient.hausnr])
+			return '\n'.join([self.zielklient.ort.ort, self.zielklient.strasse.strasse +" "+self.zielklient.hausnr])
 		else:
-			return ' '.join([self.zielklient.name+'\n', self.zielklient.ort.ort+'\n', self.zielklient.strasse.strasse +" "+self.zielklient.hausnr])
+			return '\n'.join([self.zielklient.name, self.zielklient.ort.ort, self.zielklient.strasse.strasse +" "+self.zielklient.hausnr, self.zielklient.telefon])
 
 	@property
 	def fahrgast(self):
