@@ -136,13 +136,8 @@ class TourChangeView(MyUpdateView):
 	model = Tour
 	
 	def get_context_data(self, **kwargs):
-		context = {}
-		context['sidebar_liste'] = get_sidebar(self.request.user)
+		context = super().get_context_data(**kwargs)
 		context['title'] = "Tour ändern"
-		if self.request.user.has_perm('Tour.delete_tour'): context['delete_button'] = "Löschen"
-		context['submit_button'] = "Sichern"
-		context['back_button'] = ["Abbrechen",self.success_url+url_args(self.request)]
-		context['url_args'] = url_args(self.request)
 		return context
 	
 	def get(self, request, *args, **kwargs):
@@ -152,11 +147,7 @@ class TourChangeView(MyUpdateView):
 		form.fields["fahrgast"].initial = instance.klient.name
 		form.fields["id"].initial = instance.id
 		form.fields['datum'].queryset = Fahrtag.objects.order_by('datum').filter(archiv=False, urlaub=False, team=instance.fahrgast.bus, datum__gt=datetime.now(), datum__lte=datetime.now()+timedelta(instance.bus.plantage))
-#		qs = Tour.objects.filter(klient__id=instance.klient.id).values_list('abholklient',flat=True).distinct()
-#		form.fields['abholfavorit'].queryset = Klienten.objects.filter(id__in=qs).order_by('name') 	| Klienten.objects.filter(id=instance.klient.id)
 		form.fields['abholklient'].queryset  = Klienten.objects.filter(typ='D').order_by('name') 	| Klienten.objects.filter(id=instance.klient.id)
-#		qs = Tour.objects.filter(klient__id=instance.klient.id).values_list('zielklient',flat=True).distinct()
-#		form.fields['zielfavorit'].queryset  = Klienten.objects.filter(id__in=qs).order_by('name') 	| Klienten.objects.filter(id=instance.klient.id)
 		form.fields['zielklient'].queryset   = Klienten.objects.filter(typ='D').order_by('name') 	| Klienten.objects.filter(id=instance.klient.id)
 		form.fields['bus_2'].initial = instance.bus
 		if instance.konflikt:
@@ -184,13 +175,8 @@ class TourCopyView(MyUpdateView):
 	model = Tour
 	
 	def get_context_data(self, **kwargs):
-		context = {}
-		context['sidebar_liste'] = get_sidebar(self.request.user)
+		context = super().get_context_data(**kwargs)
 		context['title'] = "Tour ändern"
-		if self.request.user.has_perm('Tour.delete_tour'): context['delete_button'] = "Löschen"
-		context['submit_button'] = "Sichern"
-		context['back_button'] = ["Abbrechen",self.success_url+url_args(self.request)]
-		context['url_args'] = url_args(self.request)
 		return context
 	
 	def get(self, request, *args, **kwargs):
@@ -200,11 +186,7 @@ class TourCopyView(MyUpdateView):
 		form.fields["fahrgast"].initial = instance.klient.name
 		form.fields["id"].initial = instance.id
 		form.fields['datum'].queryset = Fahrtag.objects.order_by('datum').filter(archiv=False, urlaub=False, team=instance.fahrgast.bus, datum__gt=datetime.now(), datum__lte=datetime.now()+timedelta(instance.bus.plantage))
-#		qs = Tour.objects.filter(klient__id=instance.klient.id).values_list('abholklient',flat=True).distinct()
-#		form.fields['abholfavorit'].queryset = Klienten.objects.filter(id__in=qs).order_by('name') 	| Klienten.objects.filter(id=instance.klient.id)
 		form.fields['abholklient'].queryset  = Klienten.objects.filter(typ='D').order_by('name') 	| Klienten.objects.filter(id=instance.klient.id)
-#		qs = Tour.objects.filter(klient__id=instance.klient.id).values_list('zielklient',flat=True).distinct()
-#		form.fields['zielfavorit'].queryset  = Klienten.objects.filter(id__in=qs).order_by('name') 	| Klienten.objects.filter(id=instance.klient.id)
 		form.fields['zielklient'].queryset   = Klienten.objects.filter(typ='D').order_by('name') 	| Klienten.objects.filter(id=instance.klient.id)
 		form.fields['bus_2'].initial = instance.bus
 		if instance.konflikt:

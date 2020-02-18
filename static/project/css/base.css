@@ -217,6 +217,10 @@ div.breadcrumbs {
 	border-bottom-left-radius: 4px;
 	border-bottom-right-radius: 4px;
 	margin: 0 20px;
+	padding-right: 2rem;
+}
+div.breadcrumbs .version {
+	float: right;
 }
 .datetimeshortcuts {
 	display: none;

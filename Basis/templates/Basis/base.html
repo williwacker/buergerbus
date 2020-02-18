@@ -82,7 +82,8 @@
             {% block breadcrumbs %}
             <div class="breadcrumbs">
                 <a href="{% url 'home' %}">{% trans 'Home' %}</a>
-                {% if title %} &rsaquo; {{ title }}{% endif %}
+                {% if title %} &rsaquo; {{ title }} {% endif %}
+                {% if git_revision %} <div class="version">{{ git_revision }}</div> {% endif %}
             </div>
             {% endblock breadcrumbs %}
             {% block messages %}
@@ -112,7 +113,7 @@
                 {% endblock %}
             </div>
             <!-- END Content -->
-            <footer> </footer>
+            <footer></footer>
             <!-- Sidebar -->
             {% block sidebar %}
 

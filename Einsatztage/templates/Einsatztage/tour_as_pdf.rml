@@ -57,6 +57,10 @@
                     fontName="Helvetica"
                     fontSize="8"
                 />
+                <paraStyle name="p2"
+                    fontName="Helvetica"
+                    fontSize="10"
+                />                
                 <paraStyle name="pl"
                     fontName="Helvetica"
                     fontSize="10"
@@ -118,20 +122,20 @@
                     </tr>
                 {% for tour in tour_liste %}
                     <tr>
-                        <td><para style="p1">{{ tour.klient }}</para></td>
-                        <td><para style="p1">{{ tour.klient.telefon|default_if_none:"-" }}<br/>{{ tour.klient.mobil|default_if_none:"" }}</para></td>
-                        <td><para style="p1">{{ tour.uhrzeit }}</para></td>
+                        <td><para style="p2">{{ tour.klient }}</para></td>
+                        <td><para style="p2">{{ tour.klient.telefon|default_if_none:"-" }}<br/>{{ tour.klient.mobil|default_if_none:"" }}</para></td>
+                        <td><para style="p2">{{ tour.uhrzeit }}</para></td>
                         {% if tour.zustieg %}
-                            <td><para style="p1">✔</para></td>
+                            <td><para style="p2">✔</para></td>
                         {% else %} 
-                            <td><para style="p1"></para></td>
+                            <td><para style="p2"></para></td>
                         {% endif %}
-                        <td><para style="p1">{{ tour.personenzahl }}</para></td>
+                        <td><para style="p2">{{ tour.personenzahl }}</para></td>
                         <td>
                             {% if tour.hat_abhol_qr %}
                             <blockTable style="myInnerTableStyle" colWidths="3.1cm,1.3cm">
                             <tr>
-                                <td><para style="p1">
+                                <td><para style="p2">
                                     {% if tour.klient != tour.abholklient %}
                                         {{ tour.abholklient.name }}<br/>
                                     {% endif %}
@@ -147,7 +151,7 @@
                             </tr>
                             </blockTable>
                             {% else %}
-                                <para style="p1">
+                                <para style="p2">
                                     {% if tour.klient != tour.abholklient %}
                                         {{ tour.abholklient.name }}<br/>
                                     {% endif %}
@@ -162,7 +166,7 @@
                             {% if tour.hat_ziel_qr %}
                             <blockTable style="myInnerTableStyle" colWidths="3.1cm,1.3cm">
                             <tr>
-                                <td><para style="p1">
+                                <td><para style="p2">
                                     {% if tour.klient != tour.zielklient %}
                                         {{ tour.zielklient.name }}<br/>
                                     {% endif %}
@@ -177,7 +181,7 @@
                             </tr>
                             </blockTable>
                             {% else %}
-                                <para style="p1">
+                                <para style="p2">
                                     {% if tour.klient != tour.zielklient %}
                                         {{ tour.zielklient.name }}<br/>
                                     {% endif %}
@@ -188,9 +192,9 @@
                                 </para>
                             {% endif %}
                         </td>
-                        <td><para style="p1">{{ tour.entfernung|default_if_none:"-" }}</para></td>
-                        <td><para style="p1">{{ tour.ankunft|default_if_none:"-" }}</para></td>
-                        <td><para style="p1">{{ tour.alle_bemerkungen|linebreaksrml }}</para></td>  
+                        <td><para style="p2">{{ tour.entfernung|default_if_none:"-" }}</para></td>
+                        <td><para style="p2">{{ tour.ankunft|default_if_none:"-" }}</para></td>
+                        <td><para style="p2">{{ tour.alle_bemerkungen|linebreaksrml }}</para></td>  
                     </tr>
                 {% endfor %}
                 </blockTable>

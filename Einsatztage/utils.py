@@ -146,7 +146,7 @@ class FahrplanBackup():
 				email_list = self.get_office_emails(bus)
 			if not email_list or not file_list:
 				continue
-			mail_text = 'Liebe Koordinatoren,\nAnbei die bisherigen Fahrpläne. Diese sind nur zu verwenden im Fall daß der Web-Server des Bürgerbus Portals ausfällt.' 
+			mail_text = 'Liebe Koordinatoren,\nAnbei die bisherigen Fahrpläne. Diese sind nur zu verwenden im Falle dass der Web-Server des Bürgerbus Portals ausfällt.' 
 			message = EmailMessage(
 						from_email=settings.EMAIL_HOST_USER,
 						to=email_list,

@@ -1,6 +1,6 @@
 from collections import OrderedDict
 from io import BytesIO
-import os
+import os, subprocess
 from pathlib import Path
 from fuzzywuzzy import fuzz, process
 
@@ -217,4 +217,7 @@ class TriggerRestartApache():
 			os.utime(fpathname, None)
 		else:
 			open(fpathname, 'a').close()
+
+def run_command(command):
+	return subprocess.getoutput(command)
 

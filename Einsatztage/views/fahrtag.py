@@ -57,12 +57,8 @@ class FahrtageChangeView(MyUpdateView):
 	model = Fahrtag
 	
 	def get_context_data(self, **kwargs):
-		context = {}
-		context['sidebar_liste'] = get_sidebar(self.request.user)
+		context = super().get_context_data(**kwargs)
 		context['title'] = "Fahrereinsatz ändern"
-		context['submit_button'] = "Sichern"
-		context['back_button'] = ["Abbrechen",self.success_url+url_args(self.request)]
-		context['url_args'] = url_args(self.request)
 		return context
 
 	def get(self, request, *args, **kwargs):
@@ -82,17 +78,28 @@ class FahrtageChangeView(MyUpdateView):
 	def form_valid(self, form):
 		instance = form.save(commit=False)
 		logger.info("Initial Datum {}, Returned Datum {}, Changed Fields {}".format(form.initial['datum'], instance.datum, form.changed_data))
-		# nur aktive Fahrer können gebucht werden
 		if instance.fahrer_vormittag:
+			# nur aktive Fahrer können gebucht werden
 			fahrer_vormittag = Fahrer.objects.filter(benutzer=instance.fahrer_vormittag.benutzer, aktiv=True, team=instance.team).first()
-			if not fahrer_vormittag and instance.fahrer_vormittag != None:
+			if not fahrer_vormittag:
 				messages.error(self.request, self.model._meta.verbose_name.title()+' am '+str(instance.datum)+' '+str(instance.team)+' kann nicht von '+str(instance.fahrer_vormittag)+' gebucht werden. Ist nicht als aktiver Fahrer eingetragen')
 				return HttpResponseRedirect(self.success_url+url_args(self.request))
+			# auf doppelte Buchung am gleichen Tag prüfen
+			fahrtag = Fahrtag.objects.filter(fahrer_vormittag__benutzer=instance.fahrer_vormittag.benutzer, datum=instance.datum).exclude(team=instance.team).first()
+			if fahrtag:
+				messages.error(self.request, str(fahrtag.fahrer_vormittag)+' ist am '+str(instance.datum)+' Vormittag bereits für '+str(fahrtag.team)+' gebucht.')
+				return HttpResponseRedirect(self.success_url+url_args(self.request))
 		if instance.fahrer_nachmittag:
+			# nur aktive Fahrer können gebucht werden
 			fahrer_nachmittag = Fahrer.objects.filter(benutzer=instance.fahrer_nachmittag.benutzer, aktiv=True, team=instance.team).first()
-			if not fahrer_nachmittag and instance.fahrer_nachmittag != None:
+			if not fahrer_nachmittag:
 				messages.error(self.request, self.model._meta.verbose_name.title()+' am '+str(instance.datum)+' '+str(instance.team)+' kann nicht von '+str(instance.fahrer_nachmittag)+' gebucht werden. Ist nicht als aktiver Fahrer eingetragen')
 				return HttpResponseRedirect(self.success_url+url_args(self.request))	
+			# auf doppelte Buchung am gleichen Tag prüfen
+			fahrtag = Fahrtag.objects.filter(fahrer_nachmittag__benutzer=instance.fahrer_nachmittag.benutzer, datum=instance.datum).exclude(team=instance.team).first()
+			if fahrtag:
+				messages.error(self.request, str(fahrtag.fahrer_nachmittag)+' ist am '+str(instance.datum)+' Nachmittag bereits für '+str(fahrtag.team)+' gebucht.')
+				return HttpResponseRedirect(self.success_url+url_args(self.request))
 		instance.updated_by = self.request.user
 		instance.save(force_update=True)
 		self.success_url += url_args(self.request)
@@ -107,10 +114,13 @@ class FahrtageBookvView(MyView):
 	def get(self, request, pk):
 		instance = get_object_or_404(self.model, pk=pk)
 		fahrer = Fahrer.objects.filter(benutzer=request.user, aktiv=True, team=instance.team).first()
-		if not fahrer:
+		fahrtag = Fahrtag.objects.filter(fahrer_vormittag__benutzer=fahrer.benutzer, datum=instance.datum).exclude(team=instance.team).first()
+		if not fahrer: # nicht als aktiver Fahrer eingetragen
 			messages.error(request, self.model._meta.verbose_name.title()+' am '+str(instance.datum)+' '+str(instance.team)+' kann nicht von Ihnen gebucht werden.')
-		elif instance.fahrer_vormittag != None:
+		elif instance.fahrer_vormittag != None: # Vormittag bereits gebucht
 			messages.error(request, self.model._meta.verbose_name.title()+' am '+str(instance.datum)+' '+str(instance.team)+' ist bereits gebucht.')
+		elif fahrtag:  # auf doppelte Buchung am gleichen Tag prüfen
+			messages.error(self.request, 'Sie sind am '+str(instance.datum)+' Vormittag bereits für '+str(fahrtag.team)+' gebucht.')
 		else:
 			instance.fahrer_vormittag = fahrer
 			instance.save()
@@ -125,10 +135,13 @@ class FahrtageBooknView(MyView):
 	def get(self, request, pk):
 		instance = get_object_or_404(Fahrtag, pk=pk)
 		fahrer = Fahrer.objects.filter(benutzer=request.user, aktiv=True, team=instance.team).first()
-		if not fahrer:
+		fahrtag = Fahrtag.objects.filter(fahrer_nachmittag__benutzer=fahrer.benutzer, datum=instance.datum).exclude(team=instance.team).first()
+		if not fahrer: # nicht als aktiver Fahrer eingetragen
 			messages.error(request, self.model._meta.verbose_name.title()+' am '+str(instance.datum)+' '+str(instance.team)+' kann nicht von Ihnen gebucht werden.')
-		elif instance.fahrer_nachmittag != None:
+		elif instance.fahrer_nachmittag != None: # Nachmittag bereits gebucht
 			messages.error(request, self.model._meta.verbose_name.title()+' am '+str(instance.datum)+' '+str(instance.team)+' ist bereits gebucht.')
+		elif fahrtag:  # auf doppelte Buchung am gleichen Tag prüfen
+			messages.error(self.request, 'Sie sind am '+str(instance.datum)+' Nachmittag bereits für '+str(fahrtag.team)+' gebucht.')
 		else:
 			instance.fahrer_nachmittag = fahrer
 			instance.save()

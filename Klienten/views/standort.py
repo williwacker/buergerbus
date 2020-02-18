@@ -82,13 +82,8 @@ class StandortChangeView(MyUpdateView):
 	model = Klienten
 
 	def get_context_data(self, **kwargs):
-		context = {}
-		context['sidebar_liste'] = get_sidebar(self.request.user)
+		context = super().get_context_data(**kwargs)
 		context['title'] = "Bus Standort ändern"
-		if self.request.user.has_perm('Klienten.delete_klienten'): context['delete_button'] = "Löschen"
-		context['submit_button'] = "Sichern"
-		context['back_button'] = ["Abbrechen",self.success_url+url_args(self.request)]
-		context['url_args'] = url_args(self.request)
 		return context
 	
 	def get(self, request, *args, **kwargs):

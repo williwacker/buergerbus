@@ -60,13 +60,8 @@ class BusChangeView(MyUpdateView):
 	success_url = '/Einsatzmittel/busse/'
 	
 	def get_context_data(self, **kwargs):
-		context = {}
-		context['sidebar_liste'] = get_sidebar(self.request.user)
+		context = super().get_context_data(**kwargs)
 		context['title'] = "Bus ändern"
-		if self.request.user.has_perm('Einsatzmittel.delete_bus'): context['delete_button'] = "Löschen" 
-		context['submit_button'] = "Sichern"
-		context['back_button'] = ["Abbrechen",self.success_url+url_args(self.request)]
-		context['url_args'] = url_args(self.request)
 		return context
 
 	def get(self, request, *args, **kwargs):
@@ -143,13 +138,8 @@ class BueroChangeView(MyUpdateView):
 	success_url = '/Einsatzmittel/bueros/'
 	
 	def get_context_data(self, **kwargs):
-		context = {}
-		context['sidebar_liste'] = get_sidebar(self.request.user)
+		context = super().get_context_data(**kwargs)
 		context['title'] = "Büro ändern"
-		if self.request.user.has_perm('Einsatzmittel.delete_buero'): context['delete_button'] = "Löschen"
-		context['submit_button'] = "Sichern"
-		context['back_button'] = ["Abbrechen",self.success_url+url_args(self.request)]
-		context['url_args'] = url_args(self.request)
 		return context
 
 	def get(self, request, *args, **kwargs):

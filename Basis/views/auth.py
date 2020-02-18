@@ -87,13 +87,7 @@ class UserChangeView(MyUpdateView):
 
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
-		context['sidebar_liste'] = get_sidebar(self.request.user)
 		context['title'] = "Benutzer ändern"
-		if self.request.user.has_perm('auth.delete_user'):
-			context['delete_button'] = "Löschen"
-		context['submit_button'] = "Sichern"
-		context['back_button'] = ["Abbrechen",self.success_url+url_args(self.request)]
-		context['url_args'] = url_args(self.request)
 		return context
 
 	def get_form(self, form_class=None):
@@ -166,13 +160,7 @@ class GroupChangeView(MyUpdateView):
 
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
-		context['sidebar_liste'] = get_sidebar(self.request.user)
 		context['title'] = "Benutzer ändern"
-		if self.request.user.has_perm('auth.delete_group'):
-			context['delete_button'] = "Löschen"
-		context['submit_button'] = "Sichern"
-		context['back_button'] = ["Abbrechen",self.success_url+url_args(self.request)]
-		context['url_args'] = url_args(self.request)
 		return context
 	
 	def form_valid(self, form):
