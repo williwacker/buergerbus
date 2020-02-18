@@ -118,7 +118,7 @@ class BasisView(LoginRequiredMixin, ListView):
 
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
-		context['git_revision'] = 'V{}-{}'.format(run_command('git describe --abbrev=0'),run_command('git rev-list --count HEAD'))
+#		context['git_revision'] = 'V{}-{}'.format(run_command('git describe --abbrev=0'),run_command('git rev-list --count HEAD'))
 		context['sidebar_liste'] = get_sidebar(self.request.user)
 		context['indexbar_liste'] = get_index_bar(self.request.user)
 		return context
