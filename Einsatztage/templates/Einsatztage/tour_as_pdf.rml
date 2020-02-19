@@ -194,7 +194,16 @@
                         </td>
                         <td><para style="p2">{{ tour.entfernung|default_if_none:"-" }}</para></td>
                         <td><para style="p2">{{ tour.ankunft|default_if_none:"-" }}</para></td>
-                        <td><para style="p2">{{ tour.alle_bemerkungen|linebreaksrml }}</para></td>  
+                        <td><para style="p2">
+                        	{% if tour.klient.bemerkung %}{{ tour.klient.bemerkung|default_if_none:"" }}<br/>{% endif %}
+                            {% if tour.bemerkung %}{{ tour.bemerkung|default_if_none:"" }}<br/>{% endif %}
+		                    {% ifnotequal tour.klient  tour.abholklient %}
+                                {% if tour.abholklient.bemerkung %}{{ tour.abholklient.bemerkung|default_if_none:"" }}<br/>{% endif %}
+                            {% endifnotequal %}
+		                    {% ifnotequal tour.klient  tour.zielklient %}
+                                {% if tour.zielklient.bemerkung %}{{ tour.zielklient.bemerkung|default_if_none:"" }}<br/>{% endif %}
+                            {% endifnotequal %}
+                        </para></td>  
                     </tr>
                 {% endfor %}
                 </blockTable>
