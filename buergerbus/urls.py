@@ -36,6 +36,7 @@ urlpatterns = [
     path('Tour/', include('Tour.urls')),
     path('Einsatztage/', include('Einsatztage.urls')),
     path('Klienten/', include('Klienten.urls')),
+    path('Kommunen/', include('Kommunen.urls')),
     path('Team/', include('Team.urls')),
     path('Faq/', include('Faq.urls')),
     path('admin/', admin.site.urls),

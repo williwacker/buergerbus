@@ -82,7 +82,7 @@ class DocumentChangeView(MyUpdateView):
 		context = self.get_context_data()
 		instance=get_object_or_404(Document, pk=kwargs['pk'])
 		form = self.form_class(instance=instance)
-		form.fields["dokument"].initial = instance.document.name
+		form.fields["document_ro"].initial = instance.document.name
 		context['form'] = form
 		return render(request, self.template_name, context)
 

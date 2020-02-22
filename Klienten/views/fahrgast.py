@@ -24,6 +24,7 @@ register = template.Library()
 
 class FahrgastView(MyListView):
 	permission_required = 'Klienten.view_klienten'
+	model = Klienten
 
 	def get_fg_queryset(self):
 		if settings.ALLOW_OUTSIDE_CLIENTS: 

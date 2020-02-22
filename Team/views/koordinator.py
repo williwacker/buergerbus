@@ -21,6 +21,7 @@ register = template.Library()
 
 class KoordinatorView(MyListView):
 	permission_required = 'Team.view_koordinator'
+	model = Koordinator
 
 	def get_fg_queryset(self):
 		return Koordinator.objects.order_by('team','benutzer').filter(team__in=get_buero_list(self.request))

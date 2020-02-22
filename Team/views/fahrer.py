@@ -20,6 +20,7 @@ register = template.Library()
 
 class FahrerView(MyListView):
 	permission_required = 'Team.view_fahrer'
+	model = Fahrer
 
 	def get_fg_queryset(self):
 		return Fahrer.objects.order_by('team','benutzer').filter(team__in=get_bus_list(self.request))
@@ -82,13 +83,8 @@ class FahrerChangeView(MyUpdateView):
 	model = Fahrer
 
 	def get_context_data(self, **kwargs):
-		context = {}
-		context['sidebar_liste'] = get_sidebar(self.request.user)
+		context = super().get_context_data(**kwargs)
 		context['title'] = "Fahrer ändern"
-		if self.request.user.has_perm('Team.delete_fahrer'): context['delete_button'] = "Löschen"
-		context['submit_button'] = "Sichern"
-		context['back_button'] = ["Abbrechen",self.success_url+url_args(self.request)]
-		context['url_args'] = url_args(self.request)
 		return context
 
 	def get(self, request, *args, **kwargs):

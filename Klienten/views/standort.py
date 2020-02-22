@@ -22,6 +22,7 @@ register = template.Library()
 
 class StandortView(MyListView):
 	permission_required = 'Einsatzmittel.change_bus'
+	model = Klienten
 
 	def get_queryset(self):
 		qs = Klienten.objects.order_by('name','ort').filter(typ='S')

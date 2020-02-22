@@ -26,6 +26,7 @@ logger = logging.getLogger(__name__)
 
 class TourView(MyListView):
 	permission_required = 'Tour.view_tour'
+	model = Tour
 	
 	def get_queryset(self):
 		TourArchive()

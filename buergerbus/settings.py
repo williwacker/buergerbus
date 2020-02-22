@@ -38,6 +38,7 @@ INSTALLED_APPS = [
 	'Einsatzmittel.apps.EinsatzmittelConfig',
 	'Einsatztage.apps.EinsatztageConfig',
 	'Klienten.apps.KlientenConfig',
+	'Kommunen.apps.KommunenConfig',
 	'Team.apps.TeamConfig',
 	'Tour.apps.TourConfig',
 	'Faq.apps.FaqConfig',

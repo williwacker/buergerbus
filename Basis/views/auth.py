@@ -20,6 +20,7 @@ from Basis.views import (MyDeleteView, MyCreateView, MyDetailView, MyListView, M
 # User Views
 class UserView(MyListView):
 	permission_required = 'auth.view_user'
+	model = User
 	
 	def get_queryset(self):
 		qs = User.objects.order_by('username')
@@ -113,6 +114,7 @@ class UserDeleteView(MyDeleteView):
 
 class GroupView(MyListView):
 	permission_required = 'auth.view_group'
+	model=Group
 	
 	def get_queryset(self):
 		qs = Group.objects.order_by('name')

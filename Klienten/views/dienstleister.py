@@ -26,6 +26,7 @@ register = template.Library()
 
 class DienstleisterView(MyListView):
 	permission_required = 'Klienten.view_klienten'
+	model = Klienten
 
 	def get_queryset(self):
 		name = self.request.GET.get('name')

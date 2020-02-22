@@ -35,6 +35,14 @@ class MyListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
 	template_name = 'Basis/simple_table.html'
 	context_object_name = 'table'
 
+	def get_context_data(self, **kwargs):
+		context = super().get_context_data(**kwargs)
+		context['title'] = self.model._meta.verbose_name_plural
+		context['sidebar_liste'] = get_sidebar(self.request.user)
+		add_perm = re.sub("view","add",self.permission_required)
+		if self.request.user.has_perm(add_perm): context['add'] = self.model._meta.verbose_name_raw	
+		return context	
+
 	def dispatch(self, request, *args, **kwargs):
 		request.session.pop('suchname','')
 		request.session.pop('suchort','')
@@ -48,6 +56,14 @@ class MyDetailView(SuccessMessageMixin, LoginRequiredMixin, PermissionRequiredMi
 class MyCreateView(SuccessMessageMixin, LoginRequiredMixin, PermissionRequiredMixin, CreateView):
 	login_url = settings.LOGIN_URL
 	template_name = 'Basis/detail.html'	
+
+	def get_context_data(self, **kwargs):
+		context = super().get_context_data(**kwargs)
+		context['sidebar_liste'] = get_sidebar(self.request.user)
+		context['title'] = self.model._meta.verbose_name+" hinzufügen"
+		context['submit_button'] = "Sichern"
+		context['back_button'] = ["Abbrechen",self.success_url+url_args(self.request)]
+		return context	
 	
 	def form_invalid(self, form):
 		context = self.get_context_data()
@@ -70,14 +86,14 @@ class MyUpdateView(SuccessMessageMixin, LoginRequiredMixin, PermissionRequiredMi
 	def get_context_data(self, **kwargs):
 		context = {}
 		context['sidebar_liste'] = get_sidebar(self.request.user)
-		context['title'] = self.model._meta.verbose_name_raw
+		context['title'] = self.model._meta.verbose_name_raw+" ändern"
 		context['submit_button'] = "Sichern"
 		context['back_button'] = ["Abbrechen",self.success_url+url_args(self.request)]
 		del_perm = re.sub("change","delete",self.permission_required)
 		if self.request.user.has_perm(del_perm): context['delete_button'] = "Löschen"
 		context['url_args'] = url_args(self.request)
 		return context	
-
+		
 	def get(self, request, *args, **kwargs):
 		context = self.get_context_data(**kwargs)
 		instance=get_object_or_404(self.model, pk=kwargs['pk'])

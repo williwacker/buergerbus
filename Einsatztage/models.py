@@ -24,7 +24,8 @@ class Fahrtag(models.Model):
 		null=True,
 		blank=True,
 		related_name='vormittag',
-		sort=True
+		sort=True,
+		verbose_name='Fahrer Vormittag'
 	)
 	fahrer_nachmittag     = ChainedForeignKey(
 		Fahrer, # the model where you're populating your fahrer from
@@ -35,7 +36,9 @@ class Fahrtag(models.Model):
 		null=True,
 		blank=True,
 		related_name='nachmittag',
-		sort=True)		
+		sort=True,
+		verbose_name='Fahrer Nachmittag'
+	)		
 	urlaub     = models.BooleanField(default=False)
 	archiv     = models.BooleanField(default=False)
 	created_on  = models.DateTimeField(auto_now_add=True, null=True)

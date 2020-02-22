@@ -22,6 +22,7 @@ register = template.Library()
 
 class OrtView(MyListView):
 	permission_required = 'Klienten.view_orte'
+	model = Orte
 	
 	def get_queryset(self):
 		ort = self.request.GET.get('ort')

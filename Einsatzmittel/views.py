@@ -18,6 +18,7 @@ register = template.Library()
 
 class BusView(MyListView):
 	permission_required = 'Einsatzmittel.view_bus'
+	model = Bus
 
 	def get_queryset(self):
 		return(BusTable(Bus.objects.order_by('bus').filter(id__in=get_bus_list(self.request))))
@@ -96,6 +97,7 @@ class BusDeleteView(MyDeleteView):
 
 class BueroView(MyListView):
 	permission_required = 'Einsatzmittel.view_buero'
+	model = Buero
 
 	def get_queryset(self):
 		return(BueroTable(Buero.objects.order_by('buero').filter(id__in=get_buero_list(self.request))))

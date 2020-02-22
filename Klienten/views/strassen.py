@@ -21,6 +21,7 @@ register = template.Library()
 
 class StrassenView(MyListView):
 	permission_required = 'Klienten.view_strassen'
+	model = Strassen
 	
 	def get_queryset(self):
 		ort = self.request.GET.get('ort')

@@ -76,6 +76,8 @@ def get_sidebar(user):
 		value.append({'name':'Benutzer','value':'/Basis/benutzer/'})
 	if user.has_perm('auth.view_group'):
 		value.append({'name':'Gruppen','value':'/Basis/gruppen/'})
+	if user.has_perm('Kommunen.view_kommune'):
+		value.append({'name':'Kommunen','value':'/Kommunen/kommunen/'})		
 	if value:
 		sidebar.append({'name':'Autorisierung', 'value':value})	
 	
