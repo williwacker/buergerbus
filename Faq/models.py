@@ -81,7 +81,7 @@ class Question(models.Model):
 	topic = models.ForeignKey(Topic, verbose_name=_('Thema'), related_name='questions', on_delete=models.CASCADE)
 	status = models.IntegerField(_('status'),
 		choices=STATUS_CHOICES, default=INACTIVE,
-		help_text=_("Nur Fragen im Status 'Aktiv' werden angezeigt.  "
+		help_text=_("Nur Fragen im Status 'Aktiv' werden angezeigt. "
 					"Fragen markiert als Gruppen Titel werden als solche behandelt."))
 	protected = models.BooleanField(_('is protected'), default=False,
 		help_text=_("Check wenn nur angemeldete Benutzer die Frage sehen dürfen"))
