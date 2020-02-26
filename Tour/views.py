@@ -94,7 +94,7 @@ class TourAddView2(MyCreateView):
 
 	def get(self, request, *args, **kwargs):
 		context = self.get_context_data(**kwargs)
-		klient = get_object_or_404(Klienten, pk=kwargs['pk'])
+		klient = get_object_or_404(Klienten, bus__in=get_bus_list(request), pk=kwargs['pk'])
 		self.initial['klient'] = klient
 		self.initial['fahrgast'] = klient
 		self.initial['bus'] = klient.bus
@@ -105,11 +105,7 @@ class TourAddView2(MyCreateView):
 		self.initial['datum'] = Fahrtag.objects.filter(id=fahrtag, team_id=klient.bus_id).first() if fahrtag else None
 		form = self.form_class(initial=self.initial)
 		form.fields['datum'].queryset = Fahrtag.objects.order_by('datum').filter(archiv=False, urlaub=False, team_id=klient.bus_id, datum__gt=datetime.now(), datum__lte=datetime.now()+timedelta(klient.bus.plantage))
-#		qs = Tour.objects.filter(klient__id=klient.id).values_list('abholklient',flat=True).distinct()
-#		form.fields['abholfavorit'].queryset = Klienten.objects.filter(id__in=qs).order_by('name')	| Klienten.objects.filter(id=klient.id)
 		form.fields['abholklient'].queryset  = Klienten.objects.filter(typ='D').order_by('name')   	| Klienten.objects.filter(id=klient.id)
-#		qs = Tour.objects.filter(klient__id=klient.id).values_list('zielklient',flat=True).distinct()
-#		form.fields['zielfavorit'].queryset  = Klienten.objects.filter(id__in=qs).order_by('name') 	| Klienten.objects.filter(id=klient.id)
 		form.fields['zielklient'].queryset   = Klienten.objects.filter(typ='D').order_by('name')   	| Klienten.objects.filter(id=klient.id)
 		if 'instance' in locals() and instance.konflikt:
 			messages.error(request, instance.konflikt)
@@ -142,7 +138,7 @@ class TourChangeView(MyUpdateView):
 	
 	def get(self, request, *args, **kwargs):
 		context = self.get_context_data(**kwargs)
-		instance=get_object_or_404(Tour, pk=kwargs['pk'])
+		instance=get_object_or_404(Tour, bus__in=get_bus_list(request), pk=kwargs['pk'])
 		form = self.form_class(instance=instance)
 		form.fields["fahrgast"].initial = instance.klient.name
 		form.fields["id"].initial = instance.id
@@ -181,7 +177,7 @@ class TourCopyView(MyUpdateView):
 	
 	def get(self, request, *args, **kwargs):
 		context = self.get_context_data(**kwargs)
-		instance=get_object_or_404(Tour, pk=kwargs['pk'])
+		instance=get_object_or_404(Tour, bus__in=get_bus_list(request), pk=kwargs['pk'])
 		form = self.form_class(instance=instance)
 		form.fields["fahrgast"].initial = instance.klient.name
 		form.fields["id"].initial = instance.id
@@ -212,4 +208,5 @@ class TourDeleteView(MyDeleteView):
 	permission_required = 'Tour.delete_tour'
 	success_url = '/Tour/tour/'
 	model = Tour
+	object_filter = [('bus__in','get_bus_list(request)')]
 	pass

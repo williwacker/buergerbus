@@ -15,7 +15,7 @@ from django.views.generic import (
 from django.views.generic.detail import BaseDetailView
 
 from Basis.multiform import MultiFormsView
-from Basis.utils import get_relation_dict, get_sidebar, url_args, get_index_bar, run_command
+from Basis.utils import get_relation_dict, get_sidebar, url_args, get_index_bar, run_command, get_object_filter
 
 
 def my_custom_bad_request_view(request, exception):  #400
@@ -81,6 +81,9 @@ class MyUpdateView(SuccessMessageMixin, LoginRequiredMixin, PermissionRequiredMi
 	def get(self, request, *args, **kwargs):
 		context = self.get_context_data(**kwargs)
 		instance=get_object_or_404(self.model, pk=kwargs['pk'])
+		kwargs['object'] = instance
+		if len(list(get_relation_dict(self.model, kwargs))) > 1 and not self.request.user.is_superuser: 
+			context['delete_button'] = None
 		form = self.form_class(instance=instance)
 		context['form'] = form
 		return render(request, self.template_name, context)	
@@ -100,12 +103,22 @@ class MyDeleteView(SuccessMessageMixin, LoginRequiredMixin, PermissionRequiredMi
 		context['related_objects'] = get_relation_dict(self.model, kwargs)
 		context['sidebar_liste'] = get_sidebar(self.request.user)
 		context['title'] = self.model._meta.verbose_name_raw+" löschen"
-		context['submit_button'] = "Ja, ich bin sicher"
-		context['back_button'] = "Nein, bitte abbrechen"
+		if len(list(context['related_objects'])) > 1 and not self.request.user.is_superuser:
+			messages.error(self.request, 'Sie haben keine Berechtigung aufgrund der Anzahl von abhängigen Daten, dieses Objekt zu löschen')
+			context['back_button'] = "Abbrechen"
+		else:
+			context['submit_button'] = "Ja, ich bin sicher"
+			context['back_button'] = "Nein, bitte abbrechen"
 		return context
-
+	
+	def get(self, request, *args, **kwargs):
+		self.object = get_object_or_404(self.model, **get_object_filter(self, request), pk=kwargs['pk'])
+		kwargs['object'] = self.object
+		context = self.get_context_data(**kwargs)
+		return render(request, self.template_name, context)
+	
 	def post(self, request, *args, **kwargs):
-		instance = get_object_or_404(self.model, pk=kwargs['pk'])
+		instance = get_object_or_404(self.model, **get_object_filter(self, request), pk=kwargs['pk'])
 		messages.success(request, self.model._meta.verbose_name_raw+' "'+str(instance)+'" wurde gelöscht.')
 		return self.delete(request, *args, **kwargs)
 

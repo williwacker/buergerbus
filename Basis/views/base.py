@@ -98,11 +98,7 @@ class DocumentDeleteView(MyDeleteView):
 	permission_required = 'Basis.delete_document'
 	model = Document
 	success_url = '/Basis/documents/'
-
-	def post(self, request, *args, **kwargs):
-		instance = self.model.objects.get(pk=kwargs['pk'])
-		messages.success(request, self.model._meta.verbose_name.title()+' "'+str(instance)+'" wurde gelöscht.')
-		return self.delete(request, *args, **kwargs)
+	pass
 
 class DocumentPDFView(MyBaseDetailView):
 	permission_required = 'Basis.view_document'

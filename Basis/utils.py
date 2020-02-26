@@ -18,6 +18,8 @@ from django.core.exceptions import ValidationError
 from xhtml2pdf import pisa
 
 from Einsatzmittel.models import Buero, Bus
+from Einsatzmittel.utils import get_bus_list, get_buero_list
+from Faq.utils import get_topic_list
 
 
 def get_user_permissions(user):
@@ -162,6 +164,13 @@ def get_relation_dict(modelclass, kwargs):
 		for item in collector.data.items():
 			objects[item[0].__name__] = item[1]
 		return objects
+
+def get_object_filter(viewclass, request):
+	filter = {}
+	if hasattr(viewclass, 'object_filter'):
+		for field, value in viewclass.object_filter:
+			filter[field] = eval(value)
+	return filter
 
 def messages(request):
 	# Remove duplicate messages

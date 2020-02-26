@@ -133,4 +133,5 @@ class QuestionAdminDeleteView(MyDeleteView):
 	permission_required = 'Faq.delete_topic'
 	success_url = '/Faq/questions/admin/'
 	model = Question
+	object_filter = [('topic__in','get_topic_list(request)')]
 	pass

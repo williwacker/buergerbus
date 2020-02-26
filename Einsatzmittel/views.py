@@ -90,6 +90,7 @@ class BusDeleteView(MyDeleteView):
 	permission_required = 'Einsatzmittel.delete_bus'
 	model=Bus
 	success_url = '/Einsatzmittel/busse/'
+	object_filter = [('id__in','get_bus_list(request)')]
 	pass
 
 # Bueros 
@@ -168,4 +169,5 @@ class BueroDeleteView(MyDeleteView):
 	permission_required = 'Einsatzmittel.delete_buero'
 	success_url = '/Einsatzmittel/bueros/'
 	model = Buero
+	object_filter = [('id__in','get_buero_list(request)')]
 	pass
