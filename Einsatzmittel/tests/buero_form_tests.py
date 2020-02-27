@@ -9,7 +9,7 @@ class BueroAddFormTest(TestCase):
 
     def test_add_form_buerotage_field_label(self):
         form = BueroAddForm()
-        self.assertTrue(form.fields['buerotage'].label == 'Bürotag')
+        self.assertTrue(form.fields['buerotage'].label == 'Bürotage')
 
     def test_add_form_email_field_label(self):
         form = BueroAddForm()

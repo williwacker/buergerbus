@@ -14,6 +14,9 @@ class BuerotagTestCase(TestCase):
     def test_buerotag_no_office_days(self):
         """Buerotag model tests with count days=0"""
         setattr(settings, 'COUNT_OFFICE_DAYS', 0)
+        buero1 = Buero.objects.first()
+        buero1.plantage = 0
+        buero1.save()
         BuerotageSchreiben().write_new_buerotage()
         buero1 = Buero.objects.first()
         bt_count = Buerotag.objects.filter(team=buero1, archiv=False).count()
@@ -22,6 +25,9 @@ class BuerotagTestCase(TestCase):
     def test_Buerotag_with_driving_days(self):
         """Buerotag model tests with count days>0"""
         setattr(settings, 'COUNT_OFFICE_DAYS', 20)
+        buero2 = Buero.objects.last()
+        buero2.plantage = 40
+        buero2.save()
         BuerotageSchreiben().write_new_buerotage()
 
         buero1 = Buero.objects.first()
@@ -31,6 +37,7 @@ class BuerotagTestCase(TestCase):
         bt_buero2_count = Buerotag.objects.filter(team=buero2).count()
         self.assertGreater(bt_buero1_count, 0)
         self.assertGreater(bt_buero2_count, 0)
+        self.assertGreater(bt_buero2_count, bt_buero1_count)
 
         bt_buero1 = Buerotag.objects.filter(team=buero1).first()
         bt_buero2 = Buerotag.objects.filter(team=buero2).first()

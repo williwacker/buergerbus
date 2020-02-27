@@ -54,6 +54,10 @@ class Tour(models.Model):
 		return date.today() == self.datum.datum
 
 	@property
+	def has_markup_text(self):
+		return len(set(settings.MARKUP_TEXT.lower().split(',')).intersection(set(self.bemerkung.lower().split()))) > 0
+
+	@property
 	def has_conflict(self):
 		return self.konflikt != ''
 

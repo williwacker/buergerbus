@@ -298,6 +298,9 @@ USE_GOOGLE 			= config('USE_GOOGLE', default=True, cast=bool)
 GOOGLEMAPS_KEY 		= config('GOOGLEMAPS_KEY', default='')
 # Ein/Aussteigezeit in Minuten (nur relevant mit USE_GOOGLE)
 TRANSFER_TIME 		= config('TRANSFER_TIME', default=3, cast=int)
+# Wenn einer der folgenden Worte in der Tour Bemerkung auftauchen,soll der Text gelb markiert werden.
+# Mehrere Worte mit Komma trennen
+MARKUP_TEXT			= config('MARKUP_TEXT', default = '')
 
 # DSGVO mit dem Fahrplan versenden
 SEND_DSGVO 			= config('SEND_DSGVO', default=False, cast=bool)

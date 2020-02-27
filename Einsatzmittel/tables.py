@@ -31,4 +31,4 @@ class BueroTable(tables.Table):
     
     class Meta:
         model = Buero
-        fields = ('buero','buerotage', 'email')      
+        fields = ('buero', 'plantage', 'plan_ende', 'buerotage', 'email')      

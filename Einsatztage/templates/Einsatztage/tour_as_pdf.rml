@@ -60,7 +60,12 @@
                 <paraStyle name="p2"
                     fontName="Helvetica"
                     fontSize="10"
-                />                
+                />
+                <paraStyle name="p2-highlight"
+                    fontName="Helvetica"
+                    fontSize="10"
+                    backColor="yellow"
+                />                                
                 <paraStyle name="pl"
                     fontName="Helvetica"
                     fontSize="10"
@@ -196,7 +201,11 @@
                         <td><para style="p2">{{ tour.ankunft|default_if_none:"-" }}</para></td>
                         <td><para style="p2">
                         	{% if tour.klient.bemerkung %}{{ tour.klient.bemerkung|default_if_none:"" }}<br/>{% endif %}
-                            {% if tour.bemerkung %}{{ tour.bemerkung|default_if_none:"" }}<br/>{% endif %}
+                            {% if tour.bemerkung %}
+                                {% if tour.has_markup_text %}</para><para style="p2-highlight">{% endif %}
+                                    {{ tour.bemerkung|default_if_none:"" }}<br/>
+                                {% if tour.has_markup_text %}</para><para style="p2">{% endif %}	
+                            {% endif %}
 		                    {% ifnotequal tour.klient  tour.abholklient %}
                                 {% if tour.abholklient.bemerkung %}{{ tour.abholklient.bemerkung|default_if_none:"" }}<br/>{% endif %}
                             {% endifnotequal %}

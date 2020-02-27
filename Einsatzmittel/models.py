@@ -22,8 +22,9 @@ class Wochentage(models.Model):
 
 class Buero(models.Model):
 	buero      	= models.CharField(max_length=20, unique=True, verbose_name = "Büro")
-	buerotage  	= models.ManyToManyField(Wochentage, default='', verbose_name = "Bürotag")
+	buerotage  	= models.ManyToManyField(Wochentage, default='', verbose_name = "Bürotage")
 	email 	   	= models.EmailField(max_length=254, blank=True)
+	plantage    = models.IntegerField(default=settings.COUNT_OFFICE_DAYS, verbose_name="Planbare Kalendertage")
 	created_on 	= models.DateTimeField(auto_now_add=True, null=True)
 	created_by 	= models.ForeignKey(settings.AUTH_USER_MODEL, null=True, related_name="+", on_delete=models.SET_NULL)
 	updated_on 	= models.DateTimeField(auto_now=True, null=True)
@@ -36,6 +37,10 @@ class Buero(models.Model):
 
 	def __str__(self):
 		return str(self.buero)
+
+	@property
+	def plan_ende(self):
+		return (datetime.now()+timedelta(self.plantage)).strftime('%Y-%m-%d')
 
 	def _permission_codename(self):
 		# gibt den codenamen der entsprechenden Berechtigung zurück

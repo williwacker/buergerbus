@@ -88,19 +88,19 @@ class BuerotageSchreiben():
 		array = [row for row in rows]
 		for item in array:
 			id, buerotag = item
-			b = get_object_or_404(Buero, pk=id)
-			rows = Buerotag.objects.filter(team=b, archiv=False).values_list('datum',flat=True)
+			buero = get_object_or_404(Buero, pk=id)
+			rows = Buerotag.objects.filter(team=buero, archiv=False).values_list('datum',flat=True)
 			existierende_tage = [row for row in rows]
 
 			# die Bürotage für die nächsten n Tage ausrechnen
-			max_days = settings.COUNT_OFFICE_DAYS
+			max_days = max(settings.COUNT_OFFICE_DAYS, buero.plantage)
 			for i in range(1,max_days):
 				neuer_tag = datetime.date.today() + datetime.timedelta(days=i)
 				if neuer_tag not in existierende_tage:  # Tag ist nicht bereits definiert
 					if neuer_tag not in holiday_list:   # Tag ist kein Feiertag
 						if neuer_tag.isoweekday() == buerotag:   # Tag ist ein Bürotag
 							if changedate != neuer_tag:
-								t = Buerotag(datum=neuer_tag, team=b)
+								t = Buerotag(datum=neuer_tag, team=buero)
 								t.save()
 
 	def archive_past_buerotage(self):

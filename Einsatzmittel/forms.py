@@ -44,13 +44,13 @@ class BusChgForm(BusForm):
 class BueroAddForm(ModelForm):
 	class Meta:
 		model = Buero
-		fields = ['buero','buerotage', 'email']
+		fields = ['buero', 'plantage' ,'buerotage', 'email']
 		widgets = {'buero': forms.TextInput(attrs={'autofocus': True})}
 
 class BueroChgForm(ModelForm):
 	class Meta:
 		model = Buero
-		fields = ['buero','buerotage', 'email']
+		fields = ['buero', 'plantage' ,'buerotage', 'email']
 
 	def __init__(self, *args, **kwargs):
 		super(BueroChgForm, self).__init__(*args, **kwargs)		
