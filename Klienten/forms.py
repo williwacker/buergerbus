@@ -1,3 +1,4 @@
+import re
 from django import forms
 from django.contrib.admin.widgets import RelatedFieldWidgetWrapper
 from django.forms import ModelForm, modelformset_factory
@@ -17,10 +18,13 @@ class KlientenForm(ModelForm):
 
 	def clean_name(self):
 		data = self.cleaned_data['name']
-		try:
-			n,v = data.split(', ')
+		try:			
+			n,v = data.split(',')
+			if n.strip() == "" or v.strip() == "":
+				raise forms.ValidationError("Ungültige Eingabe")
+			data = ', '.join([n.strip(),v.strip()])
 		except:
-			raise forms.ValidationError("Ungültiges Format")
+			raise forms.ValidationError("Ungültige Eingabe")
 		# Always return a value to use as the new cleaned data, even if
 		# this method didn't change it.
 		return data
