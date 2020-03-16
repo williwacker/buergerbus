@@ -32,7 +32,8 @@
                 href += '&_popup=1';
             }
         }
-        var win = window.open(href, name, 'height=500,width=800,resizable=yes,scrollbars=yes');
+        var height = window.screen.height
+        var win = window.open(href, name, 'height='+height+',width=800,resizable=yes,scrollbars=yes');
         win.focus();
         return false;
     }

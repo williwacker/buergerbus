@@ -46,6 +46,9 @@ h1 {
 .content #results {
 	margin-right: 280px;
 }
+#changelist-form .results {
+	min-height: 350px;
+}
 .sidebar {
   position: fixed;
   width: 17.85714rem;
@@ -335,5 +338,13 @@ and (-webkit-min-device-pixel-ratio: 2) {
 		max-height: 450px;
 		max-width: 500px;
 		padding-left: 103px;
+	}
+}
+@media only screen 
+and (max-device-width : 959px) 
+and (-webkit-min-device-pixel-ratio: 2) {
+	.flow {
+		margin-left: 25px;
+		margin-top: 0;
 	}
 }

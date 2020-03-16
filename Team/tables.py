@@ -24,7 +24,7 @@ class FahrerTable(tables.Table):
 	aktion = tables.TemplateColumn(
 		template_code='''
 			{% load static %}
-			{% if perms.Team.add_fahrer %}
+			{% if perms.Team.change_fahrer %}
 				<a href="{{ record.id }}/copy/">
 					<img src="{% static "project/img/icon_duplicate_32.png" %}" alt="Fahrer kopieren" title="Fahrer kopieren">
 				</a>
@@ -62,7 +62,7 @@ class KoordinatorTable(tables.Table):
 	aktion = tables.TemplateColumn(
 		template_code='''
 			{% load static %}
-			{% if perms.Team.add_koordinator %}
+			{% if perms.Team.change_koordinator %}
 				<a href="{{ record.id }}/copy/">
 					<img src="{% static "project/img/icon_duplicate_32.png" %}" alt="Koordinator kopieren" title="Koordinator kopieren">
 				</a>
