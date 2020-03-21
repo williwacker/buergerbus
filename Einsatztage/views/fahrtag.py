@@ -12,7 +12,7 @@ from django.utils.safestring import mark_safe
 from trml2pdf import trml2pdf
 
 from Basis.utils import get_sidebar, url_args
-from Basis.views import MyDetailView, MyListView, MyUpdateView, MyView
+from Basis.views import MyDetailView, MyCreateView, MyListView, MyUpdateView, MyView, MyDeleteView
 from Einsatzmittel.models import Bus
 from Einsatzmittel.utils import get_bus_list
 from Klienten.models import Klienten
@@ -20,7 +20,7 @@ from Team.models import Fahrer
 from Tour.models import Tour
 
 from ..filters import FahrtagFilter
-from ..forms import FahrtagChgForm
+from ..forms import FahrtagAddForm, FahrtagChgForm
 from ..models import Fahrtag
 from ..tables import FahrerTable, FahrtagTable, TourTable
 from ..utils import FahrtageSchreiben
@@ -30,6 +30,7 @@ logger = logging.getLogger(__name__)
 
 class FahrtageListView(MyListView):
 	permission_required = 'Einsatztage.view_fahrtag'
+	model = Fahrtag	
 
 	def get_queryset(self):
 		if self.request.user.has_perm('Einsatztage.change_fahrtag'): FahrtageSchreiben()
@@ -44,31 +45,51 @@ class FahrtageListView(MyListView):
 
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
-		context['sidebar_liste'] = get_sidebar(self.request.user)
-		context['title'] = "Fahrtage"
 		context['filter'] = FahrtagFilter(self.request.GET, queryset=Fahrtag.objects.filter(archiv=False, team__in=get_bus_list(self.request)))
-		context['url_args'] = url_args(self.request)
 		return context
+
+
+class FahrtageAddView(MyCreateView):
+	form_class = FahrtagAddForm
+	permission_required = 'Einsatztage.add_fahrtag'
+	success_url = '/Einsatztage/fahrer/'
+	model = Fahrtag
+
+	def form_valid(self, form):
+		instance = form.save(commit=False)
+		instance.created_by = self.request.user
+		instance.save()
+		self.success_url += url_args(self.request)
+		self.success_message = self.model._meta.verbose_name.title()+' "<a href="'+self.success_url+str(instance.id)+'">'+str(instance.datum)+' '+str(instance.team)+'</a>" wurde erfolgreich hinzugefügt.'
+		return super(FahrtageAddView, self).form_valid(form)
+
+	def get(self, request, *args, **kwargs):
+		context = self.get_context_data(**kwargs)
+		form = self.form_class()
+		form.fields['team'].queryset = Bus.objects.filter(id__in=get_bus_list(self.request))
+		context['form'] = form
+		return render(request, self.template_name, context)	
+
 
 class FahrtageChangeView(MyUpdateView):
 	form_class = FahrtagChgForm
 	permission_required = 'Einsatztage.change_fahrtag'
 	success_url = '/Einsatztage/fahrer/'
 	model = Fahrtag
-	
+
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
-		context['title'] = "Fahrereinsatz ändern"
-		return context
-
+		return context	
+	
 	def get(self, request, *args, **kwargs):
 		context = self.get_context_data(**kwargs)
 		instance=get_object_or_404(self.model, pk=kwargs['pk'])
 		form = self.form_class(instance=instance)
-		logger.info("Form Datum {}, Instance Datum {}".format(form.initial['datum'], instance.datum))
+		form.fields['fahrer_vormittag'].queryset  = Fahrer.objects.filter(aktiv=True, team=instance.team)
+		form.fields['fahrer_nachmittag'].queryset = Fahrer.objects.filter(aktiv=True, team=instance.team)
 		context['form'] = form
 		return render(request, self.template_name, context)
-
+	
 	def form_invalid(self, form):
 		context = self.get_context_data()	
 		context['form'] = form
@@ -79,22 +100,12 @@ class FahrtageChangeView(MyUpdateView):
 		instance = form.save(commit=False)
 		logger.info("Initial Datum {}, Returned Datum {}, Changed Fields {}".format(form.initial['datum'], instance.datum, form.changed_data))
 		if instance.fahrer_vormittag:
-			# nur aktive Fahrer können gebucht werden
-			fahrer_vormittag = Fahrer.objects.filter(benutzer=instance.fahrer_vormittag.benutzer, aktiv=True, team=instance.team).first()
-			if not fahrer_vormittag:
-				messages.error(self.request, self.model._meta.verbose_name.title()+' am '+str(instance.datum)+' '+str(instance.team)+' kann nicht von '+str(instance.fahrer_vormittag)+' gebucht werden. Ist nicht als aktiver Fahrer eingetragen')
-				return HttpResponseRedirect(self.success_url+url_args(self.request))
 			# auf doppelte Buchung am gleichen Tag prüfen
 			fahrtag = Fahrtag.objects.filter(fahrer_vormittag__benutzer=instance.fahrer_vormittag.benutzer, datum=instance.datum).exclude(team=instance.team).first()
 			if fahrtag:
 				messages.error(self.request, str(fahrtag.fahrer_vormittag)+' ist am '+str(instance.datum)+' Vormittag bereits für '+str(fahrtag.team)+' gebucht.')
 				return HttpResponseRedirect(self.success_url+url_args(self.request))
 		if instance.fahrer_nachmittag:
-			# nur aktive Fahrer können gebucht werden
-			fahrer_nachmittag = Fahrer.objects.filter(benutzer=instance.fahrer_nachmittag.benutzer, aktiv=True, team=instance.team).first()
-			if not fahrer_nachmittag:
-				messages.error(self.request, self.model._meta.verbose_name.title()+' am '+str(instance.datum)+' '+str(instance.team)+' kann nicht von '+str(instance.fahrer_nachmittag)+' gebucht werden. Ist nicht als aktiver Fahrer eingetragen')
-				return HttpResponseRedirect(self.success_url+url_args(self.request))	
 			# auf doppelte Buchung am gleichen Tag prüfen
 			fahrtag = Fahrtag.objects.filter(fahrer_nachmittag__benutzer=instance.fahrer_nachmittag.benutzer, datum=instance.datum).exclude(team=instance.team).first()
 			if fahrtag:
@@ -114,17 +125,18 @@ class FahrtageBookvView(MyView):
 	def get(self, request, pk):
 		instance = get_object_or_404(self.model, pk=pk)
 		fahrer = Fahrer.objects.filter(benutzer=request.user, aktiv=True, team=instance.team).first()
-		fahrtag = Fahrtag.objects.filter(fahrer_vormittag__benutzer=fahrer.benutzer, datum=instance.datum).exclude(team=instance.team).first()
 		if not fahrer: # nicht als aktiver Fahrer eingetragen
-			messages.error(request, self.model._meta.verbose_name.title()+' am '+str(instance.datum)+' '+str(instance.team)+' kann nicht von Ihnen gebucht werden.')
-		elif instance.fahrer_vormittag != None: # Vormittag bereits gebucht
-			messages.error(request, self.model._meta.verbose_name.title()+' am '+str(instance.datum)+' '+str(instance.team)+' ist bereits gebucht.')
-		elif fahrtag:  # auf doppelte Buchung am gleichen Tag prüfen
-			messages.error(self.request, 'Sie sind am '+str(instance.datum)+' Vormittag bereits für '+str(fahrtag.team)+' gebucht.')
+			messages.error(request, self.model._meta.verbose_name.title()+' am '+str(instance.datum)+' '+str(instance.team)+' kann nicht von Ihnen gebucht werden. Sie sind kein aktiver Fahrer.')
 		else:
-			instance.fahrer_vormittag = fahrer
-			instance.save()
-			messages.success(request, self.model._meta.verbose_name.title()+' "<a href="'+self.success_url+str(instance.id)+'">'+str(instance.datum)+' '+str(instance.team)+'</a>" wurde erfolgreich geändert.')
+			fahrtag = Fahrtag.objects.filter(fahrer_vormittag__benutzer=fahrer.benutzer, datum=instance.datum).exclude(team=instance.team).first()
+			if instance.fahrer_vormittag != None: # Vormittag bereits gebucht
+				messages.error(request, self.model._meta.verbose_name.title()+' am '+str(instance.datum)+' '+str(instance.team)+' ist bereits gebucht.')
+			elif fahrtag:  # auf doppelte Buchung am gleichen Tag prüfen
+				messages.error(self.request, 'Sie sind am '+str(instance.datum)+' Vormittag bereits für '+str(fahrtag.team)+' gebucht.')
+			else:
+				instance.fahrer_vormittag = fahrer
+				instance.save()
+				messages.success(request, self.model._meta.verbose_name.title()+' "<a href="'+self.success_url+str(instance.id)+'">'+str(instance.datum)+' '+str(instance.team)+'</a>" wurde erfolgreich geändert.')
 		return HttpResponseRedirect(self.success_url+url_args(request))
 
 class FahrtageBooknView(MyView):
@@ -135,17 +147,18 @@ class FahrtageBooknView(MyView):
 	def get(self, request, pk):
 		instance = get_object_or_404(Fahrtag, pk=pk)
 		fahrer = Fahrer.objects.filter(benutzer=request.user, aktiv=True, team=instance.team).first()
-		fahrtag = Fahrtag.objects.filter(fahrer_nachmittag__benutzer=fahrer.benutzer, datum=instance.datum).exclude(team=instance.team).first()
 		if not fahrer: # nicht als aktiver Fahrer eingetragen
-			messages.error(request, self.model._meta.verbose_name.title()+' am '+str(instance.datum)+' '+str(instance.team)+' kann nicht von Ihnen gebucht werden.')
-		elif instance.fahrer_nachmittag != None: # Nachmittag bereits gebucht
-			messages.error(request, self.model._meta.verbose_name.title()+' am '+str(instance.datum)+' '+str(instance.team)+' ist bereits gebucht.')
-		elif fahrtag:  # auf doppelte Buchung am gleichen Tag prüfen
-			messages.error(self.request, 'Sie sind am '+str(instance.datum)+' Nachmittag bereits für '+str(fahrtag.team)+' gebucht.')
+			messages.error(request, self.model._meta.verbose_name.title()+' am '+str(instance.datum)+' '+str(instance.team)+' kann nicht von Ihnen gebucht werden. Sie sind kein aktiver Fahrer.')
 		else:
-			instance.fahrer_nachmittag = fahrer
-			instance.save()
-			messages.success(request, self.model._meta.verbose_name.title()+' "<a href="'+self.success_url+str(instance.id)+'">'+str(instance.datum)+' '+str(instance.team)+'</a>" wurde erfolgreich geändert.')
+			fahrtag = Fahrtag.objects.filter(fahrer_nachmittag__benutzer=fahrer.benutzer, datum=instance.datum).exclude(team=instance.team).first()
+			if instance.fahrer_nachmittag != None: # Nachmittag bereits gebucht
+				messages.error(request, self.model._meta.verbose_name.title()+' am '+str(instance.datum)+' '+str(instance.team)+' ist bereits gebucht.')
+			elif fahrtag:  # auf doppelte Buchung am gleichen Tag prüfen
+				messages.error(self.request, 'Sie sind am '+str(instance.datum)+' Nachmittag bereits für '+str(fahrtag.team)+' gebucht.')
+			else:
+				instance.fahrer_nachmittag = fahrer
+				instance.save()
+				messages.success(request, self.model._meta.verbose_name.title()+' "<a href="'+self.success_url+str(instance.id)+'">'+str(instance.datum)+' '+str(instance.team)+'</a>" wurde erfolgreich geändert.')
 		return HttpResponseRedirect(self.success_url+url_args(request))
 
 class FahrtageCancelvView(MyUpdateView):
@@ -178,4 +191,10 @@ class FahrtageCancelnView(MyUpdateView):
 			instance.fahrer_nachmittag = None
 			instance.save()
 			messages.success(request, self.model._meta.verbose_name.title()+' "<a href="'+self.success_url+str(instance.id)+'">'+str(instance.datum)+' '+str(instance.team)+'</a>" wurde erfolgreich geändert.')
-		return HttpResponseRedirect(self.success_url+url_args(request))						
+		return HttpResponseRedirect(self.success_url+url_args(request))
+
+class FahrtageDeleteView(MyDeleteView):
+	permission_required = 'Einsatztage.delete_fahrtag'
+	success_url = '/Einsatztage/fahrer/'
+	model = Fahrtag
+	pass						

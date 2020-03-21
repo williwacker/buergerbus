@@ -314,7 +314,7 @@ EMAIL_USE_TLS       = config('EMAIL_USE_TLS', default=False, cast=bool)
 EMAIL_USE_SSL       = config('EMAIL_USE_SSL', default=False, cast=bool)
 DEFAULT_FROM_EMAIL  = config('DEFAULT_FROM_EMAIL', default='Bürgerbus Team <noreply@example.com>')
 
+COMMUNITY_SUBDIR    = config('COMMUNITY_SUBDIR', default='')
 PORTAL              = config('PORTAL', default='Bürgerbus Portal')
-WELCOME 			= config('PORTAL', default='Willkommen auf dem Bürgerbus Portal')
 
 LOGTAILER_HISTORY_LINES = 100

@@ -9,7 +9,7 @@ from django.conf import settings
 from django.contrib.auth.models import Permission, User
 from django.contrib.messages.api import get_messages
 from django.contrib.messages.constants import DEFAULT_LEVELS
-from django.db.models.deletion import Collector
+from django.contrib.admin.utils import NestedObjects
 from django.http import HttpResponse
 from django.template import Context, loader
 from django.utils.http import is_safe_url
@@ -56,7 +56,7 @@ def get_index_bar(user):
 
 	value = []
 	if user.has_perm('Einsatztage.view_fahrtag'):
-		value.append({'name':'Fahrtage ansehen und als Email verschicken','value':'/Einsatztage/fahrer/'})
+		value.append({'name':'Fahrplan ansehen und als Email verschicken','value':'/Einsatztage/fahrer/'})
 	if value:
 		index_bar.append({'name':'Fahrpläne anzeigen', 'value':value})						
 
@@ -66,7 +66,7 @@ def get_index_bar(user):
 	if user.has_perm('Einsatztage.change_buerotag'):
 		value.append({'name':'Bürodienst eintragen <img src="/static/project/img/kalender-plus-32-trans.png" style="height: 24px; vertical-align: bottom; padding-left: 10px;">','value':'/Einsatztage/buero/'})
 	if value:
-		index_bar.append({'name':'Dienst buchen', 'value':value})						
+		index_bar.append({'name':'Dienstpläne', 'value':value})						
 
 	return index_bar	
 
@@ -97,11 +97,11 @@ def get_sidebar(user):
 
 	value = []
 	if user.has_perm('Einsatztage.view_fahrtag'):
-		value.append({'name':'Fahrtage','value':'/Einsatztage/fahrer/'})
+		value.append({'name':'Fahrdienste','value':'/Einsatztage/fahrer/'})
 	if user.has_perm('Einsatztage.view_buerotag'):
-		value.append({'name':'Bürotage','value':'/Einsatztage/buero/'})
+		value.append({'name':'Bürodienste','value':'/Einsatztage/buero/'})
 	if value:
-		sidebar.append({'name':'Einsatztage', 'value':value})	
+		sidebar.append({'name':'Dienstpläne', 'value':value})	
 
 	value = []
 	if user.has_perm('Team.view_fahrer'):
@@ -159,7 +159,7 @@ def url_args(request):
 def get_relation_dict(modelclass, kwargs):
 		objects = OrderedDict()
 		obj = modelclass.objects.get(pk=kwargs['object'].pk)
-		collector = Collector(using='default')
+		collector = NestedObjects(using='default')
 		collector.collect([obj])
 		for item in collector.data.items():
 			objects[item[0].__name__] = item[1]

@@ -7,6 +7,7 @@ from django.forms import BaseForm, ModelForm
 from django.utils.encoding import force_text
 from django.utils.translation import ugettext_lazy as _
 from jet.filters import RelatedFieldAjaxListFilter
+from django.shortcuts import get_object_or_404
 
 from Einsatzmittel.models import Bus
 from Einsatzmittel.utils import get_bus_list
@@ -25,6 +26,31 @@ class MyModelForm(ModelForm):
 		self.fields['klient'].queryset = Klienten.objects.order_by('name').filter(typ='F')
 
 	def clean(self):
+		id      = self.cleaned_data.get('id',0)
+		bus     = self.cleaned_data.get('bus')
+		datum   = self.cleaned_data.get('datum')
+		uhrzeit = self.cleaned_data.get('uhrzeit')
+		zustieg = self.cleaned_data.get('zustieg')
+
+		# will Team Konflikte bei der Eingabe ignorieren ?
+		instance = get_object_or_404(Bus, bus=bus)
+		ignore_conflict_by_team = instance.ignore_conflict
+		# prüfe ob es eine frühere Tour gibt. Falls nicht schalte Zustieg aus
+		instance = Tour.objects.filter(bus=bus, datum=datum, uhrzeit__lt=uhrzeit).exclude(id__in=[id]).first()
+		if not instance: 
+			self.cleaned_data['zustieg'] = False
+			zustieg = self.cleaned_data.get('zustieg')
+		# prüfe auf unique Tour Abfahrtszeit. Bei Zustieg addiere solange 1 sec bis die Uhrzeit unique ist
+		instance = Tour.objects.filter(bus=bus, datum=datum, uhrzeit=uhrzeit).exclude(id__in=[id]).first()
+		if instance:
+			if zustieg:
+				while instance:
+					uhrzeit = (datetime.combine(datetime(year=100, month=1, day=1), instance.uhrzeit) + timedelta(seconds=1)).time()
+					instance = Tour.objects.filter(bus=bus, datum=datum, uhrzeit=uhrzeit).exclude(id__in=[id]).first()
+				self.cleaned_data['uhrzeit'] = uhrzeit
+			else:
+				raise forms.ValidationError('Tour zur gleicher Abholzeit ist bereits gebucht.')
+
 		self.cleaned_data['konflikt'] = ''
 		self.cleaned_data['konflikt_richtung'] = ''		
 
@@ -44,20 +70,20 @@ class MyModelForm(ModelForm):
 		if frueheste_abfahrt > self.cleaned_data['uhrzeit']:
 			self.cleaned_data['konflikt'] += "Abfahrtszeit kann nicht eingehalten werden. Frühest mögliche Abfahrt um {}".format(str(frueheste_abfahrt))
 			self.cleaned_data['konflikt_richtung'] += force_text('↑', encoding='utf-8', strings_only=False, errors='strict')
-			if not self.cleaned_data['konflikt_ignorieren']:	
+			if not self.cleaned_data['konflikt_ignorieren'] and not ignore_conflict_by_team:	
 				raise forms.ValidationError(self.cleaned_data['konflikt'])
 
 		# Kann der nächste Fahrgast zum geplanten Zeitpunkt abgeholt werden? Oder der Fahrer pünktlich Feierabend machen?
 		spaeteste_abfahrt = Latest_DepartureTime().time(self)
 		if spaeteste_abfahrt != time(0,0,0) and spaeteste_abfahrt < self.cleaned_data['uhrzeit']:
 			self.cleaned_data['konflikt'] += "<br>" if len(self.cleaned_data['konflikt']) > 0 else ''
-			tourende = Latest_DepartureTime().get_timeslot_end(self.cleaned_data['bus'], self.cleaned_data['uhrzeit'])
+			tourende = Latest_DepartureTime().get_timeslot_end(self.cleaned_data['bus'], self.cleaned_data['datum'].datum.isoweekday(), self.cleaned_data['uhrzeit'])
 			if tourende < self.cleaned_data['ankunft']:
 				self.cleaned_data['konflikt'] += "Tour Ende um {} kann nicht eingehalten werden. Empfohlene Abfahrt um {}".format(str(tourende),str(spaeteste_abfahrt))
 			else:
 				self.cleaned_data['konflikt'] += "Abfahrtszeit des nächsten Fahrgastes kann nicht eingehalten werden. Empfohlene Abfahrt um {}".format(str(spaeteste_abfahrt))
 			self.cleaned_data['konflikt_richtung'] += force_text('↓', encoding='utf-8', strings_only=False, errors='strict')
-			if not self.cleaned_data['konflikt_ignorieren']:
+			if not self.cleaned_data['konflikt_ignorieren'] and not ignore_conflict_by_team:
 				raise forms.ValidationError(self.cleaned_data['konflikt'])
 
 		# Sind genügend Plätze verfügbar ?
@@ -78,10 +104,6 @@ class TourAddForm1(forms.Form):
 class TourAddForm2(MyModelForm):
 	fahrgast = forms.CharField(required=False, widget=forms.TextInput(attrs={'readonly':'readonly'}), label='Fahrgast')
 	bus_2    = forms.CharField(required=False, widget=forms.TextInput(attrs={'readonly':'readonly'}), label='Bus')
-#	abholfavorit = forms.ModelChoiceField(queryset=Klienten.objects.order_by('name'), required=False, label="Wo",
-#		help_text="Bei wem soll der Fahrgast abgeholt werden? Wählen Sie links aus den vergangenen Touren aus oder rechts der gesamten Liste.")
-#	zielfavorit = forms.ModelChoiceField(queryset=Klienten.objects.order_by('name'), required=False, label="Wohin",
-#		help_text="Zu wem soll der Fahrgast gebracht werden? Wählen Sie links aus den vergangenen Touren aus oder rechts der gesamten Liste.")
 	konflikt_ignorieren = forms.BooleanField(required=False,
 		help_text="Tour erst mal speichern und zu einem späteren Zeitpunkt ändern.")
 
@@ -93,21 +115,10 @@ class TourAddForm2(MyModelForm):
 				   'uhrzeit': forms.TimeInput(attrs={'class':'vTimeField'}), 'bemerkung': forms.Textarea(attrs={'rows':'5'}),
 				  }
 
-	def clean(self):
-		cleaned_data = super(TourAddForm2, self).clean()
-		bus     = cleaned_data.get('bus')
-		datum   = cleaned_data.get('datum')
-		uhrzeit = cleaned_data.get('uhrzeit')
-		if Tour.objects.filter(bus=bus, datum=datum, uhrzeit=uhrzeit).exists():
-			raise forms.ValidationError('Tour zur gleicher Abholzeit ist bereits gebucht')
 
 class TourChgForm(MyModelForm):
 	fahrgast = forms.CharField(required=False, widget=forms.TextInput(attrs={'readonly':'readonly'}), label='Fahrgast')
 	bus_2    = forms.CharField(required=False, widget=forms.TextInput(attrs={'readonly':'readonly'}), label='Bus')
-#	abholfavorit = forms.ModelChoiceField(queryset=Klienten.objects.order_by('name'), required=False, label="Wo",
-#		help_text="Bei wem soll der Fahrgast abgeholt werden? Wählen Sie links aus den vergangenen Touren aus oder rechts der gesamten Liste.")
-#	zielfavorit  = forms.ModelChoiceField(queryset=Klienten.objects.order_by('name'), required=False, label="Wohin",
-#		help_text="Zu wem soll der Fahrgast gebracht werden? Wählen Sie links aus den vergangenen Touren aus oder rechts der gesamten Liste.")
 	konflikt_ignorieren = forms.BooleanField(required=False,
 		help_text="Tour erst mal speichern und zu einem späteren Zeitpunkt ändern.")
 	id		 = forms.IntegerField(required=False, widget=forms.HiddenInput())
@@ -121,14 +132,3 @@ class TourChgForm(MyModelForm):
 
 	def __init__(self, *args, **kwargs):
 		super(TourChgForm, self).__init__(*args, **kwargs)
-
-	def clean(self):
-		cleaned_data = super(TourChgForm, self).clean()
-		if set(['datum','uhrzeit','bus']).intersection(set(self.changed_data)):
-			id      = cleaned_data.get('id')
-			bus     = cleaned_data.get('bus')
-			datum   = cleaned_data.get('datum')
-			uhrzeit = cleaned_data.get('uhrzeit')
-			instance = Tour.objects.filter(bus=bus, datum=datum, uhrzeit=uhrzeit).first()
-			if instance and instance.id != id:
-				raise forms.ValidationError('Tour zur gleicher Abholzeit ist bereits gebucht')

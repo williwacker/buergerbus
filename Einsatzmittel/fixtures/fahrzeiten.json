@@ -1,0 +1,106 @@
+[
+  {
+    "model": "Einsatzmittel.Fahrzeiten",
+    "pk": 1,
+    "fields": {
+      "tag": 2,
+      "zeiten": "08:00-12:00+14:00-17:00"
+    }
+  },
+  {
+    "model": "Einsatzmittel.Fahrzeiten",
+    "pk": 2,
+    "fields": {
+      "tag": 3,      
+      "zeiten": "08:00-12:00+14:00-17:00"
+    }
+  },
+  {
+    "model": "Einsatzmittel.Fahrzeiten",
+    "pk": 3,
+    "fields": {
+      "tag": 4,
+      "zeiten": "08:00-12:00+14:00-17:00"
+    }
+  },
+  {
+    "model": "Einsatzmittel.Fahrzeiten",
+    "pk": 4,
+    "fields": {
+      "tag": 5,
+      "zeiten": "08:00-12:00+14:00-17:00"
+    }
+  },
+  {
+    "model": "Einsatzmittel.Fahrzeiten",
+    "pk": 5,
+    "fields": {
+      "tag": 2,
+      "zeiten": "08:00-12:00+14:00-18:00"
+    }
+  },
+  {
+    "model": "Einsatzmittel.Fahrzeiten",
+    "pk": 6,
+    "fields": {
+      "tag": 3,
+      "zeiten": "08:00-12:00+14:00-18:00"
+    }
+  },
+  {
+    "model": "Einsatzmittel.Fahrzeiten",
+    "pk": 7,
+    "fields": {
+      "tag": 4,
+      "zeiten": "08:00-12:00+14:00-18:00"
+    }
+  },
+  {
+    "model": "Einsatzmittel.Fahrzeiten",
+    "pk": 8,
+    "fields": {
+      "tag": 5,
+      "zeiten": "08:00-12:00+14:00-18:00"
+    }
+  },
+  {
+    "model": "Einsatzmittel.Fahrzeiten",
+    "pk": 9,
+    "fields": {
+      "tag": 2,
+      "zeiten": "08:00-17:00"
+    }
+  },
+  {
+    "model": "Einsatzmittel.Fahrzeiten",
+    "pk": 10,
+    "fields": {
+      "tag": 3,
+      "zeiten": "08:00-17:00"
+    }
+  },
+  {
+    "model": "Einsatzmittel.Fahrzeiten",
+    "pk": 11,
+    "fields": {
+      "tag": 4,
+      "zeiten": "08:00-17:00"
+    }
+  },
+  {
+    "model": "Einsatzmittel.Fahrzeiten",
+    "pk": 12,
+    "fields": {
+      "tag": 5,
+      "zeiten": "08:00-17:00"
+    }
+  },  
+  {
+    "model": "Einsatzmittel.Fahrzeiten",
+    "pk": 13,
+    "fields": {
+      "tag": 5,
+      "zeiten": "08:00-12:00"
+    }
+  }
+]

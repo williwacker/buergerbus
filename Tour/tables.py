@@ -58,7 +58,6 @@ class TourTable(tables.Table):
 				{% if record.zielklient.bemerkung %}{{ record.zielklient.bemerkung|default_if_none:"" }}<br/>{% endif %}
 			{% endifnotequal %}
 		''',
-#		template_code ='''{{ record.alle_bemerkungen | linebreaks |default_if_none:"" }} ''',
 		orderable=False,
         attrs={"td": {"class": "remark"}}
 	)

@@ -13,6 +13,7 @@ from Basis.views import (MyCreateView, MyDeleteView, MyDetailView, MyListView,
                          MyUpdateView, MyView)
 from Einsatzmittel.utils import get_bus_list
 from Einsatztage.models import Fahrtag
+from Einsatzmittel.models import Bus
 from Klienten.models import Klienten
 
 from .filters import TourFilter
@@ -26,6 +27,7 @@ logger = logging.getLogger(__name__)
 
 class TourView(MyListView):
 	permission_required = 'Tour.view_tour'
+	model = Tour
 	
 	def get_queryset(self):
 		TourArchive()
@@ -36,11 +38,9 @@ class TourView(MyListView):
 
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
-		context['sidebar_liste'] = get_sidebar(self.request.user)
-		context['title'] = "Touren"
-		if self.request.user.has_perm('Tour.add_tour'): context['add'] = "Tour"
-		context['nav_bar'] = tour_navbar(Fahrtag.objects.order_by('datum').filter(archiv=False, urlaub=False, team__in=get_bus_list(self.request),datum__gte=datetime.now(),datum__lte=datetime.now()+timedelta(settings.COUNT_TOUR_DAYS)),self.request.GET.get('datum'))
-		context['url_args'] = url_args(self.request)
+		context['nav_bar'] = tour_navbar(Fahrtag.objects.order_by('datum'). \
+			filter(archiv=False, urlaub=False, team__in=get_bus_list(self.request),datum__gte=datetime.now()),
+			self.request.GET.get('datum'))
 		return context	
 
 # Dies ist ein zweistufiger Prozess, der zuerst den Klient auswählen lässt, um im zweiten Bildschirm dann mithilfe des dem Klienten zugeordneten Busses
@@ -148,7 +148,7 @@ class TourChangeView(MyUpdateView):
 		form.fields['bus_2'].initial = instance.bus
 		if instance.konflikt:
 			messages.error(request, instance.konflikt)
-		else:
+		if not instance.konflikt or instance.bus.ignore_conflict:
 			form.fields['konflikt_ignorieren'].widget = forms.HiddenInput()
 		context['form'] = form
 		return render(request, self.template_name, context)

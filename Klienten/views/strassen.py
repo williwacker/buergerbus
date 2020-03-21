@@ -21,6 +21,7 @@ register = template.Library()
 
 class StrassenView(MyListView):
 	permission_required = 'Klienten.view_strassen'
+	model = Strassen
 	
 	def get_queryset(self):
 		ort = self.request.GET.get('ort')
@@ -34,11 +35,7 @@ class StrassenView(MyListView):
 
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
-		context['sidebar_liste'] = get_sidebar(self.request.user)
-		context['title'] = "Strassen"
-		if self.request.user.has_perm('Klienten.add_strassen'): context['add'] = "Strasse"
 		context['filter'] = StrassenFilter()
-		context['url_args'] = url_args(self.request)
 		return context
 
 class StrassenAddView(MyCreateView):
@@ -48,11 +45,7 @@ class StrassenAddView(MyCreateView):
 	model = Strassen
 
 	def get_context_data(self, **kwargs):
-		context = {}
-		context['sidebar_liste'] = get_sidebar(self.request.user)
-		context['title'] = "Strasse hinzufügen"
-		context['submit_button'] = "Sichern"
-		context['back_button'] = ["Abbrechen",self.success_url+url_args(self.request)]
+		context = super().get_context_data(**kwargs)
 		context['popup'] = self.request.GET.get('_popup',None)
 		return context
 	

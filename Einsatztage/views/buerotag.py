@@ -27,7 +27,8 @@ logger = logging.getLogger(__name__)
 
 class BuerotageListView(MyListView):
 	permission_required = 'Einsatztage.view_buerotag'
-	
+	model = Buerotag
+
 	def get_queryset(self):
 		if self.request.user.has_perm('Einsatztage.change_buerotag'): BuerotageSchreiben()
 		team = self.request.GET.get('team')
@@ -41,10 +42,8 @@ class BuerotageListView(MyListView):
 
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
-		context['sidebar_liste'] = get_sidebar(self.request.user)
-		context['title'] = "Bürotage"
 		context['filter'] = BuerotagFilter(self.request.GET, queryset=Buerotag.objects.filter(archiv=False, team__in=get_buero_list(self.request)))
-		context['url_args'] = url_args(self.request)
+		del context['add']
 		return context
 
 class BuerotageChangeView(MyUpdateView):
@@ -55,14 +54,14 @@ class BuerotageChangeView(MyUpdateView):
 
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
-		context['title'] = "Bürotag ändern"
-		return context
+		del context['delete_button']
+		return context	
 
 	def get(self, request, *args, **kwargs):
 		context = self.get_context_data(**kwargs)
 		instance=get_object_or_404(self.model, pk=kwargs['pk'])
 		form = self.form_class(instance=instance)
-		logger.info("Form Datum {}, Instance Datum {}".format(form.initial['datum'], instance.datum))
+		form.fields['koordinator'].queryset  = Koordinator.objects.filter(aktiv=True, team=instance.team)
 		context['form'] = form
 		return render(request, self.template_name, context)
 
@@ -76,10 +75,11 @@ class BuerotageChangeView(MyUpdateView):
 		instance = form.save(commit=False)
 		logger.info("Initial Datum {}, Returned Datum {}, Changed Fields {}".format(form.initial['datum'], instance.datum, form.changed_data))
 		if instance.koordinator:
-			koordinator = Koordinator.objects.filter(benutzer=instance.koordinator.benutzer, aktiv=True, team=instance.team).first()
-			if not koordinator and instance.koordinator != None:
-				messages.error(self.request, self.model._meta.verbose_name.title()+' am '+str(instance.datum)+' in '+str(instance.team)+' kann nicht von '+str(instance.koordinator)+' gebucht werden. Ist nicht als aktiver Koordinator eingetragen')
-				return HttpResponseRedirect(self.success_url+url_args(self.request))	
+			# auf doppelte Buchung am gleichen Tag prüfen
+			buerotag = Buerotag.objects.filter(koordinator__benutzer=instance.koordinator.benutzer, datum=instance.datum).exclude(team=instance.team).first()
+			if buerotag:
+				messages.error(self.request, str(buerotag.koordinator)+' ist am '+str(instance.datum)+' bereits für '+str(buerotag.team)+' gebucht.')
+				return HttpResponseRedirect(self.success_url+url_args(self.request))
 		instance.updated_by = self.request.user
 		instance.save(force_update=True)
 		self.success_url += url_args(self.request)
@@ -95,13 +95,17 @@ class BuerotageBookView(MyView):
 		instance = get_object_or_404(Buerotag, pk=pk)
 		koordinator = Koordinator.objects.filter(benutzer=request.user, aktiv=True, team=instance.team).first()
 		if not koordinator:
-			messages.error(request, self.model._meta.verbose_name.title()+' am '+str(instance.datum)+' in '+str(instance.team)+' kann nicht von Ihnen gebucht werden.')
-		elif instance.koordinator != None:
-			messages.error(request, self.model._meta.verbose_name.title()+' am '+str(instance.datum)+' in '+str(instance.team)+' ist bereits gebucht.')
+			messages.error(request, self.model._meta.verbose_name.title()+' am '+str(instance.datum)+' in '+str(instance.team)+' kann nicht von Ihnen gebucht werden. Sie sind kein aktiver Koordinator.')
 		else:
-			instance.koordinator = koordinator
-			instance.save()
-			messages.success(request, self.model._meta.verbose_name.title()+' "<a href="'+self.success_url+str(instance.id)+'">'+str(instance.datum)+' in '+str(instance.team)+'</a>" wurde erfolgreich geändert.')
+			buerotag = Buerotag.objects.filter(koordinator__benutzer=koordinator.benutzer, datum=instance.datum).exclude(team=instance.team).first()
+			if instance.koordinator != None:
+				messages.error(request, self.model._meta.verbose_name.title()+' am '+str(instance.datum)+' in '+str(instance.team)+' ist bereits gebucht.')
+			elif buerotag:
+				messages.error(self.request, 'Sie sind am '+str(instance.datum)+' bereits für '+str(buerotag.team)+' gebucht.')
+			else:
+				instance.koordinator = koordinator
+				instance.save()
+				messages.success(request, self.model._meta.verbose_name.title()+' "<a href="'+self.success_url+str(instance.id)+'">'+str(instance.datum)+' in '+str(instance.team)+'</a>" wurde erfolgreich geändert.')
 		return HttpResponseRedirect(self.success_url+url_args(request))	
 
 class BuerotageCancelView(MyUpdateView):

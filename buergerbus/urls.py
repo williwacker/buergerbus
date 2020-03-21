@@ -20,6 +20,8 @@ from django.contrib.auth.views import PasswordChangeView
 from django.urls import include, path
 from django.views.generic import TemplateView
 from smart_selects import urls as smart_selects_urls
+from django.views.i18n import JavaScriptCatalog
+
 
 from Basis.views import (BasisView, MyPasswordChangeDoneView,
                          MyPasswordChangeView)
@@ -43,6 +45,7 @@ urlpatterns = [
     url(r'^jet/', include('jet.urls', 'jet')),
     url(r'^jet/dashboard/', include('jet.dashboard.urls', 'jet-dashboard')), #??Django JET dashboard URLS
     url(r'^logs/', include('logtailer.urls')),
+    path('jsi18n', JavaScriptCatalog.as_view(), name='javascript-catalog'),
 ]
 
 handler400 = 'Basis.views.my_custom_bad_request_view'

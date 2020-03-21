@@ -14,7 +14,7 @@ def get_bus_list(request):
 def get_buero_list(request):
 	filterlist = []
 	qs = Buero.objects.values_list('id', flat=True)
-	for i in qs:
-		codename = "Einsatzmittel.Buero_{}_editieren".format(i)
-		if request.user.has_perm(codename): filterlist.append(i)
+	for id in qs:
+		codename = "Einsatzmittel.Buero_{}_editieren".format(id)
+		if request.user.has_perm(codename): filterlist.append(id)
 	return filterlist

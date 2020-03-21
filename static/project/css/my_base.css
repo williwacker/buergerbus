@@ -8,6 +8,9 @@ html {
 body {
 	background-color: #ecf2f6;
 }
+a, a:link, a:visited, a:hover, a:focus {
+	color: #47bac1;
+}
 #container {
 	min-width: unset;
 	width: unset;
@@ -142,6 +145,12 @@ h1 {
 .logo {
 	background-color: white;
 	padding-left: 5px;
+}
+.logo a img {
+    border: none;
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
 }
 .object-tools a.addlink {
 	background-image: none;

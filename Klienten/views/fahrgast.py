@@ -24,6 +24,7 @@ register = template.Library()
 
 class FahrgastView(MyListView):
 	permission_required = 'Klienten.view_klienten'
+	model = Klienten
 
 	def get_fg_queryset(self):
 		if settings.ALLOW_OUTSIDE_CLIENTS: 
@@ -44,10 +45,8 @@ class FahrgastView(MyListView):
 
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
-		context['sidebar_liste'] = get_sidebar(self.request.user)
 		context['title'] = "Fahrgäste"
 		if self.request.user.has_perm('Klienten.add_klienten'): context['add'] = "Fahrgast"
-		context['url_args'] = url_args(self.request)
 		context['filter'] = FahrgaesteFilter(self.request.GET, queryset=self.get_fg_queryset())
 		return context
 

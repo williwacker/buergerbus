@@ -11,15 +11,16 @@ class UserTestCase(TestCase):
         self.assertGreater(Permission.objects.all().count(), 0)
         group.permissions.add(Permission.objects.get(name='Can view Büro'))
         group.permissions.add(Permission.objects.get(name='Can view Bus'))
-        group.permissions.add(Permission.objects.get(name='Can change Bürotag'))
-        group.permissions.add(Permission.objects.get(name='Can view Bürotag'))
-        group.permissions.add(Permission.objects.get(name='Can change Fahrtag'))
-        group.permissions.add(Permission.objects.get(name='Can view Fahrtag'))
+        group.permissions.add(Permission.objects.get(name='Can change Bürodienst'))
+        group.permissions.add(Permission.objects.get(name='Can view Bürodienst'))
+        group.permissions.add(Permission.objects.get(name='Can change Fahrdienst'))
+        group.permissions.add(Permission.objects.get(name='Can view Fahrdienst'))
 #        id = ContentType.objects.get(model='question', app_label='Faq').id
-#        group.permissions.add(Permission.objects.get(name='Can add Frequent asked question', content_type_id=id))
-#        group.permissions.add(Permission.objects.get(name='Can view Frequent asked question', content_type_id=id))
+#        print(Permission.objects.filter(content_type_id=id))
+#        group.permissions.add(Permission.objects.get(name='Can view Fragen und Antworten', content_type_id=id))
+#        group.permissions.add(Permission.objects.get(name='Can change Fragen und Antworten', content_type_id=id))
 #        id = ContentType.objects.get(model='topic', app_label='Faq').id
-#        group.permissions.add(Permission.objects.get(name='Can view Thema', content_type_id=id))
+#        group.permissions.add(Permission.objects.get(name='Can view Fragen und Antworten Thema', content_type_id=id))
         group.permissions.add(Permission.objects.get(name='Can add Klient'))
         group.permissions.add(Permission.objects.get(name='Can change Klient'))
         group.permissions.add(Permission.objects.get(name='Can view Klient'))
@@ -32,10 +33,10 @@ class UserTestCase(TestCase):
         group.permissions.add(Permission.objects.get(name='Can change Strasse'))
         group.permissions.add(Permission.objects.get(name='Can view Strasse'))
         group.permissions.add(Permission.objects.get(name='Can delete Strasse'))
-#        id = ContentType.objects.get(model='fahrer', app_label='Team').id
-#        group.permissions.add(Permission.objects.get(name='Can view Fahrer', content_type_id=id))
-#        id = ContentType.objects.get(model='koordinator', app_label='Team').id
-#        group.permissions.add(Permission.objects.get(name='Can view Koordinator', content_type_id=id))
+        id = ContentType.objects.get(model='fahrer', app_label='Team').id
+        group.permissions.add(Permission.objects.get(name='Can view Fahrer(in)', content_type_id=id))
+        id = ContentType.objects.get(model='koordinator', app_label='Team').id
+        group.permissions.add(Permission.objects.get(name='Can view Koordinator(in)', content_type_id=id))
         group.permissions.add(Permission.objects.get(name='Can add Tour'))
         group.permissions.add(Permission.objects.get(name='Can change Tour'))
         group.permissions.add(Permission.objects.get(name='Can view Tour'))

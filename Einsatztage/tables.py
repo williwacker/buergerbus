@@ -167,16 +167,15 @@ class TourTable(tables.Table):
 	)
 	bemerkungen = tables.TemplateColumn(
 		template_code ='''
-                        	{% if record.klient.bemerkung %}{{ record.klient.bemerkung|default_if_none:"" }}<br/>{% endif %}
-                            {% if record.bemerkung %}{{ record.bemerkung|default_if_none:"" }}<br/>{% endif %}
-		                    {% ifnotequal record.klient  record.abholklient %}
-                                {% if record.abholklient.bemerkung %}{{ record.abholklient.bemerkung|default_if_none:"" }}<br/>{% endif %}
-                            {% endifnotequal %}
-		                    {% ifnotequal record.klient  record.zielklient %}
-                                {% if record.zielklient.bemerkung %}{{ record.zielklient.bemerkung|default_if_none:"" }}<br/>{% endif %}
-                            {% endifnotequal %}
+			{% if record.klient.bemerkung %}{{ record.klient.bemerkung|default_if_none:"" }}<br/>{% endif %}
+			{% if record.bemerkung %}{{ record.bemerkung|default_if_none:"" }}<br/>{% endif %}
+			{% ifnotequal record.klient  record.abholklient %}
+				{% if record.abholklient.bemerkung %}{{ record.abholklient.bemerkung|default_if_none:"" }}<br/>{% endif %}
+			{% endifnotequal %}
+			{% ifnotequal record.klient  record.zielklient %}
+				{% if record.zielklient.bemerkung %}{{ record.zielklient.bemerkung|default_if_none:"" }}<br/>{% endif %}
+			{% endifnotequal %}
 		''',
-#		template_code='''{{ record.alle_bemerkungen | linebreaks | default_if_none:"-"}}''',
         attrs={"td": {"class": "remark"}}
 	)
 	telefon = tables.TemplateColumn(

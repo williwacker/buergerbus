@@ -15,10 +15,6 @@ class FahrplanEmailformTest(TestCase):
         form = FahrplanEmailForm()
         self.assertEqual(form.fields['cc'].label, 'Cc')
 
-    def test_chg_form_cc_field_help_text(self):
-        form = FahrplanEmailForm()
-        self.assertEqual(form.fields['cc'].help_text, 'Email Adressen mit ; trennen')        
-
     def test_chg_form_betreff_field_label(self):
         form = FahrplanEmailForm()
         self.assertEqual(form.fields['betreff'].label, 'Betreff')

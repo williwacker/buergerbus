@@ -41,13 +41,46 @@ class MyListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
 		request.session.pop('clientsearch_choice','')
 		return super(MyListView, self).dispatch(request, *args, **kwargs)
 
+	def get_context_data(self, **kwargs):
+		context = super().get_context_data(**kwargs)
+		context['sidebar_liste'] = get_sidebar(self.request.user)
+		context['title'] = self.model._meta.verbose_name_plural
+		add_perm = re.sub("view","add",self.permission_required)
+		if self.request.user.has_perm(add_perm): context['add'] = self.model._meta.verbose_name_raw
+		context['url_args'] = url_args(self.request)
+		return context
+
 class MyDetailView(SuccessMessageMixin, LoginRequiredMixin, PermissionRequiredMixin, DetailView):
 	login_url = settings.LOGIN_URL
 	template_name = 'Basis/detail.html'
 
+	def get_context_data(self, **kwargs):
+		context = {}
+		context['sidebar_liste'] = get_sidebar(self.request.user)
+		context['title'] = self.model._meta.verbose_name_raw
+		context['submit_button'] = "Sichern"
+		context['back_button'] = ["Abbrechen",self.success_url+url_args(self.request)]
+		context['url_args'] = url_args(self.request)
+		return context		
+
 class MyCreateView(SuccessMessageMixin, LoginRequiredMixin, PermissionRequiredMixin, CreateView):
 	login_url = settings.LOGIN_URL
-	template_name = 'Basis/detail.html'	
+	template_name = 'Basis/detail.html'
+
+	def get(self, request, *args, **kwargs):
+		context = self.get_context_data(**kwargs)
+		form = self.form_class()
+		context['form'] = form
+		return render(request, self.template_name, context)	
+
+	def get_context_data(self, **kwargs):
+		context = {}
+		context['sidebar_liste'] = get_sidebar(self.request.user)
+		context['title'] = self.model._meta.verbose_name_raw+" hinzufügen"
+		context['submit_button'] = "Sichern"
+		context['back_button'] = ["Abbrechen",self.success_url+url_args(self.request)]
+		context['url_args'] = url_args(self.request)
+		return context	
 	
 	def form_invalid(self, form):
 		context = self.get_context_data()
@@ -70,7 +103,7 @@ class MyUpdateView(SuccessMessageMixin, LoginRequiredMixin, PermissionRequiredMi
 	def get_context_data(self, **kwargs):
 		context = {}
 		context['sidebar_liste'] = get_sidebar(self.request.user)
-		context['title'] = self.model._meta.verbose_name_raw
+		context['title'] = self.model._meta.verbose_name_raw+" ändern"
 		context['submit_button'] = "Sichern"
 		context['back_button'] = ["Abbrechen",self.success_url+url_args(self.request)]
 		del_perm = re.sub("change","delete",self.permission_required)
@@ -94,6 +127,7 @@ class MyUpdateView(SuccessMessageMixin, LoginRequiredMixin, PermissionRequiredMi
 		messages.error(self.request, form.errors)			
 		return render(self.request, self.template_name, context)
 	
+from django.db import models
 class MyDeleteView(SuccessMessageMixin, LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
 	login_url = settings.LOGIN_URL
 	template_name = 'Basis/confirm_delete.html'
@@ -121,6 +155,7 @@ class MyDeleteView(SuccessMessageMixin, LoginRequiredMixin, PermissionRequiredMi
 		instance = get_object_or_404(self.model, **get_object_filter(self, request), pk=kwargs['pk'])
 		messages.success(request, self.model._meta.verbose_name_raw+' "'+str(instance)+'" wurde gelöscht.')
 		return self.delete(request, *args, **kwargs)
+
 
 class BasisView(LoginRequiredMixin, ListView):
 	login_url = settings.LOGIN_URL

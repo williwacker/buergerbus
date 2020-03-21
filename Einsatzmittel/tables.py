@@ -13,10 +13,17 @@ class BusTable(tables.Table):
             {% endif %}
         '''
     )
+    fahrzeiten = tables.TemplateColumn(
+        template_code='''
+            {% for object in record.fahrzeiten.all %}
+                {{ object }}<br>
+            {% endfor %}
+        '''
+    )
 
     class Meta:
         model = Bus
-        fields = ('bus', 'plantage', 'plan_ende', 'sitzplaetze', 'fahrtage', 'email', 'planzeiten', 'standort')
+        fields = ('bus', 'plantage', 'plan_ende', 'sitzplaetze', 'fahrzeiten', 'email', 'standort')
 
 class BueroTable(tables.Table):
     buero = tables.TemplateColumn(

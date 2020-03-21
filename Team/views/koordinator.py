@@ -21,6 +21,7 @@ register = template.Library()
 
 class KoordinatorView(MyListView):
 	permission_required = 'Team.view_koordinator'
+	model = Koordinator
 
 	def get_fg_queryset(self):
 		return Koordinator.objects.order_by('team','benutzer').filter(team__in=get_buero_list(self.request))
@@ -35,11 +36,7 @@ class KoordinatorView(MyListView):
 
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
-		context['sidebar_liste'] = get_sidebar(self.request.user)
-		context['title'] = "Koordinator"
-		if self.request.user.has_perm('Team.add_koordinator'): context['add'] = "Koordinator"
 		context['filter'] = KoordinatorFilter(self.request.GET, queryset=self.get_fg_queryset())
-		context['url_args'] = url_args(self.request)
 		return context
 
 class KoordinatorAddView(MyCreateView):
@@ -48,13 +45,12 @@ class KoordinatorAddView(MyCreateView):
 	success_url = '/Team/koordinator/'
 	model = Koordinator
 
-	def get_context_data(self, **kwargs):
-		context = super(KoordinatorAddView, self).get_context_data(**kwargs)
-		context['sidebar_liste'] = get_sidebar(self.request.user)
-		context['title'] = "Koordinator hinzufügen"
-		context['submit_button'] = "Sichern"
-		context['back_button'] = ["Abbrechen",self.success_url+url_args(self.request)]
-		return context
+	def get(self, request, *args, **kwargs):
+		context = self.get_context_data(**kwargs)
+		form = self.form_class()
+		form.fields['team'].queryset = Buero.objects.filter(id__in=get_buero_list(self.request))
+		context['form'] = form
+		return render(request, self.template_name, context)			
 	
 	def form_valid(self, form):
 		instance = form.save(commit=False)
@@ -79,16 +75,12 @@ class KoordinatorChangeView(MyUpdateView):
 	success_url = '/Team/koordinator/'
 	model = Koordinator
 
-	def get_context_data(self, **kwargs):
-		context = super().get_context_data(**kwargs)
-		context['title'] = "Koordinator ändern"
-		return context
-	
 	def get(self, request, *args, **kwargs):
 		context = self.get_context_data(**kwargs)
 		instance = get_object_or_404(Koordinator, pk=kwargs['pk'])
 		form = self.form_class(instance=instance)
 		form.fields['name'].initial = ", ".join([instance.benutzer.last_name, instance.benutzer.first_name])
+		form.fields['team'].queryset = Buero.objects.filter(id__in=get_buero_list(self.request))
 		context['form'] = form
 		return render(request, self.template_name, context)
 	
@@ -116,23 +108,13 @@ class KoordinatorCopyView(MyUpdateView):
 	permission_required = 'Team.change_koordinator'
 	success_url = '/Team/koordinator/'
 	model = Koordinator
-
-	def get_context_data(self, **kwargs):
-		context = {}
-		context['sidebar_liste'] = get_sidebar(self.request.user)
-		context['title'] = "Koordinator ändern"
-		if self.request.user.has_perm('Team.delete_koordinator'):
-			context['delete_button'] = "Löschen"
-		context['submit_button'] = "Sichern"
-		context['back_button'] = ["Abbrechen",self.success_url+url_args(self.request)]
-		context['url_args'] = url_args(self.request)
-		return context
 	
 	def get(self, request, *args, **kwargs):
 		context = self.get_context_data(**kwargs)
 		instance = get_object_or_404(Koordinator, pk=kwargs['pk'])
 		form = self.form_class(instance=instance)
 		form.fields['name'].initial = ", ".join([instance.benutzer.last_name, instance.benutzer.first_name])
+		form.fields['team'].queryset = Buero.objects.filter(id__in=get_buero_list(self.request))
 		context['form'] = form
 		return render(request, self.template_name, context)
 	

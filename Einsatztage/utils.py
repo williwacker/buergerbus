@@ -15,7 +15,7 @@ from django.shortcuts import get_object_or_404
 
 ### Fahrtage und Bürotage schreiben
 from Basis.berechnung_feiertage import Holidays
-from Einsatzmittel.models import Buero, Bus
+from Einsatzmittel.models import Buero, Bus, Fahrzeiten
 from Einsatztage.models import Buerotag, Fahrtag
 from Tour.models import Tour
 
@@ -45,21 +45,21 @@ class FahrtageSchreiben():
 		# die nächsten Feiertage ausrechnen
 		holiday_list = get_holidays()
 
-		rows = Bus.objects.order_by('bus').values_list('id','fahrtage')
+		rows = Bus.objects.order_by('bus').values_list('id','fahrzeiten')
 		array = [row for row in rows]
 		for item in array:
-			id, fahrtag = item
+			id, fahrzeiten_id = item
 			bus = get_object_or_404(Bus, pk=id)
+			fahrzeiten = get_object_or_404(Fahrzeiten, pk=fahrzeiten_id)
 			rows = Fahrtag.objects.filter(team=bus, archiv=False).values_list('datum',flat=True)
 			existierende_tage = [row for row in rows]
-
 			# die Fahrtage für die nächsten n Tage ausrechnen
 			max_days = max(settings.COUNT_DRIVING_DAYS, bus.plantage, settings.COUNT_TOUR_DAYS)
 			for i in range(1,max_days):
 				neuer_tag = datetime.date.today() + datetime.timedelta(days=i)
 				if neuer_tag not in existierende_tage:  # Tag ist nicht bereits definiert
 					if neuer_tag not in holiday_list:   # Tag ist kein Feiertag
-						if neuer_tag.isoweekday() == fahrtag:   # Tag ist ein Fahrtag
+						if neuer_tag.isoweekday() == fahrzeiten.tag_id:   # Tag ist ein Fahrtag
 							if changedate != neuer_tag:
 								t = Fahrtag(datum=neuer_tag, team=bus)
 								t.save()

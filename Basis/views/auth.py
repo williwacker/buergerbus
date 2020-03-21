@@ -1,58 +1,47 @@
 from django.contrib import messages
+from django import forms
 from django.conf import settings
 from django.urls import reverse_lazy
 from django.core.mail import EmailMessage
 from django.contrib.auth import login as auth_login
 from django.contrib.sites.shortcuts import get_current_site
+from django.shortcuts import get_object_or_404, render
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
-from django.contrib.auth.models import Group, User
 from django.contrib.auth.views import PasswordChangeView
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.template import loader
 from django.views.generic import TemplateView
+
+from Basis.models import MyUser, MyGroup
 from Basis.forms import MyGroupChangeForm, MyUserCreationForm, MyUserChangeForm
 from Basis.tables import GroupTable, UserTable
 from Basis.utils import get_sidebar, url_args
-from Basis.views import (MyDeleteView, MyCreateView, MyDetailView, MyListView, MyUpdateView,
-						 MyView)
+from Basis.views import MyDeleteView, MyCreateView, MyDetailView, MyListView, MyUpdateView, MyView
 
 # User Views
 class UserView(MyListView):
 	permission_required = 'auth.view_user'
-	
+	model = MyUser
+
 	def get_queryset(self):
-		qs = User.objects.order_by('username')
+		qs = self.model.objects.order_by('username')
+		if not self.request.user.is_superuser:
+			qs = qs.exclude(is_superuser=True)
 		table = UserTable(qs)
 		table.paginate(page=self.request.GET.get("page", 1), per_page=20)
 		return table
 
-	def get_context_data(self, **kwargs):
-		context = super().get_context_data(**kwargs)
-		context['sidebar_liste'] = get_sidebar(self.request.user)
-		if self.request.user.has_perm('auth.change_user'):
-			context['add'] = "Benutzer"
-		context['title'] = "Benutzer"
-		context['url_args'] = url_args(self.request)
-		return context
 
 class UserAddView(MyCreateView):
 	permission_required = 'auth.add_user'
 	form_class = MyUserCreationForm
 	success_url = '/Basis/benutzer/'
-	model = User
-
-	def get_context_data(self, **kwargs):
-		context = super(UserAddView, self).get_context_data(**kwargs)
-		context['sidebar_liste'] = get_sidebar(self.request.user)
-		context['title'] = "Benutzer hinzufügen"
-		context['submit_button'] = "Sichern"
-		context['back_button'] = ["Abbrechen",self.success_url+url_args(self.request)]	
-		return context
+	model = MyUser
 
 	def form_valid(self, form):
 		user = form.save(commit=False)
-		password = User.objects.make_random_password()
+		password = self.model.objects.make_random_password()
 		user.set_password(password)
 		user.created_by = self.request.user
 		current_site = get_current_site(self.request)
@@ -82,66 +71,54 @@ class UserAddView(MyCreateView):
 class UserChangeView(MyUpdateView):
 	permission_required = 'auth.change_user'
 	form_class = MyUserChangeForm
-	model=User
+	model=MyUser
 	success_url = '/Basis/benutzer/'
 
-	def get_context_data(self, **kwargs):
-		context = super().get_context_data(**kwargs)
-		context['title'] = "Benutzer ändern"
-		return context
+	def get(self, request, *args, **kwargs):
+		context = self.get_context_data()
+		instance=get_object_or_404(self.model, pk=kwargs['pk'])
+		form = self.form_class(instance=instance)
+		if not self.request.user.is_superuser:
+			# only the owned groups and user_permissions can be assigned
+			form.fields['groups'].queryset = \
+				form.fields['groups'].queryset.filter(id__in=[i.id for i in self.request.user.groups.all()])
+			form.fields['user_permissions'].queryset = \
+				form.fields['user_permissions'].queryset.filter(id__in=[i.id for i in self.request.user.user_permissions.all()])
+			form.fields['is_superuser'].widget = forms.HiddenInput()
+			form.fields['is_staff'].widget = forms.HiddenInput()
+			form.fields['password'].widget = forms.HiddenInput()
+		context['form'] = form
+		return render(request, self.template_name, context)
 
-	def get_form(self, form_class=None):
-		form = super(UserChangeView, self).get_form(self.form_class)
-		user = self.request.user
-		if not user.is_superuser:
-			form.fields['groups'].queryset = form.fields['groups'].queryset.filter(id__in=[i.id for i in user.groups.all()])
-			form.fields['user_permissions'].queryset = form.fields['user_permissions'].queryset.filter(id__in=[i.id for i in user.user_permissions.all()])
-			form.fields['is_superuser'].widget.attrs['disabled'] = True
-		return form
-	
 	def form_valid(self, form):
 		instance = form.save()
 		messages.success(self.request, 'Benutzer "<a href="'+self.success_url+str(instance.id)+'">'+instance.username+'</a>" wurde erfolgreich geändert.')
 		return super(UserChangeView, self).form_valid(form) 
 
+
 class UserDeleteView(MyDeleteView):
 	permission_required = 'auth.delete_user'
 	success_url = '/Basis/benutzer/'
-	model = User
+	model = MyUser
 
 # Gruppen
 
 class GroupView(MyListView):
 	permission_required = 'auth.view_group'
+	model=MyGroup
 	
 	def get_queryset(self):
-		qs = Group.objects.order_by('name')
+		qs = self.model.objects.order_by('name')
 		table = GroupTable(qs)
 		table.paginate(page=self.request.GET.get("page", 1), per_page=20)
 		return table
 
-	def get_context_data(self, **kwargs):
-		context = super().get_context_data(**kwargs)
-		context['sidebar_liste'] = get_sidebar(self.request.user)
-		if self.request.user.has_perm('auth.change_group'):
-			context['add'] = "Gruppe"
-		context['title'] = "Gruppen"
-		context['url_args'] = url_args(self.request)
-		return context
 
 class GroupAddView(MyCreateView):
 	permission_required = 'auth.change_group'
 	form_class = MyGroupChangeForm
 	success_url = '/Basis/gruppen/'
-	model=Group
-
-	def get_context_data(self, **kwargs):
-		context = super(GroupAddView, self).get_context_data(**kwargs)
-		context['sidebar_liste'] = get_sidebar(self.request.user)
-		context['title'] = "Gruppe hinzufügen"
-		context['submit_button'] = "Sichern"
-		context['back_button'] = ["Abbrechen",self.success_url+url_args(self.request)]	
-		return context
+	model=MyGroup
 
 	def form_valid(self, form):
 		instance = form.save(commit=False)
@@ -156,12 +133,7 @@ class GroupChangeView(MyUpdateView):
 	permission_required = 'auth.change_group'
 	form_class = MyGroupChangeForm
 	success_url = '/Basis/gruppen/'
-	model=Group
-
-	def get_context_data(self, **kwargs):
-		context = super().get_context_data(**kwargs)
-		context['title'] = "Benutzer ändern"
-		return context
+	model=MyGroup
 	
 	def form_valid(self, form):
 		instance = form.save()
@@ -173,7 +145,7 @@ class GroupChangeView(MyUpdateView):
 class GroupDeleteView(MyDeleteView):
 	permission_required = 'auth.delete_group'
 	success_url = '/Basis/gruppen/'
-	model = Group
+	model = MyGroup
 
 
 class MyPasswordChangeView(PasswordChangeView):

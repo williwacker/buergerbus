@@ -22,6 +22,7 @@ register = template.Library()
 
 class StandortView(MyListView):
 	permission_required = 'Einsatzmittel.change_bus'
+	model = Klienten
 
 	def get_queryset(self):
 		qs = Klienten.objects.order_by('name','ort').filter(typ='S')
@@ -29,10 +30,8 @@ class StandortView(MyListView):
 
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
-		context['sidebar_liste'] = get_sidebar(self.request.user)
 		context['title'] = "Bus Standorte"
 		if self.request.user.has_perm('Klienten.add_klienten'): context['add'] = "Standort"
-		context['url_args'] = url_args(self.request)
 		return context
 
 class StandortAddView(MyCreateView):
@@ -43,10 +42,7 @@ class StandortAddView(MyCreateView):
 
 	def get_context_data(self, **kwargs):
 		context = {}
-		context['sidebar_liste'] = get_sidebar(self.request.user)
 		context['title'] = "Bus Standort hinzufügen"
-		context['submit_button'] = "Sichern"
-		context['back_button'] = ["Abbrechen",self.success_url+url_args(self.request)]
 		context['popup'] = self.request.GET.get('_popup',None)
 		return context
 	
@@ -114,4 +110,8 @@ class StandortDeleteView(MyDeleteView):
 	permission_required = 'Einsatzmittel.delete_bus'
 	success_url = '/Klienten/standorte/'
 	model = Klienten
-	pass
+
+	def get_context_data(self, **kwargs):
+		context = super().get_context_data(**kwargs)
+		context['title'] = "Bus Standort löschen"
+		return context

@@ -7,16 +7,20 @@ from django.utils.text import normalize_newlines
 
 register = template.Library()
 
+ALLOWABLE_VALUES = ("PORTAL", "MEDIA_ROOT", "MEDIA_URL", "COMMUNITY_SUBDIR")
+
 @register.filter
 def verbose_name(obj):
     return obj._meta.verbose_name
-
 
 @register.filter
 def verbose_name_plural(obj):
     return obj._meta.verbose_name_plural
 
-ALLOWABLE_VALUES = ("PORTAL", "WELCOME", "MEDIA_ROOT", "MEDIA_URL")
+@register.filter
+def to_str(value):
+    """converts int to string"""
+    return str(value)
 
 # settings value
 @register.simple_tag

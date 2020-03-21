@@ -26,6 +26,7 @@ register = template.Library()
 
 class DienstleisterView(MyListView):
 	permission_required = 'Klienten.view_klienten'
+	model = Klienten
 
 	def get_queryset(self):
 		name = self.request.GET.get('name')
@@ -41,11 +42,9 @@ class DienstleisterView(MyListView):
 
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
-		context['sidebar_liste'] = get_sidebar(self.request.user)
 		context['title'] = "Dienstleister"
 		if self.request.user.has_perm('Klienten.add_klienten'): context['add'] = "Dienstleister"
 		context['filter'] = DienstleisterFilter(self.request.GET, queryset=Klienten.objects.order_by('name','ort').filter(typ='D'))
-		context['url_args'] = url_args(self.request)
 		return context		
 
 class DienstleisterAddView(MyCreateView):
@@ -55,12 +54,9 @@ class DienstleisterAddView(MyCreateView):
 	model = Klienten
 
 	def get_context_data(self, **kwargs):
-		context = {}
-		context['sidebar_liste'] = get_sidebar(self.request.user)
+		context = super().get_context_data(**kwargs)
 		context['title'] = "Dienstleister hinzufügen"
-		context['submit_button'] = "Sichern"
 		context['popup'] = self.request.GET.get('_popup',None)
-		context['back_button'] = ["Abbrechen",self.success_url+url_args(self.request)]
 		return context
 	
 	def get(self, request, *args, **kwargs):
@@ -250,6 +246,12 @@ class DienstleisterSearchMultiformsView(MyMultiFormsView):
 
 		matching_category = process.extract(result['na'], [sub[0] for sub in DIENSTLEISTER_AUSWAHL], limit=1)
 		category = matching_category[0][0] if matching_category[0][1] > 85 else ''
+
+#		a = list(DIENSTLEISTER_AUSWAHL)
+#		dienstleister_category_match = [[sub[0].replace('Arzt','Dr.med'),sub[1]] for sub in list(DIENSTLEISTER_AUSWAHL)] 
+#		matching_category = process.extract(result['na'], [sub[0] for sub in dienstleister_category_match], limit=1)
+#		i = dienstleister_category_match.index(matching_category[0])
+#		category = dienstleister_category_match[dienstleister_category_match[0].index(matching_category[0])] if matching_category[1] > 85 else ''
 
 		if filtered_street_names:
 			existing_clients = list(Klienten.objects.values('name','id').filter(ort=matching_street[0]['ort'],strasse=matching_street[0]['id']))

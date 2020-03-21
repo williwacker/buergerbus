@@ -19,6 +19,20 @@ class Wochentage(models.Model):
 	def __str__(self):
 		return self.name
 
+	def kurzname(self):
+		return self.name[:2]
+
+class Fahrzeiten(models.Model):
+	tag    = models.ForeignKey(Wochentage, null=True, on_delete=models.CASCADE, verbose_name = "Fahrtag")
+	zeiten = models.CharField(max_length=50, default='08:00-12:00+14:00-17:00', verbose_name = "Fahrzeiten")
+
+	class Meta():
+		verbose_name_plural = "Fahrzeiten"
+		verbose_name = "Fahrzeit"
+		ordering = ["id"]	
+
+	def __str__(self):
+		return str(" ".join([self.tag.name,self.zeiten]))
 
 class Buero(models.Model):
 	buero      	= models.CharField(max_length=20, unique=True, verbose_name = "Büro")
@@ -82,13 +96,13 @@ class Buero(models.Model):
 class Bus(models.Model):
 	bus         = models.CharField(max_length=25, unique=True, verbose_name="Bus")
 	sitzplaetze = models.IntegerField(default=8, verbose_name="Sitzplätze") 
-	fahrtage    = models.ManyToManyField(Wochentage, default='', verbose_name = "Fahrtage")
 	email 		= models.EmailField(max_length=254, blank=True)
 	plantage    = models.IntegerField(default=settings.COUNT_TOUR_DAYS, verbose_name="Planbare Kalendertage")
-	planzeiten  = models.CharField(max_length=50, default='08:00-12:00, 14:00-17:00', verbose_name = "Fahrzeiten",
-		help_text = 'Mehrere Fahrzeiten durch Komma getrennt. Beispiel: 08:00-12:00, 14:00-17:00')
-	standort    = models.ForeignKey('Klienten.Klienten', null=True, related_name='standort', verbose_name="Bus Standort",
+	fahrzeiten  = models.ManyToManyField(Fahrzeiten, default='')
+	standort    = models.ForeignKey('Klienten.Klienten', null=True, related_name="+", verbose_name="Bus Standort",
 		on_delete=models.SET_NULL)
+	ignore_conflict = models.BooleanField(default=False, verbose_name="Konflikte ignorieren")
+	qr_code     = models.BooleanField(default=True, verbose_name="Fahrplan mit QR Code")
 	created_on  = models.DateTimeField(auto_now_add=True, null=True)
 	created_by  = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, related_name="+", on_delete=models.SET_NULL)
 	updated_on  = models.DateTimeField(auto_now=True, blank=True, null=True)
@@ -105,20 +119,6 @@ class Bus(models.Model):
 	@property
 	def plan_ende(self):
 		return (datetime.now()+timedelta(self.plantage)).strftime('%Y-%m-%d')
-
-	@property
-	def planzeiten_list(self):
-		ranges = self.planzeiten.split(',')
-		ranges = [item.strip() for item in ranges]
-		ranges.sort()
-		outer_list = []
-		for range in ranges:
-			timestamps = range.split('-')
-			inner_list = []
-			for timestamp in timestamps:
-				inner_list.append(datetime.strptime(timestamp, '%H:%M').time())
-			outer_list.append(inner_list)
-		return outer_list
 
 	def _permission_codename(self):
 		# gibt den codenamen der entsprechenden Berechtigung zurück

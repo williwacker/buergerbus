@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import UserChangeForm, UsernameField
-from django.contrib.auth.models import Group, User
+from .models import MyUser, MyGroup
 from django.forms import ModelForm
 from django.shortcuts import render
 
@@ -13,7 +13,7 @@ class MyUserCreationForm(forms.ModelForm):
 	"""
 
 	class Meta:
-		model = User
+		model = MyUser
 		fields = ('username', 'first_name', 'last_name', 'email')
 		field_classes = {'username': UsernameField}
 
@@ -36,15 +36,16 @@ class MyUserChangeForm(UserChangeForm):
 		super(MyUserChangeForm, self).__init__(*args, **kwargs)
 
 	class Meta:
-		model = User
+		model = MyUser
 		fields = ['username', 'first_name', 'last_name', 'email', 'groups', 'user_permissions', 'is_staff', 'is_superuser', 'is_active']
+		
 
 class MyGroupChangeForm(ModelForm):
 	def __init__(self, *args, **kwargs):
 		super(MyGroupChangeForm, self).__init__(*args, **kwargs)
 
 	class Meta:
-		model = Group
+		model = MyGroup
 		fields = ['name', 'permissions']
 
 class FeedbackForm(forms.Form):

@@ -29,13 +29,13 @@ from ..utils import FahrplanBackup
 class FahrplanView(MyListView):
 	permission_required = 'Tour.view_tour'
 	success_url = '/Einsatztage/fahrer/'
+	model = Tour
 
 	def get_queryset(self):
 		return TourTable(Tour.objects.order_by('uhrzeit').filter(datum=self.kwargs['id']))
 
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
-		context['sidebar_liste'] = get_sidebar(self.request.user)
 		ft = Fahrtag.objects.filter(pk=self.kwargs['id'])
 		context['pre_table'] = FahrerTable(ft)
 		context['title'] = 'Fahrplan {} am {}'.format(ft.first().team,ft.first())
@@ -45,6 +45,7 @@ class FahrplanView(MyListView):
 class FahrplanAsPDF(MyView):
 	permission_required = 'Tour.view_tour'
 	success_url = '/Einsatztage/fahrer/'
+	model = Tour
 
 	def pdf_render_to_response(self, template_src, context_dict={}, filename=None, prompt=False):
 		context_dict['filename'] = filename
@@ -77,6 +78,7 @@ class FahrplanAsPDF(MyView):
 class FahrplanAsCSV(MyView):
 	permission_required = 'Tour.view_tour'
 	success_url = '/Einsatztage/fahrer/'
+	model = Tour
 
 	def get(self, request, id):
 		FahrplanBackup().export_as_csv(id)
@@ -85,6 +87,7 @@ class FahrplanAsCSV(MyView):
 class FahrplanBackupView(MyView):
 	permission_required = 'Tour.view_tour'
 	success_url = '/Einsatztage/fahrer/'
+	model = Tour
 
 	def get(self, request):
 		FahrplanBackup().send_backup()
@@ -94,18 +97,17 @@ class FahrplanEmailView(MyDetailView):
 	form_class = FahrplanEmailForm
 	permission_required = 'Tour.view_tour'
 	success_url = '/Einsatztage/fahrer/'
-	context = {}
+	model = Tour
 
-	def get_context_data(self):
-		self.context['sidebar_liste'] = get_sidebar(self.request.user)
+	def get_context_data(self, **kwargs):
+		context = super().get_context_data(**kwargs)
 		ft = get_object_or_404(Fahrtag, pk=self.kwargs['id'])
-		self.context['fahrtag_liste'] = ft
-		self.context['tour_liste'] = Tour.objects.order_by('uhrzeit').filter(datum=self.kwargs['id'])
-		self.context['title'] = 'Fahrplan {} am {} versenden'.format(ft.team,ft.datum)
-		self.context['submit_button'] = "Senden"
-		self.context['back_button'] = ["Abbrechen",self.success_url+url_args(self.request)]
-		self.context['url_args'] = url_args(self.request)
-		self.context['filepath'] = []
+		context['fahrtag_liste'] = ft
+		context['tour_liste'] = Tour.objects.order_by('uhrzeit').filter(datum=self.kwargs['id'])
+		context['title'] = 'Fahrplan {} am {} versenden'.format(ft.team,ft.datum)
+		context['submit_button'] = "Senden"
+		context['filepath'] = []
+		return context
 
 	def get_dsgvo_klienten(self):
 		klienten_liste = {}
@@ -114,6 +116,7 @@ class FahrplanEmailView(MyDetailView):
 		return klienten_liste
 
 	def writeDSGVO(self):
+		context = self.get_context_data()
 		filepath_liste = []
 		if settings.SEND_DSGVO:
 			klienten_liste = self.get_dsgvo_klienten()
@@ -122,7 +125,7 @@ class FahrplanEmailView(MyDetailView):
 				klienten_keys.append(klienten_liste[key].id)
 				self.context['klient'] = klienten_liste[key]
 				filename = "DSGVO_{}_{}.pdf".format(klienten_liste[key].nachname, klienten_liste[key].vorname)
-				pdf = FahrplanAsPDF().pdf_render_to_response('Klienten/dsgvo.rml', self.context, filename)
+				pdf = FahrplanAsPDF().pdf_render_to_response('Klienten/dsgvo.rml', context, filename)
 				if pdf:
 					response = HttpResponse(pdf, content_type='application/pdf')
 					content = "inline; filename='%s'" %(filename)
@@ -135,8 +138,9 @@ class FahrplanEmailView(MyDetailView):
 		return filepath_liste
 
 	def writeFahrplan(self):
-		filename = 'Buergerbus_Fahrplan_{}_{}.pdf'.format(str(self.context['fahrtag_liste'].team).replace(' ','_'), self.context['fahrtag_liste'].datum)
-		pdf = FahrplanAsPDF().pdf_render_to_response('Einsatztage/tour_as_pdf.rml', self.context, filename)
+		context = self.get_context_data()
+		filename = 'Buergerbus_Fahrplan_{}_{}.pdf'.format(str(context['fahrtag_liste'].team).replace(' ','_'), context['fahrtag_liste'].datum)
+		pdf = FahrplanAsPDF().pdf_render_to_response('Einsatztage/tour_as_pdf.rml', context, filename)
 		if pdf:
 			response = HttpResponse(pdf, content_type='application/pdf')
 			content = "inline; filename='%s'" %(filename)
@@ -150,25 +154,26 @@ class FahrplanEmailView(MyDetailView):
 		return [filepath]
 
 	def get(self, request, *args, **kwargs):
-		self.get_context_data()
-		self.context['filepath']+=self.writeDSGVO()
-		self.context['filepath']+=self.writeFahrplan()
+		context = self.get_context_data()
+		context['filepath']+=self.writeDSGVO()
+		context['filepath']+=self.writeFahrplan()
 		form = self.form_class()
 		form.fields['von'].initial = settings.EMAIL_HOST_USER
-		ft = self.context['fahrtag_liste']
+		ft = context['fahrtag_liste']
 		email_to = []
 		if ft.fahrer_vormittag: email_to.append(ft.fahrer_vormittag.benutzer.email)
 		if ft.fahrer_nachmittag: email_to.append(ft.fahrer_nachmittag.benutzer.email)
 		if ft.team.email: email_to.append(ft.team.email)	
 		form.fields['an'].initial = "; ".join(email_to)
 		form.fields['betreff'].initial = '[Bürgerbus] Fahrplan {} am {}'.format(ft.team,ft.datum)
-		form.fields['datei'].initial = '\n'.join(self.context['filepath'])
-		self.context['form'] = form
-		return render(request, self.template_name, self.context)
+		form.fields['datei'].initial = '\n'.join(context['filepath'])
+		context['form'] = form
+		return render(request, self.template_name, context)
 
 	def post(self, request, *args, **kwargs):
+		context = self.get_context_data()
 		form = self.form_class(request.POST)
-		self.context['form'] = form
+		context['form'] = form
 		if form.is_valid():
 			post = form.cleaned_data
 			email = EmailMessage(
@@ -178,7 +183,7 @@ class FahrplanEmailView(MyDetailView):
 				post['an'].split(";"),
 				reply_to=[User.objects.get(username=request.user).email],
 			)
-			if post['cc']: email.cc = post['cc'].split(";")
+			if post['cc']: email.cc = list(post['cc'].values_list('email', flat=True))
 			for filepath in post['datei'].split('\n'):
 				email.attach_file(filepath.strip('\r'))
 			email.send(fail_silently=False)
@@ -195,4 +200,4 @@ class FahrplanEmailView(MyDetailView):
 			return HttpResponseRedirect(self.success_url+url_args(request))
 		else:
 			messages.error(request, form.errors)			
-		return render(request, self.template_name, self.context)
+		return render(request, self.template_name, context)

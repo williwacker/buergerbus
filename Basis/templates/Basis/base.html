@@ -19,7 +19,7 @@
         <link rel="stylesheet" type="text/css" href="{% static "admin/css/forms.css" %}" />
         <link rel="stylesheet" type="text/css" href="{% static "admin/css/changelists.css" %}" />
         <link rel="stylesheet" type="text/css" href="{% static "admin/css/login.css" %}" />
-        <link rel="stylesheet" type="text/css" href="{% static "project/css/base.css" %}" />
+        <link rel="stylesheet" type="text/css" href="{% static "project/css/my_base.css" %}" />        
         <script type="text/javascript" src="/admin/jsi18n/"></script>
         <script type="text/javascript" charset="utf-8">
             var DATE_FORMAT = "%d.%m.%Y";
@@ -45,6 +45,10 @@
         <script type="text/javascript" src="{% static "admin/js/prepopulate.js" %}"></script>
         <script type="text/javascript" src="{% static "admin/js/vendor/xregexp/xregexp.js" %}"></script>
         <script type="text/javascript" src="{% static "project/js/onchange.js" %}"></script>
+        <script type="text/javascript" src="{% url "javascript-catalog" %}"></script>
+        <script type="text/javascript" src="{% static "/admin/js/core.js" %}"></script>
+        <link rel="stylesheet" type="text/css" href="{% static "/admin/css/widgets.css" %}">
+        <style>.calendar>table>caption{caption-side:unset}</style><!--caption fix for bootstrap4-->
     </head>
     <body class="menu-pinned change-list {% if popup %}popup{% endif %}">
         <!-- Container -->
@@ -119,8 +123,8 @@
 
             <div class="sidebar sidebar-dependent">
                 <div class="sidebar-wrapper scrollable">
-                    <div class="sidebar-section logo">
-                        <a href="{% url 'home' %}"><img src="{% static "project/img/buergerbus.jpg" %}" alt="Startseite" title="Startseite"></a>
+                    <div class="sidebar-section logo">{% settings_value "COMMUNITY_SUBDIR" %}
+                        <a href="{% url 'home' %}"><img src="{% static "project/img/" %}{% settings_value "COMMUNITY_SUBDIR" %}/logo.jpg" alt="Startseite" title="Startseite"></a>
                     </div>
                     {% if sidebar_liste %}
                         {% for sidebar in sidebar_liste %}

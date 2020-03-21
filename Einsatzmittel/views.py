@@ -18,31 +18,17 @@ register = template.Library()
 
 class BusView(MyListView):
 	permission_required = 'Einsatzmittel.view_bus'
+	model = Bus
 
 	def get_queryset(self):
 		return(BusTable(Bus.objects.order_by('bus').filter(id__in=get_bus_list(self.request))))
 
-	def get_context_data(self, **kwargs):
-		context = super().get_context_data(**kwargs)
-		context['sidebar_liste'] = get_sidebar(self.request.user)
-		context['title'] = "Busse"
-		if self.request.user.has_perm('Einsatzmittel.add_bus'): context['add'] = "Bus"
-		context['url_args'] = url_args(self.request)
-		return context
 
 class BusAddView(MyCreateView):
 	form_class = BusAddForm
 	permission_required = 'Einsatzmittel.add_bus'
 	success_url = '/Einsatzmittel/busse/'
 	model = Bus
-
-	def get_context_data(self, **kwargs):
-		context = super(BusAddView, self).get_context_data(**kwargs)
-		context['sidebar_liste'] = get_sidebar(self.request.user)
-		context['title'] = "Bus hinzufügen"
-		context['submit_button'] = "Sichern"
-		context['back_button'] = ["Abbrechen",self.success_url+url_args(self.request)]
-		return context
 
 	def form_valid(self, form):
 		instance = form.save(commit=False)
@@ -58,18 +44,6 @@ class BusChangeView(MyUpdateView):
 	form_class = BusChgForm
 	model = Bus
 	success_url = '/Einsatzmittel/busse/'
-	
-	def get_context_data(self, **kwargs):
-		context = super().get_context_data(**kwargs)
-		context['title'] = "Bus ändern"
-		return context
-
-	def get(self, request, *args, **kwargs):
-		context = self.get_context_data(**kwargs)
-		instance=get_object_or_404(self.model, pk=kwargs['pk'])
-		form = self.form_class(instance=instance)
-		context['form'] = form
-		return render(request, self.template_name, context)
 
 	def form_invalid(self, form):
 		context = self.get_context_data()	
@@ -97,17 +71,10 @@ class BusDeleteView(MyDeleteView):
 
 class BueroView(MyListView):
 	permission_required = 'Einsatzmittel.view_buero'
+	model = Buero
 
 	def get_queryset(self):
 		return(BueroTable(Buero.objects.order_by('buero').filter(id__in=get_buero_list(self.request))))
-
-	def get_context_data(self, **kwargs):
-		context = super().get_context_data(**kwargs)
-		context['sidebar_liste'] = get_sidebar(self.request.user)
-		context['title'] = "Büros"
-		if self.request.user.has_perm('Einsatzmittel.add_buero'): context['add'] = "Büro"
-		context['url_args'] = url_args(self.request)
-		return context
 
 class BueroAddView(MyCreateView):
 	form_class = BueroAddForm

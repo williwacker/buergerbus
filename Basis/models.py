@@ -6,8 +6,24 @@ from django.conf import settings
 from django.db import models
 from django.dispatch import receiver
 from django.utils.translation import ugettext_lazy as _
+from django.contrib.auth.models import Group, User
 
 logger = logging.getLogger(__name__)
+
+class MyUser(User):
+	class Meta:
+		proxy = True
+		verbose_name = 'Benutzer'
+		verbose_name_plural = 'Benutzer'
+
+	def __str__(self):
+		return ', '.join([self.last_name, self.first_name])		
+
+class MyGroup(Group):
+	class Meta:
+		proxy = True
+		verbose_name = 'Gruppe'
+		verbose_name_plural = 'Gruppen'		
 
 class Document(models.Model):
 	document = models.FileField(upload_to='', verbose_name='Dokument')
@@ -18,7 +34,6 @@ class Document(models.Model):
 	updated_on = models.DateTimeField(auto_now=True, null=True)
 	updated_by = models.ForeignKey(settings.AUTH_USER_MODEL,
 		null=True, related_name="+", on_delete=models.SET_NULL)
-
 
 	class Meta():
 		verbose_name = "Dokument"

@@ -22,6 +22,7 @@ register = template.Library()
 
 class OrtView(MyListView):
 	permission_required = 'Klienten.view_orte'
+	model = Orte
 	
 	def get_queryset(self):
 		ort = self.request.GET.get('ort')
@@ -37,11 +38,7 @@ class OrtView(MyListView):
 
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
-		context['sidebar_liste'] = get_sidebar(self.request.user)
-		context['title'] = "Orte"
-		if self.request.user.has_perm('Klienten.add_orte'): context['add'] = "Ort"
 		context['filter'] = OrteFilter()
-		context['url_args'] = url_args(self.request)
 		return context		
 
 class OrtAddView(MyCreateView):
@@ -51,11 +48,7 @@ class OrtAddView(MyCreateView):
 	model = Orte
 
 	def get_context_data(self, **kwargs):
-		context = {}
-		context['sidebar_liste'] = get_sidebar(self.request.user)
-		context['title'] = "Ort hinzufügen"
-		context['submit_button'] = "Sichern"
-		context['back_button'] = ["Abbrechen",self.success_url+url_args(self.request)]
+		context = super().get_context_data(**kwargs)
 		context['popup'] = self.request.GET.get('_popup',None) 
 		return context
 
@@ -81,11 +74,6 @@ class OrtChangeView(MyUpdateView):
 	permission_required = 'Klienten.change_orte'
 	success_url = '/Klienten/orte/'
 	model = Orte
-
-	def get_context_data(self, **kwargs):
-		context = super().get_context_data(**kwargs)
-		context['title'] = "Ort ändern"
-		return context
 
 	def get(self, request, *args, **kwargs):
 		context = self.get_context_data(**kwargs)
