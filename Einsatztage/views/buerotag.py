@@ -43,7 +43,6 @@ class BuerotageListView(MyListView):
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
 		context['filter'] = BuerotagFilter(self.request.GET, queryset=Buerotag.objects.filter(archiv=False, team__in=get_buero_list(self.request)))
-		del context['add']
 		return context
 
 class BuerotageChangeView(MyUpdateView):
@@ -54,7 +53,6 @@ class BuerotageChangeView(MyUpdateView):
 
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
-		del context['delete_button']
 		return context	
 
 	def get(self, request, *args, **kwargs):
