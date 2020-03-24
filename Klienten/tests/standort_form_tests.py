@@ -2,6 +2,7 @@ from django.test import TestCase
 
 from Klienten.forms import StandortAddForm, StandortChgForm
 
+
 class StandortChgFormTest(TestCase):
     def test_chg_form_name_field_label(self):
         form = StandortChgForm()
@@ -29,4 +30,4 @@ class StandortChgFormTest(TestCase):
 
     def test_chg_form_hausnr_field_help_text(self):
         form = StandortChgForm()
-        self.assertEqual(form.fields['hausnr'].label, 'Hausnr')                                               
+        self.assertEqual(form.fields['hausnr'].label, 'Hausnr')

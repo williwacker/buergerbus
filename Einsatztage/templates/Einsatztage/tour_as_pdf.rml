@@ -201,6 +201,9 @@
                         <td><para style="p2">{{ tour.ankunft|default_if_none:"-" }}</para></td>
                         <td><para style="p2">
                         	{% if tour.klient.bemerkung %}{{ tour.klient.bemerkung|default_if_none:"" }}<br/>{% endif %}
+                            {% if tour.termin %}
+				                </para><para style="p2-highlight">Termin: {{ tour.termin }}<br/></para><para style="p2">
+			                {% endif %}
                             {% if tour.bemerkung %}
                                 {% if tour.has_markup_text %}</para><para style="p2-highlight">{% endif %}
                                     {{ tour.bemerkung|default_if_none:"" }}<br/>

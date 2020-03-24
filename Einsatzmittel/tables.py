@@ -25,6 +25,7 @@ class BusTable(tables.Table):
         model = Bus
         fields = ('bus', 'plantage', 'plan_ende', 'sitzplaetze', 'fahrzeiten', 'email', 'standort')
 
+
 class BueroTable(tables.Table):
     buero = tables.TemplateColumn(
         template_code='''
@@ -35,7 +36,7 @@ class BueroTable(tables.Table):
         {% endif %}
         '''
     )
-    
+
     class Meta:
         model = Buero
-        fields = ('buero', 'plantage', 'plan_ende', 'buerotage', 'email')      
+        fields = ('buero', 'plantage', 'plan_ende', 'buerotage', 'email')

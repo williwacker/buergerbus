@@ -19,13 +19,12 @@ from django.contrib import admin
 from django.contrib.auth.views import PasswordChangeView
 from django.urls import include, path
 from django.views.generic import TemplateView
-from smart_selects import urls as smart_selects_urls
 from django.views.i18n import JavaScriptCatalog
-
+from smart_selects import urls as smart_selects_urls
+from Basis.signals import *
 
 from Basis.views import (BasisView, MyPasswordChangeDoneView,
                          MyPasswordChangeView)
-from Basis.signals import *                    
 
 urlpatterns = [
     path('', BasisView.as_view(), name='home'),
@@ -43,7 +42,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     url(r'^chaining/', include('smart_selects.urls')),
     url(r'^jet/', include('jet.urls', 'jet')),
-    url(r'^jet/dashboard/', include('jet.dashboard.urls', 'jet-dashboard')), #??Django JET dashboard URLS
+    url(r'^jet/dashboard/', include('jet.dashboard.urls', 'jet-dashboard')),  # ??Django JET dashboard URLS
     url(r'^logs/', include('logtailer.urls')),
     path('jsi18n', JavaScriptCatalog.as_view(), name='javascript-catalog'),
 ]

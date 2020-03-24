@@ -1,7 +1,7 @@
-from django.test import TestCase, Client
-from django.contrib.auth.models import Group, User, Permission
-from django.contrib.contenttypes.models import ContentType
 from django.conf import settings
+from django.contrib.auth.models import Group, Permission, User
+from django.contrib.contenttypes.models import ContentType
+from django.test import Client, TestCase
 
 
 class UserTestCase(TestCase):
@@ -42,10 +42,10 @@ class UserTestCase(TestCase):
         group.permissions.add(Permission.objects.get(name='Can view Tour'))
         group.permissions.add(Permission.objects.get(name='Can delete Tour'))
 
-
     def test_user(self):
         # create user and assign group permission
-        user = User.objects.create_user(username='testuser', password='12345', first_name='Test', last_name='User', email='bla@bla.de')
+        user = User.objects.create_user(username='testuser', password='12345',
+                                        first_name='Test', last_name='User', email='bla@bla.de')
         self.assertTrue(user.is_active)
         group, created = Group.objects.get_or_create(name='Büro ABC')
         user.groups.add(group)

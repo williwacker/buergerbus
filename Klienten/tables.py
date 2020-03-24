@@ -24,7 +24,7 @@ class FahrgaesteTable(tables.Table):
     bemerkung = tables.TemplateColumn(
         template_code='''{{ record.bemerkung }}''',
         attrs={"td": {"class": "remark"}}
-    )    
+    )
     dsgvo = tables.TemplateColumn('''
         {% load static %}
         {% if record.dsgvo == '01' %}
@@ -38,16 +38,16 @@ class FahrgaesteTable(tables.Table):
             {% endif %}
         {% endif %}  
         ''',
-        orderable=False
-    )
+                                  orderable=False
+                                  )
     tour = tables.TemplateColumn('''
         {% load static %}
         {% if record.bus %}
             <a href="/Tour/tour/add/{{ record.id }}/"><img src="{% static "project/img/fahrplan.png" %}" alt="Tour hinzuf&uuml;gen" title="Tour hinzuf&uuml;gen"></a>
         {% endif %}
         ''',
-        orderable=False
-    )
+                                 orderable=False
+                                 )
     anzahl_fahrgast_touren = tables.TemplateColumn(
         template_code='''{{ record.anzahl_fahrgast_touren }}''',
         orderable=False,
@@ -56,7 +56,7 @@ class FahrgaesteTable(tables.Table):
 
     class Meta:
         model = Klienten
-        fields = ('tour','name','telefon','adresse','bus','bemerkung','dsgvo','anzahl_fahrgast_touren')
+        fields = ('tour', 'name', 'telefon', 'adresse', 'bus', 'bemerkung', 'dsgvo', 'anzahl_fahrgast_touren')
 
     def before_render(self, request):
         if request.user.is_superuser:
@@ -69,6 +69,7 @@ class FahrgaesteTable(tables.Table):
         else:
             self.columns.hide('dsgvo')
 
+
 class DienstleisterTable(tables.Table):
     name = tables.TemplateColumn(
         template_code='''
@@ -80,8 +81,8 @@ class DienstleisterTable(tables.Table):
         '''
     )
     adresse = tables.TemplateColumn(
-       template_code='''{{ record.ort }}<br/>{{ record.strasse }} {{ record.hausnr }}''',
-       orderable=False
+        template_code='''{{ record.ort }}<br/>{{ record.strasse }} {{ record.hausnr }}''',
+        orderable=False
     )
     telefon = tables.TemplateColumn(
         template_code='''{{ record.telefon |default_if_none:"-" }}<br/>{{ record.mobil |default_if_none:"" }}'''
@@ -89,7 +90,7 @@ class DienstleisterTable(tables.Table):
     bemerkung = tables.TemplateColumn(
         template_code='''{{ record.bemerkung|default_if_none:"-" }}''',
         attrs={"td": {"class": "remark"}}
-    )     
+    )
     anzahl_dienstleister_touren = tables.TemplateColumn(
         template_code='''{{ record.anzahl_dienstleister_touren }}''',
         orderable=False,
@@ -98,13 +99,14 @@ class DienstleisterTable(tables.Table):
 
     class Meta:
         model = Klienten
-        fields = ('name','telefon','adresse','bemerkung','kategorie','anzahl_dienstleister_touren')
+        fields = ('name', 'telefon', 'adresse', 'bemerkung', 'kategorie', 'anzahl_dienstleister_touren')
 
     def before_render(self, request):
         if request.user.is_superuser:
             self.columns.show('anzahl_dienstleister_touren')
         else:
             self.columns.hide('anzahl_dienstleister_touren')
+
 
 class StandorteTable(tables.Table):
     name = tables.TemplateColumn(
@@ -126,7 +128,8 @@ class StandorteTable(tables.Table):
 
     class Meta:
         model = Klienten
-        fields = ('name','telefon','adresse')
+        fields = ('name', 'telefon', 'adresse')
+
 
 class OrteTable(tables.Table):
     ort = tables.TemplateColumn(
@@ -141,7 +144,8 @@ class OrteTable(tables.Table):
 
     class Meta:
         model = Orte
-        fields = ('ort','plz','bus')
+        fields = ('ort', 'plz', 'bus')
+
 
 class StrassenTable(tables.Table):
     ort = tables.TemplateColumn(
@@ -153,7 +157,7 @@ class StrassenTable(tables.Table):
             {% endif %} 
         '''
     )
-    
+
     class Meta:
         model = Strassen
-        fields = ('ort','strasse')       
+        fields = ('ort', 'strasse')

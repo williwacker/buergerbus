@@ -7,17 +7,17 @@ from .models import Buerotag, Fahrtag
 
 
 class FahrtagTable(tables.Table):
-	datum = tables.TemplateColumn(
-		template_code='''
+    datum = tables.TemplateColumn(
+        template_code='''
 			{% if perms.Einsatztage.change_fahrtag %}
 				<a href="{{ record.id }}/{{ url_args }}">{{ record.datum |safe }}</a>
 			{% else %}
 				{{ record.datum |safe }}
 			{% endif %}
 		'''
-	)
-	fahrplan = tables.TemplateColumn(
-		template_code='''
+    )
+    fahrplan = tables.TemplateColumn(
+        template_code='''
 			{% if record.gaeste_vormittag > 0 or record.gaeste_nachmittag > 0 %}
 				{% load static %}
 				<a href="/Einsatztage/fahrer/{{ record.id }}/fahrplan/{{ url_args }}"><img src="{% static "project/img/fahrplan.png" %}" alt="Fahrplan anzeigen" title="Fahrplan anzeigen"></a>
@@ -29,12 +29,12 @@ class FahrtagTable(tables.Table):
 			{% else %}
 				&nbsp;
 			{% endif %}
-		''',orderable=False
-	)
-	gaeste_vormittag = tables.Column(orderable=False, verbose_name='Gäste')
-	gaeste_nachmittag = tables.Column(orderable=False, verbose_name='Gäste')
-	fahrer_vormittag = tables.TemplateColumn(
-		template_code='''
+		''', orderable=False
+    )
+    gaeste_vormittag = tables.Column(orderable=False, verbose_name='Gäste')
+    gaeste_nachmittag = tables.Column(orderable=False, verbose_name='Gäste')
+    fahrer_vormittag = tables.TemplateColumn(
+        template_code='''
 			{% if record.gaeste_vormittag > 0 and record.fahrer_vormittag == None %}
 				<span style="color:red; font-weight:bold">KEIN FAHRER EINGETEILT</span>
 			{% elif record.urlaub %}
@@ -43,9 +43,9 @@ class FahrtagTable(tables.Table):
 				{{ record.fahrer_vormittag|default_if_none:'' }}
 			{% endif %}
 		'''
-	)
-	fahrer_nachmittag = tables.TemplateColumn(
-		template_code='''
+    )
+    fahrer_nachmittag = tables.TemplateColumn(
+        template_code='''
 			{% if record.gaeste_nachmittag > 0 and record.fahrer_nachmittag == None %}
 				<span style="color:red; font-weight:bold">KEIN FAHRER EINGETEILT</span>
 			{% elif record.urlaub %}
@@ -54,12 +54,12 @@ class FahrtagTable(tables.Table):
 				{{ record.fahrer_nachmittag|default_if_none:'' }}
 			{% endif %}
 		'''
-	)
-	wochentag = tables.Column(
-		orderable=False, verbose_name='Tag'
-	)
-	aktion_vormittag = tables.TemplateColumn(
-		template_code='''
+    )
+    wochentag = tables.Column(
+        orderable=False, verbose_name='Tag'
+    )
+    aktion_vormittag = tables.TemplateColumn(
+        template_code='''
 			{% load static %}
 			{% if perms.Einsatztage.change_fahrtag and not record.urlaub %}
 				{% if record.bookable_vormittag %}
@@ -75,9 +75,9 @@ class FahrtagTable(tables.Table):
 				{% endif %}
 			{% endif %}
 		''', orderable=False, verbose_name='Aktion'
-	)
-	aktion_nachmittag = tables.TemplateColumn(
-		template_code='''
+    )
+    aktion_nachmittag = tables.TemplateColumn(
+        template_code='''
 			{% load static %}
 			{% if perms.Einsatztage.change_fahrtag and not record.urlaub %}
 				{% if record.bookable_nachmittag %}
@@ -93,45 +93,47 @@ class FahrtagTable(tables.Table):
 				{% endif %}
 			{% endif %}
 		''', orderable=False, verbose_name='Aktion'
-	)     
+    )
 
-	class Meta:
-		model = Fahrtag
-		fields = ('datum','wochentag','team','fahrer_vormittag','aktion_vormittag','gaeste_vormittag','fahrer_nachmittag','aktion_nachmittag','gaeste_nachmittag','fahrplan')
+    class Meta:
+        model = Fahrtag
+        fields = ('datum', 'wochentag', 'team', 'fahrer_vormittag', 'aktion_vormittag', 'gaeste_vormittag',
+                  'fahrer_nachmittag', 'aktion_nachmittag', 'gaeste_nachmittag', 'fahrplan')
 
-	def before_render(self, request):
-		if Fahrer.objects.filter(benutzer=request.user, aktiv=True).exists() \
-		and request.user.has_perm('Einsatztage.change_fahrtag'):
-			self.columns.show('aktion_vormittag')
-			self.columns.show('aktion_nachmittag')
-		else:
-			self.columns.hide('aktion_vormittag')
-			self.columns.hide('aktion_nachmittag')
+    def before_render(self, request):
+        if Fahrer.objects.filter(benutzer=request.user, aktiv=True).exists() \
+                and request.user.has_perm('Einsatztage.change_fahrtag'):
+            self.columns.show('aktion_vormittag')
+            self.columns.show('aktion_nachmittag')
+        else:
+            self.columns.hide('aktion_vormittag')
+            self.columns.hide('aktion_nachmittag')
+
 
 class BuerotagTable(tables.Table):
-	datum = tables.TemplateColumn(
-		template_code='''
+    datum = tables.TemplateColumn(
+        template_code='''
 			{% if perms.Einsatztage.change_buerotag %}
 				<a href="{{ record.id }}/{{ url_args }}">{{ record.datum |safe }}</a>
 			{% else %}
 				{{ record.datum |safe }}
 			{% endif %}            
 		'''
-	)
-	koordinator = tables.TemplateColumn(
-		template_code='''
+    )
+    koordinator = tables.TemplateColumn(
+        template_code='''
 			{% if record.urlaub %}
 				<span style="color:green; font-weight:bold">URLAUB</span>
 			{% else %}
 				{{ record.koordinator|default_if_none:'' }}
 			{% endif %}
 		'''
-	) 
-	wochentag = tables.Column(
-		orderable=False
-	)
-	aktion = tables.TemplateColumn(
-		template_code='''
+    )
+    wochentag = tables.Column(
+        orderable=False
+    )
+    aktion = tables.TemplateColumn(
+        template_code='''
 			{% load static %}
 			{% if perms.Einsatztage.change_buerotag and not record.urlaub %}
 				{% if record.bookable %}
@@ -147,27 +149,28 @@ class BuerotagTable(tables.Table):
 				{% endif %}
 			{% endif %}
 		''', orderable=False
-	)      
+    )
 
-	class Meta:
-		model = Buerotag
-		fields = ('datum','wochentag','team','koordinator','aktion')
+    class Meta:
+        model = Buerotag
+        fields = ('datum', 'wochentag', 'team', 'koordinator', 'aktion')
 
-	def before_render(self, request):
-		if Koordinator.objects.filter(benutzer=request.user, aktiv=True).exists() \
-		and request.user.has_perm('Einsatztage.change_buerotag'):
-			self.columns.show('aktion')
-		else:
-			self.columns.hide('aktion')
+    def before_render(self, request):
+        if Koordinator.objects.filter(benutzer=request.user, aktiv=True).exists() \
+                and request.user.has_perm('Einsatztage.change_buerotag'):
+            self.columns.show('aktion')
+        else:
+            self.columns.hide('aktion')
 
 
 class TourTable(tables.Table):
-	fahrgast = tables.TemplateColumn(
-		template_code='''{{ record.klient |safe }}'''
-	)
-	bemerkungen = tables.TemplateColumn(
-		template_code ='''
+    fahrgast = tables.TemplateColumn(
+        template_code='''{{ record.klient |safe }}'''
+    )
+    bemerkungen = tables.TemplateColumn(
+        template_code='''
 			{% if record.klient.bemerkung %}{{ record.klient.bemerkung|default_if_none:"" }}<br/>{% endif %}
+			{% if record.termin %}<span style="background-color:yellow;">Termin: {{ record.termin }}</span><br/>{% endif %}
 			{% if record.bemerkung %}{{ record.bemerkung|default_if_none:"" }}<br/>{% endif %}
 			{% ifnotequal record.klient  record.abholklient %}
 				{% if record.abholklient.bemerkung %}{{ record.abholklient.bemerkung|default_if_none:"" }}<br/>{% endif %}
@@ -177,23 +180,25 @@ class TourTable(tables.Table):
 			{% endifnotequal %}
 		''',
         attrs={"td": {"class": "remark"}}
-	)
-	telefon = tables.TemplateColumn(
-		template_code='''{{ record.klient.telefon |default_if_none:"-" }}<br/>{{ record.klient.mobil |default_if_none:"" }}
+    )
+    telefon = tables.TemplateColumn(
+        template_code='''{{ record.klient.telefon |default_if_none:"-" }}<br/>{{ record.klient.mobil |default_if_none:"" }}
 		'''
-	)
-	abholort = tables.TemplateColumn(
-		template_code='''{{ record.abholort | linebreaks }}'''
-	)
-	zielort = tables.TemplateColumn(
-		template_code='''{{ record.zielort | linebreaks }}'''
-	)		
-	
-	class Meta:
-		model = Tour
-		fields = ('fahrgast','telefon','uhrzeit','zustieg','personenzahl','abholort','zielort','entfernung','ankunft','bemerkungen')
+    )
+    abholort = tables.TemplateColumn(
+        template_code='''{{ record.abholort | linebreaks }}'''
+    )
+    zielort = tables.TemplateColumn(
+        template_code='''{{ record.zielort | linebreaks }}'''
+    )
+
+    class Meta:
+        model = Tour
+        fields = ('fahrgast', 'telefon', 'uhrzeit', 'zustieg', 'personenzahl',
+                  'abholort', 'zielort', 'entfernung', 'ankunft', 'bemerkungen')
+
 
 class FahrerTable(tables.Table):
-	class Meta:
-		model = Fahrtag
-		fields = ('fahrer_vormittag','fahrer_nachmittag')        
+    class Meta:
+        model = Fahrtag
+        fields = ('fahrer_vormittag', 'fahrer_nachmittag')

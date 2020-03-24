@@ -7,4 +7,4 @@ class TourFilter(django_filters.FilterSet):
 
     class Meta:
         model = Tour
-        fields = ['datum','bus']
+        fields = ['datum', 'bus']

@@ -1,67 +1,70 @@
+import datetime
 import logging
 import os
-import datetime
 
 from django.conf import settings
+from django.contrib.auth.models import Group, User
 from django.db import models
 from django.dispatch import receiver
 from django.utils.translation import ugettext_lazy as _
-from django.contrib.auth.models import Group, User
 
 logger = logging.getLogger(__name__)
 
-class MyUser(User):
-	class Meta:
-		proxy = True
-		verbose_name = 'Benutzer'
-		verbose_name_plural = 'Benutzer'
 
-	def __str__(self):
-		return ', '.join([self.last_name, self.first_name])		
+class MyUser(User):
+    class Meta:
+        proxy = True
+        verbose_name = 'Benutzer'
+        verbose_name_plural = 'Benutzer'
+
+    def __str__(self):
+        return ', '.join([self.last_name, self.first_name])
+
 
 class MyGroup(Group):
-	class Meta:
-		proxy = True
-		verbose_name = 'Gruppe'
-		verbose_name_plural = 'Gruppen'		
+    class Meta:
+        proxy = True
+        verbose_name = 'Gruppe'
+        verbose_name_plural = 'Gruppen'
+
 
 class Document(models.Model):
-	document = models.FileField(upload_to='', verbose_name='Dokument')
-	description = models.CharField(max_length=255, verbose_name='Beschreibung')
-	uploaded_on = models.DateTimeField(auto_now_add=True, verbose_name='hochgeladen am')
-	uploaded_by = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name='hochgeladen von',
-		null=True, related_name="+", on_delete=models.SET_NULL)
-	updated_on = models.DateTimeField(auto_now=True, null=True)
-	updated_by = models.ForeignKey(settings.AUTH_USER_MODEL,
-		null=True, related_name="+", on_delete=models.SET_NULL)
+    document = models.FileField(upload_to='', verbose_name='Dokument')
+    description = models.CharField(max_length=255, verbose_name='Beschreibung')
+    uploaded_on = models.DateTimeField(auto_now_add=True, verbose_name='hochgeladen am')
+    uploaded_by = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name='hochgeladen von',
+                                    null=True, related_name="+", on_delete=models.SET_NULL)
+    updated_on = models.DateTimeField(auto_now=True, null=True)
+    updated_by = models.ForeignKey(settings.AUTH_USER_MODEL,
+                                   null=True, related_name="+", on_delete=models.SET_NULL)
 
-	class Meta():
-		verbose_name = "Dokument"
-		constraints = [models.UniqueConstraint(fields=['document'], name='unique_document')]
-		
-	def __str__(self):
-		return str(self.document)
+    class Meta():
+        verbose_name = "Dokument"
+        constraints = [models.UniqueConstraint(fields=['document'], name='unique_document')]
 
-	@property
-	def relative_path(self):
-		return os.path.relpath(self.document.path, settings.MEDIA_ROOT)		
+    def __str__(self):
+        return str(self.document)
 
+    @property
+    def relative_path(self):
+        return os.path.relpath(self.document.path, settings.MEDIA_ROOT)
 
 
 # These two auto-delete files from filesystem when they are unneeded:
 
 @receiver(models.signals.post_delete, sender=Document)
 def auto_delete_file_on_delete(sender, instance, **kwargs):
-	"""
-	Deletes file from filesystem
-	when corresponding `Document` object is deleted.
-	"""
-	if instance.document.file:
-		if os.path.isfile(instance.document.file.name):
-			try:
-				os.remove(instance.document.file.name)
-			except:
-				logger.info("{}: Error while deleting file {}".format(__name__, instance.document.file.name))
+    """
+    Deletes file from filesystem
+    when corresponding `Document` object is deleted.
+    """
+    if instance.document.file:
+        if os.path.isfile(instance.document.file.name):
+            try:
+                os.remove(instance.document.file.name)
+            except:
+                logger.info("{}: Error while deleting file {}".format(__name__, instance.document.file.name))
+
 
 '''
 @receiver(models.signals.pre_save, sender=Document)

@@ -13,10 +13,11 @@ class TopicTable(tables.Table):
             {% endif %}            
         '''
     )
-    
+
     class Meta:
         model = Topic
-        fields = ('name','sort_order')
+        fields = ('name', 'sort_order')
+
 
 class QuestionTopicTable(tables.Table):
     name = tables.TemplateColumn(
@@ -28,15 +29,17 @@ class QuestionTopicTable(tables.Table):
             {% endif %}            
         '''
     )
-    
+
     class Meta:
         model = Topic
         fields = ('name',)
+
 
 class QuestionTable(tables.Table):
     class Meta:
         model = Question
         fields = ('text', 'answer')
+
 
 class QuestionAdminTable(tables.Table):
     text = tables.TemplateColumn(
@@ -48,6 +51,7 @@ class QuestionAdminTable(tables.Table):
             {% endif %}            
         '''
     )
+
     class Meta:
         model = Question
-        fields = ('text', 'answer', 'topic', 'status', 'created_on', 'created_by', 'updated_on')        
+        fields = ('text', 'answer', 'topic', 'status', 'created_on', 'created_by', 'updated_on')

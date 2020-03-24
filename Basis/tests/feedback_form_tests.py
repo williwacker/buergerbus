@@ -2,6 +2,7 @@ from django.test import TestCase
 
 from Basis.forms import FeedbackForm
 
+
 class FeedbackFormTest(TestCase):
     def test_chg_form_an_field_label(self):
         form = FeedbackForm()

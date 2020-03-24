@@ -8,7 +8,8 @@ class FahrtagFilter(django_filters.FilterSet):
         model = Fahrtag
         fields = ['team']
 
+
 class BuerotagFilter(django_filters.FilterSet):
     class Meta:
         model = Buerotag
-        fields = ['team']     
+        fields = ['team']

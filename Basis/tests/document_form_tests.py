@@ -2,6 +2,7 @@ from django.test import TestCase
 
 from Basis.forms import DocumentAddForm, DocumentChangeForm
 
+
 class DocumentAddFormTest(TestCase):
     def test_add_form_description_field_label(self):
         form = DocumentAddForm()
@@ -11,6 +12,7 @@ class DocumentAddFormTest(TestCase):
         form = DocumentAddForm()
         self.assertEqual(form.fields['document'].label, 'Dokument')
 
+
 class DocumentChgFormTest(TestCase):
     def test_chg_form_description_field_label(self):
         form = DocumentChangeForm()
@@ -18,4 +20,4 @@ class DocumentChgFormTest(TestCase):
 
     def test_chg_form_document_ro_field_label(self):
         form = DocumentChangeForm()
-        self.assertEqual(form.fields['document_ro'].label, 'Dokument')        
+        self.assertEqual(form.fields['document_ro'].label, 'Dokument')

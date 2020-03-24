@@ -2,6 +2,7 @@ from django.test import TestCase
 
 from Klienten.forms import FahrgastAddForm, FahrgastChgForm
 
+
 class FahrgastChgFormTest(TestCase):
     def test_chg_form_name_field_label(self):
         form = FahrgastChgForm()
@@ -17,7 +18,7 @@ class FahrgastChgFormTest(TestCase):
 
     def test_chg_form_telefon_field_help_text(self):
         form = FahrgastChgForm()
-        self.assertEqual(form.fields['telefon'].help_text, '01234-1111')        
+        self.assertEqual(form.fields['telefon'].help_text, '01234-1111')
 
     def test_chg_form_mobil_field_label(self):
         form = FahrgastChgForm()
@@ -37,7 +38,7 @@ class FahrgastChgFormTest(TestCase):
 
     def test_chg_form_hausnr_field_help_text(self):
         form = FahrgastChgForm()
-        self.assertEqual(form.fields['hausnr'].label, 'Hausnr')        
+        self.assertEqual(form.fields['hausnr'].label, 'Hausnr')
 
     def test_chg_form_bemerkung_field_help_text(self):
         form = FahrgastChgForm()
@@ -45,11 +46,11 @@ class FahrgastChgFormTest(TestCase):
 
     def test_chg_form_dsgvo_field_help_text(self):
         form = FahrgastChgForm()
-        self.assertEqual(form.fields['dsgvo'].label, 'DSGVO Status') 
+        self.assertEqual(form.fields['dsgvo'].label, 'DSGVO Status')
 
     def test_addf_form_typ_field_help_text(self):
         form = FahrgastAddForm()
-        self.assertEqual(form.fields['typ'].label, 'Typ') 
+        self.assertEqual(form.fields['typ'].label, 'Typ')
 
     def test_chg_form_bus_field_help_text(self):
         form = FahrgastChgForm()
@@ -57,4 +58,6 @@ class FahrgastChgFormTest(TestCase):
 
     def test_chg_form_bus_field_help_text(self):
         form = FahrgastChgForm()
-        self.assertEqual(form.fields['bus'].help_text, 'Dem Wohnort ist kein Bus zugeordnet. Deshalb für den Fahrgast einen Bus auswählen!')                                         
+        self.assertEqual(
+            form.fields['bus'].help_text,
+            'Dem Wohnort ist kein Bus zugeordnet. Deshalb für den Fahrgast einen Bus auswählen!')

@@ -286,25 +286,23 @@ COUNT_DRIVING_DAYS 	= config('COUNT_DRIVING_DAYS', default=30, cast=int)
 COUNT_OFFICE_DAYS  	= config('COUNT_OFFICE_DAYS', default=30, cast=int)
 # Tour Anfangs- und Endzeiten berücksichtigen
 USE_TOUR_HOURS		= config('USE_TOUR_HOURS', default=False, cast=bool)
-
 # Anzahl planbarer Tage für Touren
 COUNT_TOUR_DAYS 	= config('COUNT_TOUR_DAYS', default=13, cast=int)
-
 # Pfad für die Tourlisten zu speichern
 TOUR_PATH  			= config('TOUR_PATH', default='tour\\')
-
 # Fahrzeit und Ankunftszeit mittels Google Maps errechnen
 USE_GOOGLE 			= config('USE_GOOGLE', default=True, cast=bool)
 GOOGLEMAPS_KEY 		= config('GOOGLEMAPS_KEY', default='')
+# Bundesland für die Feiertagsberechnung
+STATE_CODE          = config('STATE_CODE', default='RP')
 # Ein/Aussteigezeit in Minuten (nur relevant mit USE_GOOGLE)
 TRANSFER_TIME 		= config('TRANSFER_TIME', default=3, cast=int)
 # Wenn einer der folgenden Worte in der Tour Bemerkung auftauchen,soll der Text gelb markiert werden.
 # Mehrere Worte mit Komma trennen
 MARKUP_TEXT			= config('MARKUP_TEXT', default = '')
-
 # DSGVO mit dem Fahrplan versenden
 SEND_DSGVO 			= config('SEND_DSGVO', default=False, cast=bool)
-
+# Pfad für die DSGVO Listen zu speichern
 DSGVO_PATH          = config('DSGVO_PATH', default='tour\\')
 EMAIL_HOST          = config('EMAIL_HOST', default='localhost')
 EMAIL_PORT          = config('EMAIL_PORT', default=25, cast=int)
@@ -313,7 +311,7 @@ EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='')
 EMAIL_USE_TLS       = config('EMAIL_USE_TLS', default=False, cast=bool)
 EMAIL_USE_SSL       = config('EMAIL_USE_SSL', default=False, cast=bool)
 DEFAULT_FROM_EMAIL  = config('DEFAULT_FROM_EMAIL', default='Bürgerbus Team <noreply@example.com>')
-
+# img Unterverzeichnis
 COMMUNITY_SUBDIR    = config('COMMUNITY_SUBDIR', default='')
 PORTAL              = config('PORTAL', default='Bürgerbus Portal')
 

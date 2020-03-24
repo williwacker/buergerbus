@@ -8,17 +8,20 @@ class StrassenFilter(django_filters.FilterSet):
         model = Strassen
         fields = ['ort']
 
+
 class OrteFilter(django_filters.FilterSet):
     class Meta:
         model = Orte
-        fields = ['bus']    
+        fields = ['bus']
+
 
 class FahrgaesteFilter(django_filters.FilterSet):
     class Meta:
         model = Klienten
-        fields = ['ort','bus']   
+        fields = ['ort', 'bus']
+
 
 class DienstleisterFilter(django_filters.FilterSet):
     class Meta:
         model = Klienten
-        fields = ['ort','kategorie']                    
+        fields = ['ort', 'kategorie']

@@ -7,10 +7,13 @@ For more information on this file, see
 https://docs.djangoproject.com/en/2.2/howto/deployment/wsgi/
 """
 
-import os, sys
+import os
+import sys
 
-for f in sys.path: print(f)
 from django.core.wsgi import get_wsgi_application
+
+for f in sys.path:
+    print(f)
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'buergerbus.settings')
 

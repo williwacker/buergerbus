@@ -10,6 +10,7 @@ from Tour.utils import TourArchive
 
 logger = logging.getLogger(__name__)
 
+
 class EinsatztageCronJob(CronJobBase):
     ALLOW_PARALLEL_RUNS = True
     RUN_AT_TIMES = ['01:00']
@@ -24,6 +25,7 @@ class EinsatztageCronJob(CronJobBase):
         logger.info("Buerotage updated")
         TourArchive()
         logger.info("Touren archiviert")
+
 
 class BackupCronJob(CronJobBase):
     ALLOW_PARALLEL_RUNS = True

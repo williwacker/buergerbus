@@ -1,10 +1,15 @@
 from django.urls import path
 from django.views.generic import TemplateView
 
-from Einsatztage.views import (BuerotageChangeView, BuerotageListView, BuerotageBookView, BuerotageCancelView,
-                               FahrplanAsCSV, FahrplanAsPDF, FahrplanBackupView, FahrplanEmailView, FahrplanView, 
-                               FahrtageChangeView, FahrtageListView, FahrtageAddView, FahrtageDeleteView,
-                               FahrtageBookvView, FahrtageBooknView, FahrtageCancelvView, FahrtageCancelnView)
+from Einsatztage.views import (BuerotageBookView, BuerotageCancelView,
+                               BuerotageChangeView, BuerotageListView,
+                               FahrplanAsCSV, FahrplanAsPDF,
+                               FahrplanBackupView, FahrplanEmailView,
+                               FahrplanView, FahrtageAddView,
+                               FahrtageBooknView, FahrtageBookvView,
+                               FahrtageCancelnView, FahrtageCancelvView,
+                               FahrtageChangeView, FahrtageDeleteView,
+                               FahrtageListView)
 
 from . import views
 

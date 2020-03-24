@@ -1,14 +1,14 @@
+from django.conf import settings
 from django.conf.urls import url
 from django.urls import path
-from django.conf import settings
 from django.views.generic import TemplateView
 
 from Basis.models import Document
 from Basis.views import (
-    DocumentAddView, DocumentChangeView, DocumentDeleteView, DocumentListView,
-    DocumentPDFView, FeedbackView, GroupAddView, GroupChangeView,
-    GroupDeleteView, GroupView, UserAddView, UserChangeView, UserDeleteView,
-    UserView, RestartApache, CoffeeView)
+    CoffeeView, DocumentAddView, DocumentChangeView, DocumentDeleteView,
+    DocumentListView, DocumentPDFView, FeedbackView, GroupAddView,
+    GroupChangeView, GroupDeleteView, GroupView, RestartApache, UserAddView,
+    UserChangeView, UserDeleteView, UserView)
 
 app_name = 'Basis'
 urlpatterns = [
@@ -29,4 +29,4 @@ urlpatterns = [
     path('documents/<int:pk>/delete/', DocumentDeleteView.as_view()),
     path('documents/<int:pk>/view/<str:str>.pdf', DocumentPDFView.as_view()),
     path('coffee/', CoffeeView.as_view()),
-] 
+]
