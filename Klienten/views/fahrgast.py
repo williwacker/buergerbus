@@ -38,10 +38,13 @@ class FahrgastView(MyListView):
             return Klienten.objects.order_by('name', 'ort').filter(typ='F', bus__in=get_bus_list(self.request))
 
     def get_queryset(self):
+        name = self.request.GET.get('firstchar')
         ort = self.request.GET.get('ort')
         bus = self.request.GET.get('bus')
         sort = self.request.GET.get('sort')
         qs = self.get_fg_queryset()
+        if name:
+            qs = qs.filter(name__istartswith=name)
         if ort:
             qs = qs.filter(ort=ort)
         if bus:

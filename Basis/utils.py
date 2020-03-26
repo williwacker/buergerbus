@@ -159,6 +159,7 @@ def get_sidebar(user):
 
     value = []
     if user.is_superuser:
+        value.append({'name': 'Statistik', 'value': '/Basis/statistics/?page=Touren'})
         value.append({'name': 'Log Viewer', 'value': '/admin/logtailer/'})
         value.append({'name': 'Web Service neu starten', 'value': '/Basis/restart_apache/'})
     if value:

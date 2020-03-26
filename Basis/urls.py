@@ -7,8 +7,8 @@ from Basis.models import Document
 from Basis.views import (
     CoffeeView, DocumentAddView, DocumentChangeView, DocumentDeleteView,
     DocumentListView, DocumentPDFView, FeedbackView, GroupAddView,
-    GroupChangeView, GroupDeleteView, GroupView, RestartApache, UserAddView,
-    UserChangeView, UserDeleteView, UserView)
+    GroupChangeView, GroupDeleteView, GroupView, RestartApache, StatisticView,
+    UserAddView, UserChangeView, UserDeleteView, UserView)
 
 app_name = 'Basis'
 urlpatterns = [
@@ -29,4 +29,5 @@ urlpatterns = [
     path('documents/<int:pk>/delete/', DocumentDeleteView.as_view()),
     path('documents/<int:pk>/view/<str:str>.pdf', DocumentPDFView.as_view()),
     path('coffee/', CoffeeView.as_view()),
+    path('statistics/', StatisticView.as_view()),
 ]

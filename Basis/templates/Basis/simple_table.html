@@ -21,12 +21,12 @@
                 {% endif %}
                 {% if filter %}
                 <form id="filter-form" action="" method="get">
-                    <p>{{ filter.form }}
+                    <p>{{ filter.form }}</p>
                 </form>
                 {% endif %}
             </div>
             {% if table_header %}
-                {{ table_header| safe }}
+                <p>{{ table_header| safe }}</p>
             {% endif %}
             <form id="changelist-form">
                 <div class="results">

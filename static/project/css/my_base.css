@@ -350,10 +350,13 @@ and (-webkit-min-device-pixel-ratio: 2) {
 	}
 }
 @media only screen 
-and (max-device-width : 959px) 
-and (-webkit-min-device-pixel-ratio: 2) {
+and (max-device-width : 959px)  {
 	.flow {
 		margin-left: 25px;
 		margin-top: 0;
+	}
+	#changelist .results, #changelist table {
+		left: 0;
+		width: 100%;
 	}
 }

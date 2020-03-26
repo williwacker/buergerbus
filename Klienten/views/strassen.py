@@ -38,7 +38,7 @@ class StrassenView(MyListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['filter'] = StrassenFilter()
+        context['filter'] = StrassenFilter(self.request.GET.copy())
         return context
 
 

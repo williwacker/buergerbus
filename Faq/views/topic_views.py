@@ -29,27 +29,6 @@ class TopicView(MyListView):
         if self.request.user.is_superuser:
             context['add'] = "Thema"
         context['url_args'] = url_args(self.request)
-
-        # This slightly magical queryset grabs the latest update date for
-        # topic's questions, then the latest date for that whole group.
-        # In other words, it's::
-        #
-        #   max(max(q.updated_on for q in topic.questions) for topic in topics)
-        #
-        # Except performed in the DB, so quite a bit more efficiant.
-        #
-        # We can't just do Question.objects.all().aggregate(max('updated_on'))
-        # because that'd prevent a subclass from changing the view's queryset
-        # (or even model -- this view'll even work with a different model
-        # as long as that model has a many-to-one to something called "questions"
-        # with an "updated_on" field). So this magic is the price we pay for
-        # being generic.
-#		last_updated = (context['object_list']
-#							.annotate(updated=Max('questions__updated_on'))
-#							.aggregate(Max('updated'))
-#						)
-
-#		context['last_updated'] = last_updated['updated__max']
         return context
 
 

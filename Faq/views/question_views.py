@@ -31,6 +31,8 @@ class QuestionTopicView(MyListView):
         context['sidebar_liste'] = get_sidebar(self.request.user)
         context['title'] = self.model._meta.verbose_name_raw
         context['url_args'] = url_args(self.request)
+        if 'add' in context:
+            del context['add']
         return context
 
 
@@ -54,11 +56,8 @@ class QuestionListView(MyListView):
         context['title'] = "Fragen und Antworten"
         if self.request.user.has_perm('Faq.add_question'):
             context['add'] = "Frage"
-        context['filter'] = TopicFilter()
+        context['filter'] = TopicFilter(self.request.GET.copy())
         topic = self.request.GET.get('topic')
-        if topic:
-            top = Topic.objects.get(id=topic)
-            context['table_header'] = '<p>'+top.name+'</p>'
         context['url_args'] = url_args(self.request)
         return context
 
