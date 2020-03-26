@@ -201,12 +201,18 @@ ul.pagination li {
 .flow {
 	float: left;
 	background-color: #59677e;
-	margin-top: -15px;
 	border-top-right-radius: 0.28571rem;
 	border-top-left-radius: 0.28571rem;
 	border-bottom-right-radius: 0.8rem;
-	position: absolute;
 	max-width: 230px;
+	margin-bottom: 15px;
+}
+.index-image {
+	float: left;
+	max-width: calc(100% - 240px);
+}
+.index-image img {
+	width: 630px;
 }
 .flow .sidebar-section {
 	padding-top: 11px;
@@ -345,18 +351,29 @@ and (-webkit-min-device-pixel-ratio: 2) {
 	}
 	.index-image img {
 		max-height: 450px;
-		max-width: 500px;
-		padding-left: 103px;
+		width: 100%;
 	}
 }
 @media only screen 
-and (max-device-width : 959px)  {
+and (max-device-width : 960px)  
+and (-webkit-min-device-pixel-ratio: 2) {
 	.flow {
-		margin-left: 25px;
+		margin-left: 0;
 		margin-top: 0;
 	}
 	#changelist .results, #changelist table {
 		left: 0;
 		width: 100%;
+	}
+	.index-image img {
+		width: 100%;
+	}
+	.sidebar-title {
+		font-size: 11px;
+		padding-left: 1.71429rem;
+		padding-top: 0;
+	}
+	.sidebar-link, .sidebar-link:visited, .sidebar-link:hover {
+		padding: 0.57143rem 0.85714rem 0.57143rem 1.42857rem;
 	}
 }

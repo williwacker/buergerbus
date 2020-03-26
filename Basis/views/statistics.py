@@ -62,6 +62,6 @@ class StatisticView(MyListView):
 			context['table_header'] = 'Anzahl Touren pro Monat und Bus'
 			context['filter'] = TourFilter(self.request.GET.copy())
 		elif page == 'Koordinatoren':
-			context['table_header'] = 'Anzahl gebuchte Touren pro Koordinator'
+			context['table_header'] = 'Anzahl gebuchte Touren pro Monat und Koordinator'
 			context['filter'] = TourFilter(self.request.GET.copy())
 		return context
