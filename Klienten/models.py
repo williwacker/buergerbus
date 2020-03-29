@@ -75,7 +75,7 @@ class Klienten(models.Model):
     name.short_description = "Name des Klienten"
     telefon = models.CharField(max_length=30, blank=True, help_text="01234-1111")
     mobil = models.CharField(max_length=30, blank=True, null=True, help_text="0150-1111")
-    ort = models.ForeignKey(Orte, null=True, on_delete=models.CASCADE, verbose_name="Wohnort")
+    ort = models.ForeignKey(Orte, null=True, on_delete=models.CASCADE, verbose_name="Ort")
     bus = models.ForeignKey(
         'Einsatzmittel.Bus', null=True, on_delete=models.CASCADE,
         help_text="Dem Wohnort ist kein Bus zugeordnet. Deshalb für den Fahrgast einen Bus auswählen!")

@@ -29,20 +29,21 @@ class OrtView(MyListView):
         ort = self.request.GET.get('ort')
         plz = self.request.GET.get('plz')
         bus = self.request.GET.get('bus')
-        # nur managed orte anzeigen
-#		qs = Orte.objects.order_by('ort').filter(bus__in=get_bus_list(self.request)) | Orte.objects.order_by('ort').filter(bus__isnull=True)
         qs = Orte.objects.order_by('ort')
         if ort:
             qs = qs.filter(ort=ort)
         if plz:
             qs = qs.filter(plz=plz)
         if bus:
-            qs = qs.filter(bus=bus)
+            if bus == 'null':
+                qs = qs.filter(bus=None)
+            else:        
+                qs = qs.filter(bus=bus)
         return OrteTable(qs)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['filter'] = OrteFilter(self.request.GET.copy())
+        context['filter'] = OrteFilter(self.request.GET.copy(), queryset=Orte.objects.order_by('ort'))
         return context
 
 

@@ -53,7 +53,7 @@ class FahrtageListView(MyListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['filter'] = FahrtagFilter(self.request.GET, queryset=Fahrtag.objects.filter(
+        context['filter'] = FahrtagFilter(self.request.GET.copy(), queryset=Fahrtag.objects.filter(
             archiv=False, team__in=get_bus_list(self.request)))
         return context
 

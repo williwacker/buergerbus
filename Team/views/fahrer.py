@@ -38,7 +38,7 @@ class FahrerView(MyListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['filter'] = FahrerFilter(self.request.GET, queryset=self.get_fg_queryset())
+        context['filter'] = FahrerFilter(self.request.GET.copy(), queryset=self.get_fg_queryset())
         return context
 
 

@@ -38,7 +38,7 @@ class FahrgastView(MyListView):
             return Klienten.objects.order_by('name', 'ort').filter(typ='F', bus__in=get_bus_list(self.request))
 
     def get_queryset(self):
-        name = self.request.GET.get('firstchar')
+        name = self.request.GET.get('name')
         ort = self.request.GET.get('ort')
         bus = self.request.GET.get('bus')
         sort = self.request.GET.get('sort')
@@ -48,7 +48,10 @@ class FahrgastView(MyListView):
         if ort:
             qs = qs.filter(ort=ort)
         if bus:
-            qs = qs.filter(bus=bus)
+            if bus == 'null':
+                qs = qs.filter(bus=None)
+            else:            
+                qs = qs.filter(bus=bus)
         if sort:
             qs = qs.order_by(sort)
         return FahrgaesteTable(qs)
@@ -58,7 +61,7 @@ class FahrgastView(MyListView):
         context['title'] = "Fahrgäste"
         if self.request.user.has_perm('Klienten.add_klienten'):
             context['add'] = "Fahrgast"
-        context['filter'] = FahrgaesteFilter(self.request.GET, queryset=self.get_fg_queryset())
+        context['filter'] = FahrgaesteFilter(self.request.GET.copy(), queryset=self.get_fg_queryset())
         return context
 
 

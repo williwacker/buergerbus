@@ -50,7 +50,7 @@ class BuerotageListView(MyListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['filter'] = BuerotagFilter(
-            self.request.GET, queryset=Buerotag.objects.filter(
+            self.request.GET.copy(), queryset=Buerotag.objects.filter(
                 archiv=False, team__in=get_buero_list(self.request)))
         if 'add' in context:
             del context['add']

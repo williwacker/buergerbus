@@ -376,4 +376,7 @@ and (-webkit-min-device-pixel-ratio: 2) {
 	.sidebar-link, .sidebar-link:visited, .sidebar-link:hover {
 		padding: 0.57143rem 0.85714rem 0.57143rem 1.42857rem;
 	}
+	.select2-container--jet {
+		min-width: 130px;
+	}
 }
