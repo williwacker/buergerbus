@@ -41,7 +41,7 @@ class DienstleisterView(MyListView):
             qs = qs.filter(ort=ort)
         if kategorie:
             if kategorie == 'null':
-                qs = qs.filter(kategorie=None)
+                qs = qs.filter(kategorie=None) | qs.filter(kategorie='')
             else:
                 qs = qs.filter(kategorie=kategorie)
         if sort:
