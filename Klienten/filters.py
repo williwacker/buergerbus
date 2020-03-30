@@ -3,6 +3,7 @@ from django.conf import settings
 from django.db.models.functions import Substr, Upper
 
 from .models import Klienten, Orte, Strassen
+from Einsatzmittel.models import Bus
 
 
 class StrassenFilter(django_filters.FilterSet):
@@ -16,14 +17,10 @@ class OrteFilter(django_filters.FilterSet):
     def __init__(self, *args, **kwargs):
         self.queryset = kwargs.pop('queryset')
 
-        bus_qs = self.queryset.values('bus', 'bus__bus').distinct().order_by('bus')
-        bus_choices = []
-        for item in bus_qs:
-            if not item['bus']:
-                continue
-            bus_choices.append((item['bus'], item['bus__bus']))
-        self.base_filters['bus'] = django_filters.ChoiceFilter(
-            choices=bus_choices, label='Bus', null_label='nicht gesetzt')
+        bus_list = list(self.queryset.order_by('bus').exclude(bus=None).values_list('bus', flat=True).distinct())
+        self.base_filters['bus'] = django_filters.ModelChoiceFilter(
+            queryset=Bus.objects.filter(id__in=bus_list),
+            field_name='bus', to_field_name='id', null_label='nicht gesetzt')
 
         super(OrteFilter, self).__init__(*args, **kwargs)
 
@@ -37,27 +34,20 @@ class FahrgaesteFilter(django_filters.FilterSet):
     def __init__(self, *args, **kwargs):
         self.queryset = kwargs.pop('queryset')
 
-        bus_qs = self.queryset.values('bus', 'bus__bus').distinct().order_by('bus')
-        bus_choices = []
-        for item in bus_qs:
-            if not item['bus']:
-                continue
-            bus_choices.append((item['bus'], item['bus__bus']))
-        self.base_filters['bus'] = django_filters.ChoiceFilter(
-            choices=bus_choices, label='Bus', null_label='nicht gesetzt')
+        name_choices = list(self.queryset.annotate(
+            firstchar=Upper(Substr('name', 1, 1))).order_by(
+                'firstchar').values_list('firstchar', 'firstchar').distinct())
+        self.base_filters['name'] = django_filters.ChoiceFilter(choices=name_choices, label='Name')
 
-        ort_qs = self.queryset.values('ort', 'ort__ort').distinct().order_by('ort')
-        ort_choices = []
-        for item in ort_qs:
-            ort_choices.append((item['ort'], item['ort__ort']))
-        self.base_filters['ort'] = django_filters.ChoiceFilter(choices=ort_choices, label='Ort')
+        bus_list = list(self.queryset.order_by('bus').exclude(bus=None).values_list('bus', flat=True).distinct())
+        self.base_filters['bus'] = django_filters.ModelChoiceFilter(
+            queryset=Bus.objects.filter(id__in=bus_list),
+            field_name='bus', to_field_name='id', null_label='nicht gesetzt')
 
-        klienten_qs = self.queryset.annotate(firstchar=Upper(Substr('name', 1, 1))).values(
-            'firstchar').distinct().order_by('firstchar')
-        klienten_choices = []
-        for item in klienten_qs:
-            klienten_choices.append((item['firstchar'], item['firstchar']))
-        self.base_filters['name'] = django_filters.ChoiceFilter(choices=klienten_choices, label='Name')
+        ort_list = list(self.queryset.order_by('ort').values_list('ort', flat=True).distinct())
+        self.base_filters['ort'] = django_filters.ModelChoiceFilter(
+            queryset=Orte.objects.filter(id__in=ort_list),
+            field_name='ort', to_field_name='id')
 
         super(FahrgaesteFilter, self).__init__(*args, **kwargs)
 
@@ -71,27 +61,20 @@ class DienstleisterFilter(django_filters.FilterSet):
     def __init__(self, *args, **kwargs):
         self.queryset = kwargs.pop('queryset')
 
-        ort_qs = self.queryset.values('ort', 'ort__ort').distinct().order_by('ort')
-        ort_choices = []
-        for item in ort_qs:
-            ort_choices.append((item['ort'], item['ort__ort']))
-        self.base_filters['ort'] = django_filters.ChoiceFilter(choices=ort_choices, label='Ort')
+        name_choices = list(self.queryset.annotate(
+            firstchar=Upper(Substr('name', 1, 1))).order_by(
+                'firstchar').values_list('firstchar', 'firstchar').distinct())
+        self.base_filters['name'] = django_filters.ChoiceFilter(choices=name_choices, label='Name')
 
-        kategorie_qs = self.queryset.values('kategorie', 'kategorie').distinct().order_by('kategorie')
-        kategorie_choices = []
-        for item in kategorie_qs:
-            if not item['kategorie']:
-                continue
-            kategorie_choices.append((item['kategorie'], item['kategorie']))
+        ort_list = list(self.queryset.order_by('ort').values_list('ort', flat=True).distinct())
+        self.base_filters['ort'] = django_filters.ModelChoiceFilter(
+            queryset=Orte.objects.filter(id__in=ort_list),
+            field_name='ort', to_field_name='id')
+
+        kategorie_choices = list(self.queryset.exclude(kategorie='').exclude(kategorie=None).order_by(
+            'kategorie').values_list('kategorie', 'kategorie').distinct())
         self.base_filters['kategorie'] = django_filters.ChoiceFilter(
             choices=kategorie_choices, label='Kategorie', null_label='nicht gesetzt')
-
-        klienten_qs = self.queryset.annotate(firstchar=Upper(Substr('name', 1, 1))).values(
-            'firstchar').distinct().order_by('firstchar')
-        klienten_choices = []
-        for item in klienten_qs:
-            klienten_choices.append((item['firstchar'], item['firstchar']))
-        self.base_filters['name'] = django_filters.ChoiceFilter(choices=klienten_choices, label='Name')
 
         super(DienstleisterFilter, self).__init__(*args, **kwargs)
 

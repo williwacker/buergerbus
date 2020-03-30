@@ -1,6 +1,7 @@
 import django_filters
 
 from .models import Buerotag, Fahrtag
+from Einsatzmittel.models import Bus, Buero
 
 
 class FahrtagFilter(django_filters.FilterSet):
@@ -8,11 +9,10 @@ class FahrtagFilter(django_filters.FilterSet):
     def __init__(self, *args, **kwargs):
         self.queryset = kwargs.pop('queryset')
 
-        team_qs = self.queryset.exclude(team=None).values('team', 'team__bus').distinct().order_by('team')
-        team_choices = []
-        for item in team_qs:
-            team_choices.append((item['team'], item['team__bus']))
-        self.base_filters['team'] = django_filters.ChoiceFilter(choices=team_choices, label='Team')
+        team_list = list(self.queryset.order_by('team').values_list('team', flat=True).distinct())
+        self.base_filters['team'] = django_filters.ModelChoiceFilter(
+            queryset=Bus.objects.filter(id__in=team_list),
+            field_name='team', to_field_name='id')
 
         super(FahrtagFilter, self).__init__(*args, **kwargs)
 
@@ -26,11 +26,10 @@ class BuerotagFilter(django_filters.FilterSet):
     def __init__(self, *args, **kwargs):
         self.queryset = kwargs.pop('queryset')
 
-        team_qs = self.queryset.exclude(team=None).values('team', 'team__buero').distinct().order_by('team')
-        team_choices = []
-        for item in team_qs:
-            team_choices.append((item['team'], item['team__buero']))
-        self.base_filters['team'] = django_filters.ChoiceFilter(choices=team_choices, label='Team')
+        team_list = list(self.queryset.order_by('team').values_list('team', flat=True).distinct())
+        self.base_filters['team'] = django_filters.ModelChoiceFilter(
+            queryset=Buero.objects.filter(id__in=team_list),
+            field_name='team', to_field_name='id')
 
         super(BuerotagFilter, self).__init__(*args, **kwargs)
 
