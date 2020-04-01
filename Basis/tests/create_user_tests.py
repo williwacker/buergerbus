@@ -1,13 +1,14 @@
 from django.conf import settings
-from django.contrib.auth.models import Group, Permission, User
+from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 from django.test import Client, TestCase
+from Accounts.models import MyUser, MyGroup
 
 
 class UserTestCase(TestCase):
     def test_group(self):
         # create group and add permissions
-        group, created = Group.objects.get_or_create(name='Büro ABC')
+        group, created = MyGroup.objects.get_or_create(name='Büro ABC')
         self.assertGreater(Permission.objects.all().count(), 0)
         group.permissions.add(Permission.objects.get(name='Can view Büro'))
         group.permissions.add(Permission.objects.get(name='Can view Bus'))
@@ -44,10 +45,10 @@ class UserTestCase(TestCase):
 
     def test_user(self):
         # create user and assign group permission
-        user = User.objects.create_user(username='testuser', password='12345',
+        user = MyUser.objects.create_user(username='testuser', password='12345',
                                         first_name='Test', last_name='User', email='bla@bla.de')
         self.assertTrue(user.is_active)
-        group, created = Group.objects.get_or_create(name='Büro ABC')
+        group, created = MyGroup.objects.get_or_create(name='Büro ABC')
         user.groups.add(group)
         self.assertEqual(user.groups.count(), 1)
 #        self.assertTrue(user.has_perm('Tour.add_tour'))

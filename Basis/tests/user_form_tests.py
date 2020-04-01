@@ -1,6 +1,6 @@
 from django.test import TestCase
 
-from Basis.forms import MyUserChangeForm, MyUserCreationForm
+from Accounts.forms import MyUserChangeForm, MyUserCreationForm
 
 
 class UserAddFormTest(TestCase):

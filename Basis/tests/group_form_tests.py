@@ -1,6 +1,6 @@
 from django.test import TestCase
 
-from Basis.forms import MyGroupChangeForm
+from Accounts.forms import MyGroupChangeForm
 
 
 class GroupChgFormTest(TestCase):
