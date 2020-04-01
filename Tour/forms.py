@@ -165,7 +165,11 @@ class MyModelForm(ModelForm):
 
 
 class TourAddForm1(forms.Form):
-    fahrgast = forms.ModelChoiceField(queryset=Klienten.objects.order_by('name').filter(typ='F'))
+    class KlientenChoiceField(forms.ModelChoiceField):
+        def label_from_instance(self, obj):
+            return ' - '.join([obj.name, obj.ort.ort])
+
+    fahrgast = KlientenChoiceField(queryset=Klienten.objects.order_by('name').filter(typ='F'))
 
 
 class TourAddForm2(MyModelForm):
