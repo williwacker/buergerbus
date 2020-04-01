@@ -10,7 +10,7 @@ from .models import Fahrer, Koordinator
 class FahrerAddForm(KlientenForm):
     class Meta:
         model = Fahrer
-        fields = ['benutzer', 'team', 'telefon', 'mobil']
+        fields = ['benutzer', 'team']
 
 
 class FahrerChgForm(KlientenForm):
@@ -18,7 +18,7 @@ class FahrerChgForm(KlientenForm):
 
     class Meta:
         model = Fahrer
-        fields = ['benutzer', 'name', 'team', 'telefon', 'mobil', 'aktiv']
+        fields = ['benutzer', 'name', 'team', 'aktiv']
         widgets = {'benutzer': forms.HiddenInput()}
 
     def __init__(self, *args, **kwargs):
@@ -29,7 +29,7 @@ class KoordinatorAddForm(KlientenForm):
 
     class Meta:
         model = Koordinator
-        fields = ['benutzer', 'team', 'telefon', 'mobil']
+        fields = ['benutzer', 'team']
 
 
 class KoordinatorChgForm(KlientenForm):
@@ -37,7 +37,7 @@ class KoordinatorChgForm(KlientenForm):
 
     class Meta:
         model = Koordinator
-        fields = ['name', 'team', 'telefon', 'mobil', 'aktiv']
+        fields = ['name', 'team', 'aktiv']
 
     def __init__(self, *args, **kwargs):
         super(KoordinatorChgForm, self).__init__(*args, **kwargs)

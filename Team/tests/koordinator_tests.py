@@ -18,7 +18,7 @@ class KoordinatorTestCase(TestCase):
 		buero2 = Buero.objects.get(buero='Büro 2')
 		user = User.objects.get(username='testuser')
 		if Koordinator.objects.count() == 0:
-			Koordinator.objects.create(benutzer=user, telefon='01234-678', mobil='0111-345', team=buero1, aktiv=False)
+			Koordinator.objects.create(benutzer=user, team=buero1, aktiv=False)
 			Koordinator.objects.create(benutzer=user, team=buero2)
 
 	def test_koordinator(self):

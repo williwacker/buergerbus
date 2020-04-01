@@ -5,9 +5,8 @@ from .models import Fahrer, Koordinator
 
 class FahrerAdmin(admin.ModelAdmin):
 	
-    list_display = ('benutzer', 'team', 'mobil', 'aktiv')
+    list_display = ('benutzer', 'team', 'aktiv')
     list_filter = ('team',)
-    list_editable = ('mobil',)
     ordering = ('benutzer',)
 
     def get_queryset(self, request):
@@ -22,9 +21,8 @@ admin.site.register(Fahrer, FahrerAdmin)
 
 class KoordinatorAdmin(admin.ModelAdmin):
 	
-    list_display = ('benutzer', 'name', 'team', 'mobil', 'aktiv')
+    list_display = ('benutzer', 'name', 'team', 'aktiv')
     list_filter = ('team',)
-    list_editable = ('mobil',)
     ordering = ('benutzer',)
 
     def name(self, obj):

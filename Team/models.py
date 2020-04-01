@@ -8,8 +8,6 @@ from django.utils import timezone
 
 class Fahrer(models.Model):
     benutzer = models.ForeignKey(User, related_name='+', on_delete=models.CASCADE)
-    telefon = models.CharField(max_length=30, blank=True, help_text="01234-1111")
-    mobil = models.CharField(max_length=30, blank=True, null=True, help_text="0150-1111")
     team = models.ForeignKey('Einsatzmittel.Bus', null=True, on_delete=models.SET_NULL)
     aktiv = models.BooleanField(max_length=1, default=True, help_text="Kann als Fahrer(in) eingeteilt werden")
     created_on = models.DateTimeField(auto_now_add=True, null=True)
@@ -29,8 +27,6 @@ class Fahrer(models.Model):
 
 class Koordinator(models.Model):
     benutzer = models.ForeignKey(User, related_name='+', on_delete=models.CASCADE)
-    telefon = models.CharField(max_length=30, blank=True)
-    mobil = models.CharField(max_length=30, blank=True, null=True)
     team = models.ForeignKey('Einsatzmittel.Buero', null=True, on_delete=models.SET_NULL)
     aktiv = models.BooleanField(max_length=1, default=True, help_text="Kann als Koordinator(in) eingeteilt werden")
     created_on = models.DateTimeField(auto_now_add=True, null=True)

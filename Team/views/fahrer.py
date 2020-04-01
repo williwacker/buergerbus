@@ -24,7 +24,7 @@ class FahrerView(MyListView):
     model = Fahrer
 
     def get_fg_queryset(self):
-        return Fahrer.objects.order_by('team', 'benutzer').filter(team__in=get_bus_list(self.request))
+        return Fahrer.objects.order_by('team', 'benutzer').filter(team__in=get_bus_list(self.request)).select_related('benutzer')
 
     def get_queryset(self):
         team = self.request.GET.get('team')

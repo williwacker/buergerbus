@@ -15,7 +15,7 @@ class FahrerTable(tables.Table):
 		'''
     )
     telefon = tables.TemplateColumn(
-        template_code='''{{ record.telefon |default_if_none:"-" }}<br/>{{ record.mobil |default_if_none:"" }}'''
+        template_code='''{{ record.benutzer.profile.telefon |default_if_none:"-" }}<br/>{{ record.benutzer.profile.mobil |default_if_none:"" }}'''
     )
     email = tables.TemplateColumn(
         template_code='''<a href="mailto:{{ record.benutzer.email }}">{{ record.benutzer.email }}</a>''',
@@ -54,7 +54,7 @@ class KoordinatorTable(tables.Table):
 		''', orderable=False
     )
     telefon = tables.TemplateColumn(
-        template_code='''{{ record.telefon |default_if_none:"-" }}<br/>{{ record.mobil |default_if_none:"" }}'''
+        template_code='''{{ record.benutzer.profile.telefon |default_if_none:"-" }}<br/>{{ record.benutzer.profile.mobil |default_if_none:"" }}'''
     )
     email = tables.TemplateColumn(
         template_code='''<a href="mailto:{{ record.benutzer.email }}">{{ record.benutzer.email }}</a>''',

@@ -24,7 +24,7 @@ class KoordinatorView(MyListView):
     model = Koordinator
 
     def get_fg_queryset(self):
-        return Koordinator.objects.order_by('team', 'benutzer').filter(team__in=get_buero_list(self.request))
+        return Koordinator.objects.order_by('team', 'benutzer').filter(team__in=get_buero_list(self.request)).select_related('benutzer')
 
     def get_queryset(self):
         team = self.request.GET.get('team')

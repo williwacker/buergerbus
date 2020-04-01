@@ -3,8 +3,8 @@
 from django.conf import settings
 from django.db import models
 from django.forms import ModelForm
-from django.utils import timezone
 from django.shortcuts import get_object_or_404
+from django.utils import timezone
 from smart_selects.db_fields import ChainedForeignKey, GroupedForeignKey
 
 from Team.models import Fahrer, Koordinator

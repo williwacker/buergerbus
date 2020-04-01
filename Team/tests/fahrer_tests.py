@@ -18,7 +18,7 @@ class FahrerTestCase(TestCase):
 		bus2 = Bus.objects.get(bus='Bus 2')
 		user = User.objects.get(username='testuser')
 		if Fahrer.objects.count() == 0:
-			Fahrer.objects.create(benutzer=user, telefon='01234-678', mobil='0111-345', team=bus1, aktiv=False)
+			Fahrer.objects.create(benutzer=user, team=bus1, aktiv=False)
 			Fahrer.objects.create(benutzer=user, team=bus2)
 
 	def test_fahrer(self):
