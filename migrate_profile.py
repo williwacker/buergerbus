@@ -19,15 +19,16 @@ class Migrate():
 		self.migrate_model(model)
 
 	def migrate_model(self,model):
-		qs = model.objects.order_by('benutzer').distinct().values_list('benutzer','telefon','mobil')
-		for old_item in qs:
-			new_item = Profile.objects.filter(user=old_item[0]).first()
+		qs = model.objects.order_by('benutzer').distinct()
+		for item in qs:
+			old_item = item
+			new_item = Profile.objects.filter(user=old_item.benutzer).first()
 			if not new_item:
-				new_item = Profile(user=old_item[0], telefon=old_item[1], mobil=old_item[2])
+				new_item = Profile(user=old_item.benutzer, telefon=old_item.telefon, mobil=old_item.mobil)
 			if not new_item.telefon:
-				new_item.telefon = old_item[1]
+				new_item.telefon = old_item.telefon
 			if not new_item.mobil:
-				new_item.mobil = old_item[2]
+				new_item.mobil = old_item.mobil
 			print(new_item.user, new_item.telefon, new_item.mobil)
 			new_item.save()
 
