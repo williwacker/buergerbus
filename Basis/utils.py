@@ -91,9 +91,11 @@ def get_sidebar(user):
 
     value = []
     if user.has_perm('auth.view_user'):
-        value.append({'name': 'Benutzer', 'value': '/Basis/benutzer/'})
+        value.append({'name': 'Benutzer', 'value': '/Accounts/benutzer/'})
     if user.has_perm('auth.view_group'):
-        value.append({'name': 'Gruppen', 'value': '/Basis/gruppen/'})
+        value.append({'name': 'Gruppen', 'value': '/Accounts/gruppen/'})
+    if user.has_perm('auth.view_user'):
+        value.append({'name': 'Profile', 'value': '/Accounts/profile/'})        
     if value:
         sidebar.append({'name': 'Autorisierung', 'value': value})
 

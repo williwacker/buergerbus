@@ -2,7 +2,6 @@
 from django.db.models import Max
 from django.shortcuts import get_object_or_404, render
 from django.utils.translation import ugettext as _
-from django.views.generic import TemplateView
 
 from Basis.utils import get_sidebar, url_args
 from Basis.views import (MyCreateView, MyDeleteView, MyDetailView, MyListView,
@@ -24,11 +23,8 @@ class TopicView(MyListView):
 
     def get_context_data(self, **kwargs):
         context = super(TopicView, self).get_context_data(**kwargs)
-        context['sidebar_liste'] = get_sidebar(self.request.user)
-        context['title'] = self.model._meta.verbose_name_plural
         if self.request.user.is_superuser:
             context['add'] = "Thema"
-        context['url_args'] = url_args(self.request)
         return context
 
 
@@ -37,15 +33,6 @@ class TopicAddView(MyCreateView):
     permission_required = 'Faq.add_topic'
     success_url = '/Faq/topics/admin/'
     model = Topic
-
-    def get_context_data(self, **kwargs):
-        context = super(TopicAddView, self).get_context_data(**kwargs)
-        context['sidebar_liste'] = get_sidebar(self.request.user)
-        context['title'] = self.model._meta.verbose_name_raw+" hinzufügen"
-        context['submit_button'] = "Sichern"
-        context['back_button'] = ["Abbrechen", self.success_url+url_args(self.request)]
-        context['popup'] = self.request.GET.get('_popup', None)
-        return context
 
     def form_valid(self, form):
         instance = form.save(commit=False)
@@ -62,11 +49,6 @@ class TopicChangeView(MyUpdateView):
     form_class = TopicAddForm
     success_url = '/Faq/topics/admin/'
     model = Topic
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['title'] = self.model._meta.verbose_name_raw+" ändern"
-        return context
 
     def form_valid(self, form):
         instance = form.save(commit=False)

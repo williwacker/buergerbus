@@ -4,8 +4,7 @@ from django.shortcuts import render
 from django.contrib.admin import widgets
 
 from .models import Buerotag, Fahrtag
-from Basis.models import MyUser
-from Team.models import Fahrer, Koordinator
+from Accounts.models import MyUser
 
 
 class FahrtagAddForm(ModelForm):

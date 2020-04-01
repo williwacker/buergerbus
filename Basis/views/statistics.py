@@ -47,7 +47,7 @@ class StatisticView(MyListView):
 				'datum__datum__year', 'datum__datum__month', 'created_by__last_name', 'created_by__first_name').exclude(
 				created_by=None).annotate(
 				anzahl=Count('id')).order_by(
-				'datum__datum__year', 'datum__datum__month', 'created_by')
+				'datum__datum__year', 'datum__datum__month', '-anzahl', 'created_by')
 			if year:
 				qs = qs.filter(datum__datum__year=year)
 			if sort:

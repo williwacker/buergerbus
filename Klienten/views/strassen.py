@@ -86,8 +86,6 @@ class StrassenChangeView(MyUpdateView):
         instance = form.save(commit=False)
         instance.updated_by = self.request.user
         instance.save(force_update=True)
-        storage = messages.get_messages(self.request)
-        storage.used = True
         self.success_message = 'Strasse "<a href="'+self.success_url+str(instance.id)+'/'+url_args(
             self.request)+'">'+instance.strasse+'</a>" wurde erfolgreich geändert.'
         self.success_url += url_args(self.request)

@@ -34,6 +34,7 @@ ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost', cast=Csv())
 
 INSTALLED_APPS = [
 	'smart_selects',
+	'Accounts.apps.AccountsConfig',
 	'Basis.apps.BasisConfig',
 	'Einsatzmittel.apps.EinsatzmittelConfig',
 	'Einsatztage.apps.EinsatztageConfig',

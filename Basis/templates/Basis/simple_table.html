@@ -31,6 +31,9 @@
             <form id="changelist-form">
                 <div class="results">
                     {% render_table table %}
+                    {% if row_count %}
+                        <table><tr class='even'><td>Anzahl: {{ row_count }}</td></tr></table>
+                    {% endif %}
                 </div>
             </form>
         </div>

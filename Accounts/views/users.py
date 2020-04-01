@@ -10,17 +10,16 @@ from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.template import loader
 from django.urls import reverse_lazy
-from django.views.generic import TemplateView
 
-from Basis.forms import MyGroupChangeForm, MyUserChangeForm, MyUserCreationForm
-from Basis.models import MyGroup, MyUser
-from Basis.tables import GroupTable, UserTable
-from Basis.utils import get_sidebar, url_args
+from Basis.utils import url_args
 from Basis.views import (MyCreateView, MyDeleteView, MyDetailView, MyListView,
                          MyUpdateView, MyView)
 
+from ..forms import MyUserChangeForm, MyUserCreationForm
+from ..models import MyUser
+from ..tables import UserTable
 
-# User Views
+
 class UserView(MyListView):
     permission_required = 'auth.view_user'
     model = MyUser
@@ -37,7 +36,7 @@ class UserView(MyListView):
 class UserAddView(MyCreateView):
     permission_required = 'auth.add_user'
     form_class = MyUserCreationForm
-    success_url = '/Basis/benutzer/'
+    success_url = '/Accounts/benutzer/'
     model = MyUser
 
     def form_valid(self, form):
@@ -74,7 +73,7 @@ class UserChangeView(MyUpdateView):
     permission_required = 'auth.change_user'
     form_class = MyUserChangeForm
     model = MyUser
-    success_url = '/Basis/benutzer/'
+    success_url = '/Accounts/benutzer/'
 
     def get(self, request, *args, **kwargs):
         context = self.get_context_data()
@@ -102,78 +101,5 @@ class UserChangeView(MyUpdateView):
 
 class UserDeleteView(MyDeleteView):
     permission_required = 'auth.delete_user'
-    success_url = '/Basis/benutzer/'
+    success_url = '/Accounts/benutzer/'
     model = MyUser
-
-# Gruppen
-
-
-class GroupView(MyListView):
-    permission_required = 'auth.view_group'
-    model = MyGroup
-
-    def get_queryset(self):
-        qs = self.model.objects.order_by('name')
-        table = GroupTable(qs)
-        table.paginate(page=self.request.GET.get("page", 1), per_page=20)
-        return table
-
-
-class GroupAddView(MyCreateView):
-    permission_required = 'auth.change_group'
-    form_class = MyGroupChangeForm
-    success_url = '/Basis/gruppen/'
-    model = MyGroup
-
-    def form_valid(self, form):
-        instance = form.save(commit=False)
-        instance.created_by = self.request.user
-        instance.save()
-        self.success_url += url_args(self.request)
-        self.success_message = self.model._meta.verbose_name.title(
-        )+' "<a href="'+self.success_url+str(instance.id)+'">'+instance.name+'</a>" wurde erfolgreich angelegt.'
-        return super(GroupAddView, self).form_valid(form)
-
-
-class GroupChangeView(MyUpdateView):
-    permission_required = 'auth.change_group'
-    form_class = MyGroupChangeForm
-    success_url = '/Basis/gruppen/'
-    model = MyGroup
-
-    def form_valid(self, form):
-        instance = form.save()
-        storage = messages.get_messages(self.request)
-        storage.used = True
-        messages.success(self.request, self.model._meta.verbose_name.title() + ' "<a href="' + self.success_url +
-                         str(instance.id) + '">' + instance.name + '</a>" wurde erfolgreich geändert.')
-        return super(GroupChangeView, self).form_valid(form)
-
-
-class GroupDeleteView(MyDeleteView):
-    permission_required = 'auth.delete_group'
-    success_url = '/Basis/gruppen/'
-    model = MyGroup
-
-
-class MyPasswordChangeView(PasswordChangeView):
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context.update({
-            'title': self.title,
-            **(self.extra_context or {})
-        })
-        context.update({
-            'sidebar_liste': get_sidebar(self.request.user)
-        })
-        return context
-
-
-class MyPasswordChangeDoneView(TemplateView):
-    template_name = 'registration/password_change_done.html'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['sidebar_liste'] = get_sidebar(self.request.user)
-        return context

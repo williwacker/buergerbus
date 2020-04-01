@@ -209,8 +209,6 @@ class FahrplanEmailView(MyDetailView):
                     klient = Klienten.objects.get(id=id)
                     klient.dsgvo = '02'
                     klient.save(force_update=True)
-            storage = messages.get_messages(request)
-            storage.used = True
             messages.success(request, post['betreff']+' wurde erfolgreich versandt.')
             return HttpResponseRedirect(self.success_url+url_args(request))
         else:

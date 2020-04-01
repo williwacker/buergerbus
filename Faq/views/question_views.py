@@ -2,7 +2,6 @@
 from django.db.models import Max
 from django.shortcuts import get_object_or_404, render
 from django.utils.translation import ugettext as _
-from django.views.generic import TemplateView
 
 from Basis.utils import get_sidebar, url_args
 from Basis.views import (MyCreateView, MyDeleteView, MyDetailView, MyListView,

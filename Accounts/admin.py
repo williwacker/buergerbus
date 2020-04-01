@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import User, UserAdmin
+from Accounts.models import Profile
 
 # Register your models here.
 
@@ -19,5 +20,10 @@ class RestrictedUserAdmin(UserAdmin):
                 field.widget.attrs['disabled'] = True
         return field
 
+class ProfileAdmin(admin.ModelAdmin):
+	ordering = ('user',)
+	list_display = ('user','telefon','mobil')	        
+
 admin.site.unregister(User)
 admin.site.register(User, RestrictedUserAdmin)
+admin.site.register(Profile, ProfileAdmin)

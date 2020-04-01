@@ -21,18 +21,19 @@ from django.urls import include, path
 from django.views.generic import TemplateView
 from django.views.i18n import JavaScriptCatalog
 from smart_selects import urls as smart_selects_urls
-from Basis.signals import *
 
-from Basis.views import (BasisView, MyPasswordChangeDoneView,
-                         MyPasswordChangeView)
+from Accounts.signals import *
+from Accounts.views import MyPasswordChangeDoneView, MyPasswordChangeView
+from Basis.views import BasisView
 
 urlpatterns = [
     path('', BasisView.as_view(), name='home'),
-    path('Basis/', include('Basis.urls')),
+    path('Accounts/', include('Accounts.urls')),
+    path('Basis/', include('Basis.urls')),  
     path('accounts/password/change/', MyPasswordChangeView.as_view(), name='password_change'),
-    path('accounts/password/change/done/', MyPasswordChangeDoneView.as_view(), name='password_change_done'),
+    path('accounts/password_change/done/', MyPasswordChangeDoneView.as_view(), name='password_change_done'),
     path('accounts/logout_success/', TemplateView.as_view(template_name='registration/logout_success.html')),
-    path('accounts/', include('django.contrib.auth.urls')),
+    path('accounts/', include('django.contrib.auth.urls')),      
     path('Einsatzmittel/', include('Einsatzmittel.urls')),
     path('Tour/', include('Tour.urls')),
     path('Einsatztage/', include('Einsatztage.urls')),

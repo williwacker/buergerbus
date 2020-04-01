@@ -56,6 +56,8 @@ class MyListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
         if self.request.user.has_perm(add_perm):
             context['add'] = self.model._meta.verbose_name_raw
         context['url_args'] = url_args(self.request)
+        if self.request.user.is_superuser:
+            context['row_count'] = self.object_list.data.data.count()
         return context
 
 

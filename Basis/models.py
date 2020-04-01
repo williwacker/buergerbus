@@ -3,29 +3,11 @@ import logging
 import os
 
 from django.conf import settings
-from django.contrib.auth.models import Group, User
 from django.db import models
 from django.dispatch import receiver
 from django.utils.translation import ugettext_lazy as _
 
 logger = logging.getLogger(__name__)
-
-
-class MyUser(User):
-    class Meta:
-        proxy = True
-        verbose_name = 'Benutzer'
-        verbose_name_plural = 'Benutzer'
-
-    def __str__(self):
-        return ', '.join([self.last_name, self.first_name])
-
-
-class MyGroup(Group):
-    class Meta:
-        proxy = True
-        verbose_name = 'Gruppe'
-        verbose_name_plural = 'Gruppen'
 
 
 class Document(models.Model):
