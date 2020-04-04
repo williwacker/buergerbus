@@ -20,7 +20,7 @@ class BusListViewTests(TestCase):
         self.user.groups.add(self.group)
     
     def testListNoAddPerm(self):
-        response = self.client.get('/Einsatzmittel/busse/')
+        response = self.client.get('/Einsatzmittel/busse/', secure=True)
         self.assertEqual(response.status_code, 200)
         self.assertIn('sidebar_liste', response.context)
         self.assertEqual(response.context['title'],'Busse')
@@ -29,14 +29,14 @@ class BusListViewTests(TestCase):
 
     def testListWithAddPerm(self):
         self.group.permissions.add(Permission.objects.get(name='Can add Bus'))
-        response = self.client.get('/Einsatzmittel/busse/')
+        response = self.client.get('/Einsatzmittel/busse/', secure=True)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context['add'],'Bus')
 
     def testAddWithAddPerm(self):
         self.group.permissions.add(Permission.objects.get(name='Can add Bus'))
         factory = RequestFactory()
-        request = factory.get('/Einsatzmittel/busse/add/')
+        request = factory.get('/Einsatzmittel/busse/add/', secure=True)
         request.user = self.user
         response = BusAddView.as_view()(request)
         self.assertEqual(response.status_code, 200)
@@ -46,8 +46,9 @@ class BusListViewTests(TestCase):
 #        self.assertEqual(response.context['back_button'],'Abbrechen')
 
     def testChangeNoDeletePerm(self):
+        self.group.permissions.add(Permission.objects.get(name='Can change Bus'))
         bus_id = Bus.objects.first().id
-        response = self.client.get('/Einsatzmittel/busse/'+str(bus_id)+'/')
+        response = self.client.get('/Einsatzmittel/busse/'+str(bus_id)+'/', secure=True)
         self.assertEqual(response.status_code, 200)
 #        self.assertIn('sidebar_liste', response.context)
 #        self.assertEqual(response.context['title'],'Bus ändern')
@@ -58,7 +59,7 @@ class BusListViewTests(TestCase):
     def testChangeWithDeletePerm(self):
         bus_id = Bus.objects.first().id
         self.group.permissions.add(Permission.objects.get(name='Can delete Bus'))
-        response = self.client.get('/Einsatzmittel/busse/'+str(bus_id)+'/')
+        response = self.client.get('/Einsatzmittel/busse/'+str(bus_id)+'/', secure=True)
         self.assertEqual(response.status_code, 200)
 #        self.assertIn('sidebar_liste', response.context)
 #        self.assertEqual(response.context['submit_button'],'Sichern')
@@ -67,7 +68,7 @@ class BusListViewTests(TestCase):
 
     def testDeleteWithDeletePerm(self):
         bus_id = Bus.objects.first().id
-        response = self.client.get('/Einsatzmittel/busse/'+str(bus_id)+'/delete/')
+        response = self.client.get('/Einsatzmittel/busse/'+str(bus_id)+'/delete/', secure=True)
         self.assertEqual(response.status_code, 200)
 #        self.assertIn('sidebar_liste', response.context)
 #        self.assertEqual(response.context['title'],'Bus löschen')
