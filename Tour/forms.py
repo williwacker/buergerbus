@@ -59,7 +59,6 @@ class MyModelForm(ModelForm):
         self.cleaned_data['konflikt_richtung'] = ''
         self.cleaned_data['konflikt_zeiten'] = ''
 
-        logger.info('calculate time to destination')
         googleDict = DistanceMatrix().get_form_data(self.cleaned_data)
         if googleDict:
             self.cleaned_data['entfernung'] = googleDict['distance']
@@ -86,8 +85,9 @@ class MyModelForm(ModelForm):
                     tourstart.strftime("%H:%M"),
                     frueheste_abfahrt_1.strftime("%H:%M")))
 
+        previous_client = DepartureTime().get_previous_client(self.cleaned_data)
         # Kann der Bus zum gewünschten Zeitpunkt am Abholort sein ?
-        frueheste_abfahrt_2 = DepartureTime().check_previous_client(self.cleaned_data)
+        frueheste_abfahrt_2 = DepartureTime().check_previous_client(self.cleaned_data, previous_client)
         if frueheste_abfahrt_2 == time(0, 0, 0):
             self.cleaned_data['zustieg'] = False
 
@@ -131,8 +131,9 @@ class MyModelForm(ModelForm):
                     self.cleaned_data['termin'].strftime("%H:%M"),
                     spaeteste_abfahrt_2.strftime("%H:%M")))
 
+        next_client = DepartureTime().get_next_client(self.cleaned_data)
         # Kann der nächste Fahrgast zum geplanten Zeitpunkt abgeholt werden?
-        spaeteste_abfahrt_3 = DepartureTime().check_next_client(self.cleaned_data)
+        spaeteste_abfahrt_3 = DepartureTime().check_next_client(self.cleaned_data, next_client)
         # Konflikt nur anzeigen falls Abfahrt noch früher erfolgen müsste
         if spaeteste_abfahrt_3 < self.cleaned_data['uhrzeit'] and spaeteste_abfahrt_3 < spaeteste_abfahrt_2:
             latest_departure_conflict = True
