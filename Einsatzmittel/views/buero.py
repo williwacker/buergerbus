@@ -56,18 +56,6 @@ class BueroChangeView(MyUpdateView):
     model = Buero
     success_url = '/Einsatzmittel/bueros/'
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['title'] = "Büro ändern"
-        return context
-
-    def get(self, request, *args, **kwargs):
-        context = self.get_context_data(**kwargs)
-        instance = get_object_or_404(self.model, pk=kwargs['pk'])
-        form = self.form_class(instance=instance)
-        context['form'] = form
-        return render(request, self.template_name, context)
-
     def form_invalid(self, form):
         context = self.get_context_data()
         context['form'] = form
@@ -89,5 +77,5 @@ class BueroDeleteView(MyDeleteView):
     permission_required = 'Einsatzmittel.delete_buero'
     success_url = '/Einsatzmittel/bueros/'
     model = Buero
-    object_filter = [('id__in', 'get_buero_list(request)')]
+#    object_filter = [('id__in', 'get_buero_list(request)')]
     pass

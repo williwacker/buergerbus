@@ -131,8 +131,10 @@ class MyUpdateView(SuccessMessageMixin, LoginRequiredMixin, PermissionRequiredMi
         context = self.get_context_data(**kwargs)
         instance = get_object_or_404(self.model, pk=kwargs['pk'])
         kwargs['object'] = instance
-        if len(list(get_relation_dict(self.model, kwargs))) > 1 and not self.request.user.is_superuser:
-            context['delete_button'] = None
+        if len(list(get_relation_dict(self.model, kwargs))) > 1 \
+                and not self.request.user.is_superuser \
+                and 'delete_button' in context:
+            del context['delete_button']
         form = self.form_class(instance=instance)
         context['form'] = form
         return render(request, self.template_name, context)

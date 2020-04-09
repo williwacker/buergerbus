@@ -68,5 +68,4 @@ class BusDeleteView(MyDeleteView):
     permission_required = 'Einsatzmittel.delete_bus'
     model = Bus
     success_url = '/Einsatzmittel/busse/'
-    object_filter = [('id__in', 'get_bus_list(request)')]
     pass

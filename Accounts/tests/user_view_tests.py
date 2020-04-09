@@ -1,23 +1,21 @@
 from django.contrib.auth.models import Group, Permission, User
+from django.contrib.contenttypes.models import ContentType
 from django.test import Client, TestCase
 
 from Basis.tests import *
-from Einsatzmittel.tests import *
 
-from ..models import Bus
+from ..models import MyUser
 
 
-class BusListViewTests(TestCase):
-	model = Bus
-	list_url = '/Einsatzmittel/busse/'
-	title = 'Bus'
-	title_plural = 'Busse'
+class UserListViewTests(TestCase):
+	model = MyUser
+	list_url = '/Accounts/benutzer/'
+	title = 'Benutzer'
+	title_plural = 'Benutzer'
 
 	def setUp(self):
 		UserTestCase().test_group()
 		UserTestCase().test_user()
-		BusTestCase().setUp()
-		BusTestCase().test_bus()
 
 		self.client = Client()
 		self.user = User.objects.get(username='testuser')
@@ -28,8 +26,10 @@ class BusListViewTests(TestCase):
 		self.add_url = self.list_url+'add/'
 		self.change_url = self.list_url+id+'/'
 		self.delete_url = self.list_url+id+'/'+'delete/'
+		self.contentTypeId = ContentType.objects.get(model='user').id
 
 	def testListNoAddPerm(self):
+		self.group.permissions.add(Permission.objects.get(name='Can view user', content_type_id=self.contentTypeId))
 		response = self.client.get(self.list_url, secure=True)
 		self.assertEqual(response.status_code, 200)
 		self.assertIn('sidebar_liste', response.context)
@@ -38,13 +38,15 @@ class BusListViewTests(TestCase):
 		self.assertNotIn('add', response.context)
 
 	def testListWithAddPerm(self):
-		self.group.permissions.add(Permission.objects.get(name='Can add '+self.model._meta.verbose_name))
+		self.group.permissions.add(Permission.objects.get(name='Can view user', content_type_id=self.contentTypeId))
+		self.group.permissions.add(Permission.objects.get(name='Can add user', content_type_id=self.contentTypeId))
 		response = self.client.get(self.list_url, secure=True)
 		self.assertEqual(response.status_code, 200)
 		self.assertEqual(response.context['add'], self.title)
 
 	def testAddWithAddPerm(self):
-		self.group.permissions.add(Permission.objects.get(name='Can add '+self.model._meta.verbose_name))
+		self.group.permissions.add(Permission.objects.get(name='Can view user', content_type_id=self.contentTypeId))
+		self.group.permissions.add(Permission.objects.get(name='Can add user', content_type_id=self.contentTypeId))
 		response = self.client.get(self.add_url, secure=True)
 		self.assertEqual(response.status_code, 200)
 		self.assertIn('sidebar_liste', response.context)
@@ -53,7 +55,8 @@ class BusListViewTests(TestCase):
 		self.assertEqual(response.context['back_button'], ['Abbrechen', self.list_url])
 
 	def testChangeNoDeletePerm(self):
-		self.group.permissions.add(Permission.objects.get(name='Can change '+self.model._meta.verbose_name))
+		self.group.permissions.add(Permission.objects.get(name='Can view user', content_type_id=self.contentTypeId))
+		self.group.permissions.add(Permission.objects.get(name='Can change user', content_type_id=self.contentTypeId))
 		response = self.client.get(self.change_url, secure=True)
 		self.assertEqual(response.status_code, 200)
 		self.assertIn('sidebar_liste', response.context)
@@ -61,20 +64,25 @@ class BusListViewTests(TestCase):
 		self.assertEqual(response.context['submit_button'], 'Sichern')
 		self.assertEqual(response.context['back_button'], ['Abbrechen', self.list_url])
 		self.assertNotIn('delete_button', response.context)
+#		self.assertDictContainsSubset(response.context['form'], 'input type="hidden" name="is_staff"')
+#		self.assertDictContainsSubset(response.context['form'], 'input type="hidden" name="is_superuser"')
+
 
 	def testChangeWithDeletePerm(self):
-		self.group.permissions.add(Permission.objects.get(name='Can change '+self.model._meta.verbose_name))
-		self.group.permissions.add(Permission.objects.get(name='Can delete '+self.model._meta.verbose_name))
+		self.group.permissions.add(Permission.objects.get(name='Can view user', content_type_id=self.contentTypeId))
+		self.group.permissions.add(Permission.objects.get(name='Can change user', content_type_id=self.contentTypeId))
+		self.group.permissions.add(Permission.objects.get(name='Can delete user', content_type_id=self.contentTypeId))
 		response = self.client.get(self.change_url, secure=True)
 		self.assertEqual(response.status_code, 200)
 		self.assertIn('sidebar_liste', response.context)
 		self.assertEqual(response.context['submit_button'],'Sichern')
 		self.assertEqual(response.context['back_button'],['Abbrechen',self.list_url])
-#		self.assertEqual(response.context['delete_button'],'Löschen')
+		self.assertEqual(response.context['delete_button'],'Löschen')
 
 	def testDeleteWithDeletePerm(self):
-		self.group.permissions.add(Permission.objects.get(name='Can change '+self.model._meta.verbose_name))
-		self.group.permissions.add(Permission.objects.get(name='Can delete '+self.model._meta.verbose_name))
+		self.group.permissions.add(Permission.objects.get(name='Can view user', content_type_id=self.contentTypeId))
+		self.group.permissions.add(Permission.objects.get(name='Can change user', content_type_id=self.contentTypeId))
+		self.group.permissions.add(Permission.objects.get(name='Can delete user', content_type_id=self.contentTypeId))
 		response = self.client.get(self.delete_url, secure=True)
 		self.assertEqual(response.status_code, 200)
 		self.assertIn('sidebar_liste', response.context)

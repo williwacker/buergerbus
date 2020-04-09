@@ -2,7 +2,6 @@ from django.contrib.auth.views import PasswordChangeView
 from django.views.generic import TemplateView
 
 from Basis.utils import get_sidebar
-from Basis.views import *
 
 
 class MyPasswordChangeView(PasswordChangeView):

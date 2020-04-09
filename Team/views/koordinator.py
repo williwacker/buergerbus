@@ -1,7 +1,7 @@
 from django import template
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.auth.models import Group, User
+from django.contrib.auth.models import Group
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 

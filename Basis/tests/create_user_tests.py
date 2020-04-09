@@ -12,9 +12,7 @@ class UserTestCase(TestCase):
         self.assertGreater(Permission.objects.all().count(), 0)
         group.permissions.add(Permission.objects.get(name='Can view Büro'))
         group.permissions.add(Permission.objects.get(name='Can view Bus'))
-        group.permissions.add(Permission.objects.get(name='Can change Bürodienst'))
         group.permissions.add(Permission.objects.get(name='Can view Bürodienst'))
-        group.permissions.add(Permission.objects.get(name='Can change Fahrdienst'))
         group.permissions.add(Permission.objects.get(name='Can view Fahrdienst'))
 #        id = ContentType.objects.get(model='question', app_label='Faq').id
 #        print(Permission.objects.filter(content_type_id=id))
@@ -22,26 +20,16 @@ class UserTestCase(TestCase):
 #        group.permissions.add(Permission.objects.get(name='Can change Fragen und Antworten', content_type_id=id))
 #        id = ContentType.objects.get(model='topic', app_label='Faq').id
 #        group.permissions.add(Permission.objects.get(name='Can view Fragen und Antworten Thema', content_type_id=id))
-        group.permissions.add(Permission.objects.get(name='Can add Klient'))
-        group.permissions.add(Permission.objects.get(name='Can change Klient'))
+#        group.permissions.add(Permission.objects.get(name='Can add Klient'))
+#        group.permissions.add(Permission.objects.get(name='Can change Klient'))
         group.permissions.add(Permission.objects.get(name='Can view Klient'))
-        group.permissions.add(Permission.objects.get(name='Can delete Klient'))
-        group.permissions.add(Permission.objects.get(name='Can add Ort'))
-        group.permissions.add(Permission.objects.get(name='Can change Ort'))
         group.permissions.add(Permission.objects.get(name='Can view Ort'))
-        group.permissions.add(Permission.objects.get(name='Can delete Ort'))
-        group.permissions.add(Permission.objects.get(name='Can add Strasse'))
-        group.permissions.add(Permission.objects.get(name='Can change Strasse'))
         group.permissions.add(Permission.objects.get(name='Can view Strasse'))
-        group.permissions.add(Permission.objects.get(name='Can delete Strasse'))
         id = ContentType.objects.get(model='fahrer', app_label='Team').id
         group.permissions.add(Permission.objects.get(name='Can view Fahrer(in)', content_type_id=id))
         id = ContentType.objects.get(model='koordinator', app_label='Team').id
         group.permissions.add(Permission.objects.get(name='Can view Koordinator(in)', content_type_id=id))
-        group.permissions.add(Permission.objects.get(name='Can add Tour'))
-        group.permissions.add(Permission.objects.get(name='Can change Tour'))
         group.permissions.add(Permission.objects.get(name='Can view Tour'))
-        group.permissions.add(Permission.objects.get(name='Can delete Tour'))
 
     def test_user(self):
         # create user and assign group permission

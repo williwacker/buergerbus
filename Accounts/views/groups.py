@@ -5,7 +5,6 @@ from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.template import loader
 
-from Basis.utils import url_args
 from Basis.views import (MyCreateView, MyDeleteView, MyDetailView, MyListView,
                          MyUpdateView)
 
@@ -26,7 +25,7 @@ class GroupView(MyListView):
 
 
 class GroupAddView(MyCreateView):
-    permission_required = 'auth.change_group'
+    permission_required = 'auth.add_group'
     form_class = MyGroupChangeForm
     success_url = '/Accounts/gruppen/'
     model = MyGroup

@@ -124,7 +124,11 @@ class DienstleisterDeleteView(MyDeleteView):
     permission_required = 'Klienten.delete_klienten'
     success_url = '/Klienten/dienstleister/'
     model = Klienten
-    pass
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = "Dienstleister löschen"
+        return context
 
 
 class DienstleisterSearchMultiformsView(MyMultiFormsView):

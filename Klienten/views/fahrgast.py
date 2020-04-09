@@ -174,7 +174,11 @@ class FahrgastDeleteView(MyDeleteView):
     permission_required = 'Klienten.delete_klienten'
     success_url = '/Klienten/fahrgaeste/'
     model = Klienten
-    pass
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = "Fahrgast löschen"
+        return context
 
 
 class DSGVOView(MyDetailView):

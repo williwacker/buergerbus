@@ -44,7 +44,7 @@ class StandortAddView(MyCreateView):
     model = Klienten
 
     def get_context_data(self, **kwargs):
-        context = {}
+        context = super().get_context_data(**kwargs)
         context['title'] = "Bus Standort hinzufügen"
         context['popup'] = self.request.GET.get('_popup', None)
         return context
